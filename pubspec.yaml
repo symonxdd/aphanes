@@ -1,5 +1,5 @@
 name: aphanes
-description: "webOS Dev Mode Manager: manage LG webOS TVs in developer mode from your phone."
+description: "webOS Dev Mode Manager: manage LG webOS TVs in developer mode from a phone."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -37,6 +37,22 @@ dependencies:
   flutter_riverpod: ^3.4.2
   shared_preferences: ^2.5.5
   package_info_plus: ^10.2.1
+  dartssh2: ^3.1.0
+  flutter_secure_storage: ^11.0.0
+  uuid: ^4.6.0
+  asn1lib: ^1.6.5
+  pointycastle: ^4.0.0
+  intl: ^0.20.3
+  url_launcher: ^6.3.2
+  # Lucide icon set for the device detail page's field icons. 160 pub
+  # points (max), 133k downloads, verified publisher, actively maintained
+  # (last published 41 days ago), single dependency (Flutter itself).
+  lucide_icons_flutter: ^3.0.4
+  # HSV/RGB free-choice color picker for the accent color setting. 150 pub
+  # points, 1,020 likes, 536k downloads, MIT, single dependency (Flutter
+  # itself) - a pure-widget package with no native code, so its "last
+  # published 2 years ago" carries little compatibility risk.
+  flutter_colorpicker: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -48,6 +64,13 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+
+  # Generates the Android launcher icon (legacy + adaptive) from the
+  # source images in assets/icon/. Standard, actively used tool for this
+  # (max pub points, 8000+ likes, native adaptive-icon support) - only
+  # ever run manually via `dart run flutter_launcher_icons`, never at
+  # app build/runtime.
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -90,3 +113,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  min_sdk_android: 21
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_background: "#0E0E0E"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
