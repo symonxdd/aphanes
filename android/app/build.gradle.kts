@@ -6,7 +6,9 @@ plugins {
 
 android {
     namespace = "me.symon.aphanes"
-    compileSdk = flutter.compileSdkVersion
+    // flutter_secure_storage requires compileSdk 37; flutter.compileSdkVersion
+    // (the Flutter SDK's own bundled default) hasn't caught up yet.
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -15,7 +17,6 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "me.symon.aphanes"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.

@@ -2,6 +2,8 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 
+import 'info_sheet.dart';
+
 /// The word "Aphanes", the project's internal codename, with a quiet easter
 /// egg: a tap smoothly flips the letters into reverse order and back (each
 /// glyph sliding through the others, pausing briefly at the mirrored
@@ -61,6 +63,22 @@ class _AphanesTitleState extends State<AphanesTitle>
     }
   }
 
+  void _onLongPress(BuildContext context) {
+    InfoSheet.show(
+      context,
+      icon: Icons.visibility_off_outlined,
+      title: 'Aphanes',
+      body:
+          'Aphanes comes from the Ancient Greek word ἀφανής '
+          '(aphanēs), meaning unseen, invisible, not manifest.\n\n'
+          'It\'s built from a negative prefix, a-, plus phainesthai, '
+          '"to appear". Literally: the thing that does not appear.\n\n'
+          'The same root is commonly linked to Aphaia, a minor Greek '
+          'goddess worshipped on Aegina, known in myth for vanishing '
+          'into a sacred grove.',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextStyle style = DefaultTextStyle.of(context).style;
@@ -87,6 +105,7 @@ class _AphanesTitleState extends State<AphanesTitle>
 
     return GestureDetector(
       onTap: _onTap,
+      onLongPress: () => _onLongPress(context),
       behavior: HitTestBehavior.opaque,
       child: AnimatedBuilder(
         animation: _t,
