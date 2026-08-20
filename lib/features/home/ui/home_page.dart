@@ -10,6 +10,7 @@ import '../../../core/ui/keep_alive_page.dart';
 import '../../../core/ui/shader_warmup.dart';
 import '../../apps/ui/apps_page.dart';
 import '../../devices/ui/devices_page.dart';
+import '../../devices/ui/pair_device_page.dart';
 import '../../files/ui/files_page.dart';
 import '../../settings/ui/settings_sheet.dart';
 import '../../terminal/ui/terminal_page.dart';
@@ -113,6 +114,16 @@ class _HomePageState extends ConsumerState<HomePage> {
           HomeTab.terminal => const Text('Terminal'),
         },
         actions: [
+          if (selectedTab == HomeTab.devices)
+            IconButton(
+              icon: const Icon(Icons.add),
+              tooltip: 'Pair another device',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (BuildContext _) => const PairDevicePage(),
+                ),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             tooltip: 'Settings',

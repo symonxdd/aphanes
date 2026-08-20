@@ -1,9 +1,24 @@
+import 'package:aphanes/core/persistence/key_value_store.dart';
+import 'package:aphanes/core/persistence/secure_storage_provider.dart';
 import 'package:aphanes/core/persistence/shared_preferences_provider.dart';
 import 'package:aphanes/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class _InMemoryKeyValueStore implements SecureKeyValueStore {
+  final Map<String, String> _values = {};
+
+  @override
+  Future<String?> read(String key) async => _values[key];
+
+  @override
+  Future<void> write(String key, String value) async => _values[key] = value;
+
+  @override
+  Future<void> delete(String key) async => _values.remove(key);
+}
 
 void main() {
   testWidgets('home shell shows default tabs and switches on tap', (
@@ -16,7 +31,10 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          secureStorageProvider.overrideWithValue(_InMemoryKeyValueStore()),
+        ],
         child: const AphanesApp(),
       ),
     );
@@ -45,7 +63,10 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            secureStorageProvider.overrideWithValue(_InMemoryKeyValueStore()),
+          ],
           child: const AphanesApp(),
         ),
       );
@@ -85,7 +106,10 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            secureStorageProvider.overrideWithValue(_InMemoryKeyValueStore()),
+          ],
           child: const AphanesApp(),
         ),
       );
