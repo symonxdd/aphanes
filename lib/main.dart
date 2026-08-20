@@ -8,6 +8,9 @@ import 'core/theme/app_theme.dart';
 import 'features/home/ui/home_page.dart';
 import 'features/onboarding/state/onboarding_controller.dart';
 import 'features/onboarding/ui/onboarding_page.dart';
+import 'features/settings/state/effective_brightness.dart';
+import 'features/settings/state/oled_controller.dart';
+import 'features/settings/state/seed_color_controller.dart';
 import 'features/settings/state/theme_mode_controller.dart';
 
 Future<void> main() async {
@@ -29,15 +32,12 @@ class AphanesApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeMode? chosen = ref.watch(themeModeControllerProvider);
-    final Brightness effective =
-        chosen == ThemeMode.light
-            ? Brightness.light
-            : chosen == ThemeMode.dark
-            ? Brightness.dark
-            : MediaQuery.platformBrightnessOf(context);
+    final Brightness effective = resolveEffectiveBrightness(context, chosen);
+    final bool oledEnabled = ref.watch(oledControllerProvider);
+    final Color seedColor = ref.watch(seedColorProvider);
     final ThemeData theme = effective == Brightness.dark
-        ? AppTheme.dark
-        : AppTheme.light;
+        ? (oledEnabled ? AppTheme.oled(seedColor) : AppTheme.dark(seedColor))
+        : AppTheme.light(seedColor);
     final bool hasSeenOnboarding = ref.watch(onboardingControllerProvider);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(

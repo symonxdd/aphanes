@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../state/effective_brightness.dart';
 import '../state/theme_mode_controller.dart';
 
 /// Flips between light and dark, falling back to system brightness display
@@ -11,12 +12,7 @@ class ThemeToggleButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeMode? chosen = ref.watch(themeModeControllerProvider);
-    final Brightness effective =
-        chosen == ThemeMode.light
-            ? Brightness.light
-            : chosen == ThemeMode.dark
-            ? Brightness.dark
-            : MediaQuery.platformBrightnessOf(context);
+    final Brightness effective = resolveEffectiveBrightness(context, chosen);
     final bool isDark = effective == Brightness.dark;
 
     return IconButton(

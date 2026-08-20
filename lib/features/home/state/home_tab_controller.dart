@@ -1,38 +1,40 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// The four bottom-nav destinations, and the [PageView] positions they map
-/// to. Kept as separate index spaces (rather than reusing one enum) so a
-/// future sub-tab (mirroring Rivus's Library tracks/folders split) can be
-/// inserted as extra page positions without renumbering destinations.
-const int devicesTabIndex = 0;
-const int appsTabIndex = 1;
-const int filesTabIndex = 2;
-const int terminalTabIndex = 3;
+import '../../settings/state/tab_visibility_controller.dart';
 
-const int devicesPage = 0;
-const int appsPage = 1;
-const int filesPage = 2;
-const int terminalPage = 3;
-const int homePageCount = 4;
+/// The four possible bottom-nav destinations. Devices and Apps are always
+/// present; Files and Terminal can be hidden from Settings, so this is an
+/// identity, not a fixed page position - [visibleHomeTabsProvider] is what
+/// maps a subset of these to actual [PageView]/[NavigationBar] positions.
+enum HomeTab { devices, apps, files, terminal }
 
-/// Single source of truth for "which page is current". Bottom-nav taps and
+/// The ordered, currently-visible subset of [HomeTab]. Devices and Apps
+/// are unconditional; Files and Terminal only appear once their Settings
+/// toggle is on.
+final Provider<List<HomeTab>> visibleHomeTabsProvider = Provider<List<HomeTab>>(
+  (Ref ref) {
+    final bool filesVisible = ref.watch(filesTabVisibleProvider);
+    final bool terminalVisible = ref.watch(terminalTabVisibleProvider);
+    return [
+      HomeTab.devices,
+      HomeTab.apps,
+      if (filesVisible) HomeTab.files,
+      if (terminalVisible) HomeTab.terminal,
+    ];
+  },
+);
+
+/// Single source of truth for "which tab is current". Bottom-nav taps and
 /// user swipes both funnel through this controller so the app bar title,
 /// nav-bar highlight, and [PageView] position never disagree.
-class HomeTabController extends Notifier<int> {
+class HomeTabController extends Notifier<HomeTab> {
   @override
-  int build() => devicesPage;
+  HomeTab build() => HomeTab.devices;
 
-  /// Called when the bottom nav bar is tapped.
-  void select(int tabIndex) {
-    state = tabIndex;
-  }
-
-  /// Called only for a genuine user swipe, never for the intermediate pages
-  /// a tap-driven [PageController.animateToPage] scrolls past.
-  void onPageChanged(int page) {
-    state = page;
+  void select(HomeTab tab) {
+    state = tab;
   }
 }
 
-final NotifierProvider<HomeTabController, int> homeTabProvider =
-    NotifierProvider<HomeTabController, int>(HomeTabController.new);
+final NotifierProvider<HomeTabController, HomeTab> homeTabProvider =
+    NotifierProvider<HomeTabController, HomeTab>(HomeTabController.new);
