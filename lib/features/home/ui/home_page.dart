@@ -127,6 +127,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ),
             ),
+          if (selectedTab == HomeTab.apps) const _AddAppAction(),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             tooltip: 'Settings',
@@ -201,6 +202,39 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 }
 
+Device? _findDeviceById(List<Device> devices, String id) {
+  for (final Device device in devices) {
+    if (device.id == id) {
+      return device;
+    }
+  }
+  return null;
+}
+
+/// The Apps tab's "+" app-bar action: opens the install-source chooser for
+/// whichever device is active, hidden entirely when none is (matching
+/// `AppsPage`'s own empty state for that case).
+class _AddAppAction extends ConsumerWidget {
+  const _AddAppAction();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final String? activeId = ref.watch(activeDeviceProvider);
+    final List<Device>? devices = ref.watch(deviceListProvider).value;
+    final Device? device = activeId == null || devices == null
+        ? null
+        : _findDeviceById(devices, activeId);
+    if (device == null) {
+      return const SizedBox.shrink();
+    }
+    return IconButton(
+      icon: const Icon(Icons.add),
+      tooltip: 'Install an app',
+      onPressed: () => AddAppSheet.show(context, device),
+    );
+  }
+}
+
 /// The Apps/Files/Terminal tabs' app bar title: the tab name, plus a
 /// small, muted subtitle naming whichever paired device those tabs act
 /// on - the only place that's ever shown once a device is selected, since
@@ -218,7 +252,7 @@ class _TabTitle extends ConsumerWidget {
     final AsyncValue<List<Device>> devices = ref.watch(deviceListProvider);
     final String? deviceName = devices.value == null || activeId == null
         ? null
-        : _findDevice(devices.value!, activeId)?.name;
+        : _findDeviceById(devices.value!, activeId)?.name;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -235,15 +269,6 @@ class _TabTitle extends ConsumerWidget {
           ),
       ],
     );
-  }
-
-  Device? _findDevice(List<Device> devices, String id) {
-    for (final Device device in devices) {
-      if (device.id == id) {
-        return device;
-      }
-    }
-    return null;
   }
 }
 

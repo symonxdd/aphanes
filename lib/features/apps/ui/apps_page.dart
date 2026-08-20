@@ -1,11 +1,292 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:io';
 
-/// Placeholder for Milestone 3 (list/install/uninstall homebrew apps and IPKs).
-class AppsPage extends StatelessWidget {
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/ui/ambient_backdrop.dart';
+import '../../devices/models/device.dart';
+import '../../devices/state/active_device_controller.dart';
+import '../../devices/state/device_list_controller.dart';
+import '../../devices/ui/pair_device_page.dart';
+import '../../home/state/home_tab_controller.dart';
+import '../models/installed_app.dart';
+import '../state/app_operation_controller.dart';
+import '../state/installed_apps_controller.dart';
+import 'catalog_page.dart';
+import 'widgets/installed_app_tile.dart';
+import 'widgets/operation_progress_dialog.dart';
+
+class AppsPage extends ConsumerWidget {
   const AppsPage({super.key});
 
   @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<List<Device>> devicesAsync = ref.watch(
+      deviceListProvider,
+    );
+
+    return devicesAsync.when(
+      data: (List<Device> devices) {
+        if (devices.isEmpty) {
+          return const _NoDevicesEmptyState();
+        }
+        final String? activeId = ref.watch(activeDeviceProvider);
+        Device? active;
+        for (final Device d in devices) {
+          if (d.id == activeId) {
+            active = d;
+            break;
+          }
+        }
+        if (active == null) {
+          return const _NoActiveDeviceEmptyState();
+        }
+        return _AppsList(device: active);
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (Object _, StackTrace _) =>
+          const Center(child: Text("Couldn't load paired devices.")),
+    );
+  }
+}
+
+class _NoDevicesEmptyState extends StatelessWidget {
+  const _NoDevicesEmptyState();
+
+  @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Pair a device to manage apps'));
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Pair a device to manage apps'),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (BuildContext _) => const PairDevicePage(),
+                ),
+              ),
+              child: const Text('Pair a device'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NoActiveDeviceEmptyState extends ConsumerWidget {
+  const _NoActiveDeviceEmptyState();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Select a device on the Devices tab to manage its apps'),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: () =>
+                  ref.read(homeTabProvider.notifier).select(HomeTab.devices),
+              child: const Text('Go to Devices'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AppsList extends ConsumerWidget {
+  const _AppsList({required this.device});
+
+  final Device device;
+
+  Future<void> _confirmUninstall(
+    BuildContext context,
+    WidgetRef ref,
+    InstalledApp app,
+  ) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text('Uninstall "${app.title}"?'),
+        content: const Text(
+          "This removes the app and its data from the TV. This can't be "
+          'undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Uninstall'),
+          ),
+        ],
+      ),
+    );
+    if (!(confirmed ?? false) || !context.mounted) {
+      return;
+    }
+    unawaited(
+      OperationProgressDialog.show(
+        context,
+        provider: uninstallOperationProvider,
+        title: 'Uninstalling ${app.title}...',
+        run: () => ref
+            .read(uninstallOperationProvider.notifier)
+            .run(ref.read(appsServiceProvider).uninstall(device, app.id)),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<List<InstalledApp>> apps = ref.watch(
+      installedAppsProvider,
+    );
+
+    return Stack(
+      children: [
+        const AmbientBackdrop(),
+        RefreshIndicator(
+          onRefresh: () => ref.read(installedAppsProvider.notifier).refresh(),
+          child: apps.when(
+            data: (List<InstalledApp> list) => list.isEmpty
+                ? ListView(
+                    children: const [
+                      SizedBox(height: 160),
+                      Center(child: Text('No apps installed on this TV yet')),
+                    ],
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: list.length,
+                    separatorBuilder: (BuildContext _, int _) =>
+                        const SizedBox(height: 12),
+                    itemBuilder: (BuildContext context, int index) =>
+                        InstalledAppTile(
+                          app: list[index],
+                          onUninstall: () =>
+                              _confirmUninstall(context, ref, list[index]),
+                        ),
+                  ),
+            loading: () => ListView(
+              children: const [
+                SizedBox(height: 160),
+                Center(child: CircularProgressIndicator()),
+              ],
+            ),
+            error: (Object _, StackTrace _) => ListView(
+              children: const [
+                SizedBox(height: 160),
+                Center(child: Text("Couldn't load this TV's apps.")),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The "+" app-bar action's destination on the Apps tab: a choice between
+/// the two install sources this milestone supports.
+class AddAppSheet extends ConsumerWidget {
+  const AddAppSheet({required this.device, super.key});
+
+  final Device device;
+
+  static Future<void> show(BuildContext context, Device device) {
+    return showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (BuildContext _) => AddAppSheet(device: device),
+    );
+  }
+
+  Future<void> _pickAndInstall(
+    BuildContext context,
+    WidgetRef ref,
+    Device device,
+  ) async {
+    final PlatformFile? picked = await FilePicker.pickFile(
+      type: FileType.custom,
+      allowedExtensions: ['ipk'],
+    );
+    final String? path = picked?.path;
+    if (path == null || !context.mounted) {
+      return;
+    }
+    unawaited(
+      OperationProgressDialog.show(
+        context,
+        provider: installOperationProvider,
+        title: 'Installing...',
+        run: () => ref
+            .read(installOperationProvider.notifier)
+            .run(
+              ref
+                  .read(appsServiceProvider)
+                  .installFromFile(device, File(path)),
+            ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ThemeData theme = Theme.of(context);
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Install an app', style: theme.textTheme.headlineSmall),
+            const SizedBox(height: 16),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.storefront_outlined),
+              title: const Text('Browse Homebrew catalog'),
+              subtitle: const Text('Community apps, installed from the store'),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (BuildContext _) => CatalogPage(device: device),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.upload_file_outlined),
+              title: const Text('Install from a file'),
+              subtitle: const Text('Pick an .ipk already on this phone'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _pickAndInstall(context, ref, device);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

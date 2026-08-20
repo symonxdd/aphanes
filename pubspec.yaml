@@ -53,6 +53,14 @@ dependencies:
   # itself) - a pure-widget package with no native code, so its "last
   # published 2 years ago" carries little compatibility risk.
   flutter_colorpicker: ^1.1.0
+  # Dart team packages (dart-lang/http, dart-lang/core) for the Homebrew
+  # catalog fetch/download and its SHA-256 integrity check.
+  http: ^1.6.0
+  crypto: ^3.0.7
+  # Native file picker for local .ipk sideloading. 160/160 pub points,
+  # verified publisher, MIT, actively maintained (published days ago as
+  # of this writing).
+  file_picker: ^12.0.0
 
 dev_dependencies:
   flutter_test:
