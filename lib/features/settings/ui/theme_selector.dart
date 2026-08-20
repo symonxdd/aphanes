@@ -15,16 +15,30 @@ class ThemeToggleButton extends ConsumerWidget {
     final Brightness effective = resolveEffectiveBrightness(context, chosen);
     final bool isDark = effective == Brightness.dark;
 
-    return IconButton(
-      icon: Icon(
-        isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+    // A bare InkWell+Icon, not IconButton: IconButton doesn't reliably
+    // shrink to a tight custom size even with constraints overridden and
+    // padding zeroed, which throws off the symmetric spacing this header
+    // relies on to keep the title centered.
+    return Tooltip(
+      message: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: () {
+          ref
+              .read(themeModeControllerProvider.notifier)
+              .select(isDark ? ThemeMode.light : ThemeMode.dark);
+        },
+        child: Padding(
+          // Asymmetric top/bottom, not a Transform: a real layout nudge
+          // rather than a paint-only offset keeps the tap target exactly
+          // where it visually sits.
+          padding: const EdgeInsets.fromLTRB(4, 5, 4, 3),
+          child: Icon(
+            isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+            size: 24,
+          ),
+        ),
       ),
-      tooltip: isDark ? 'Switch to light mode' : 'Switch to dark mode',
-      onPressed: () {
-        ref
-            .read(themeModeControllerProvider.notifier)
-            .select(isDark ? ThemeMode.light : ThemeMode.dark);
-      },
     );
   }
 }

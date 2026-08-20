@@ -52,38 +52,34 @@ class SettingsSheet extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Two equal, empty Expanded slots either side of the title,
-              // rather than centering the row as a whole, so "Aphanes"
-              // stays exactly centered regardless of the toggle's own
-              // width, with the toggle vertically centered on just this
-              // single-line row (the subtitle below sits outside it, so it
-              // can't pull the toggle's alignment off the title).
-              Row(
-                children: [
-                  const Expanded(child: SizedBox()),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const AppIconGlyph(size: 22),
-                      const SizedBox(width: 8),
-                      DefaultTextStyle(
-                        style: theme.textTheme.headlineSmall!.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                        child: const AphanesTitle(),
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Transform.translate(
-                        offset: const Offset(-6, 0),
-                        child: const ThemeToggleButton(),
-                      ),
+              // Centered as a whole, with the icon and toggle each real
+              // Row children (no Transform, no edge-pinning). Equal
+              // SizedBox gaps here would still look uneven: the app icon
+              // glyph is a stylized shape that doesn't fill its own
+              // square (unlike the toggle's near-edge-to-edge Material
+              // icon), so it reads as farther from the title at the same
+              // layout gap. The 18/12 split compensates for that so the
+              // visible whitespace lands even on both sides; the few dp
+              // of layout asymmetry that costs is imperceptible.
+              Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(4),
+                      child: AppIconGlyph(),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 9),
+                    DefaultTextStyle(
+                      style: theme.textTheme.headlineSmall!.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      child: const AphanesTitle(),
+                    ),
+                    const SizedBox(width: 3),
+                    const ThemeToggleButton(),
+                  ],
+                ),
               ),
               const SizedBox(height: 4),
               const Center(

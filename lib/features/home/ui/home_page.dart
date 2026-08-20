@@ -9,6 +9,9 @@ import '../../../core/ui/app_icon_glyph.dart';
 import '../../../core/ui/keep_alive_page.dart';
 import '../../../core/ui/shader_warmup.dart';
 import '../../apps/ui/apps_page.dart';
+import '../../devices/models/device.dart';
+import '../../devices/state/active_device_controller.dart';
+import '../../devices/state/device_list_controller.dart';
 import '../../devices/ui/devices_page.dart';
 import '../../devices/ui/pair_device_page.dart';
 import '../../files/ui/files_page.dart';
@@ -109,9 +112,9 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         title: switch (selectedTab) {
           HomeTab.devices => const _DevicesTitle(),
-          HomeTab.apps => const Text('Apps'),
-          HomeTab.files => const Text('Files'),
-          HomeTab.terminal => const Text('Terminal'),
+          HomeTab.apps => const _TabTitle('Apps'),
+          HomeTab.files => const _TabTitle('Files'),
+          HomeTab.terminal => const _TabTitle('Terminal'),
         },
         actions: [
           if (selectedTab == HomeTab.devices)
@@ -195,6 +198,52 @@ class _HomePageState extends ConsumerState<HomePage> {
         label: 'Terminal',
       ),
     };
+  }
+}
+
+/// The Apps/Files/Terminal tabs' app bar title: the tab name, plus a
+/// small, muted subtitle naming whichever paired device those tabs act
+/// on - the only place that's ever shown once a device is selected, since
+/// the Devices tab's own card highlighting already covers the moment of
+/// picking one. No subtitle at all while nothing is selected yet.
+class _TabTitle extends ConsumerWidget {
+  const _TabTitle(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ThemeData theme = Theme.of(context);
+    final String? activeId = ref.watch(activeDeviceProvider);
+    final AsyncValue<List<Device>> devices = ref.watch(deviceListProvider);
+    final String? deviceName = devices.value == null || activeId == null
+        ? null
+        : _findDevice(devices.value!, activeId)?.name;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label),
+        if (deviceName != null)
+          Text(
+            deviceName,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+      ],
+    );
+  }
+
+  Device? _findDevice(List<Device> devices, String id) {
+    for (final Device device in devices) {
+      if (device.id == id) {
+        return device;
+      }
+    }
+    return null;
   }
 }
 

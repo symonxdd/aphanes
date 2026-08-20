@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// The device Apps/Files/Terminal act on. Tapping a device card sets it;
-/// there is no dedicated switcher UI yet (planned for Milestone 6), so
-/// "most recently tapped" is simply the active device for now.
+/// The device Apps/Files/Terminal act on. Tapping a device card on the
+/// Devices tab sets it; "most recently tapped" is the active device.
 class ActiveDeviceController extends Notifier<String?> {
   @override
   String? build() => null;
