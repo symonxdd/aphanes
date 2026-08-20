@@ -9,7 +9,9 @@ void main() {
   testWidgets('home shell shows all four tabs and switches on tap', (
     WidgetTester tester,
   ) async {
-    SharedPreferences.setMockInitialValues(<String, Object>{});
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      'has_seen_onboarding': true,
+    });
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     await tester.pumpWidget(
@@ -28,4 +30,33 @@ void main() {
 
     expect(find.text('Pair a device to manage apps'), findsOneWidget);
   });
+
+  testWidgets(
+    'onboarding shows the disclaimer and completing it reveals home',
+    (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+          child: const AphanesApp(),
+        ),
+      );
+      // Not pumpAndSettle: the onboarding backdrop has a perpetually
+      // repeating animation, which would never settle.
+      await tester.pump();
+
+      expect(
+        find.textContaining('Unaffiliated with LG Electronics'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Got it, boss'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 700));
+
+      expect(find.text('No devices paired yet'), findsOneWidget);
+    },
+  );
 }
