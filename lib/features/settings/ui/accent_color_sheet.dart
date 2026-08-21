@@ -85,9 +85,16 @@ class AccentColorSheet extends ConsumerWidget {
     WidgetRef ref,
     Color current,
   ) async {
-    final Color? picked = await showDialog<Color>(
+    // A sheet, not an AlertDialog: a dialog's constrained width left the
+    // color picker area small and cramped, and didn't have room for
+    // Reset/Cancel/Select together on one line (Flutter's default
+    // AlertDialog action bar fell back to stacking them vertically
+    // instead). Full sheet width fixes both at once.
+    final Color? picked = await showModalBottomSheet<Color>(
       context: context,
-      builder: (BuildContext context) => _CustomColorDialog(initial: current),
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (BuildContext context) => _CustomColorSheet(initial: current),
     );
     if (picked != null) {
       await ref.read(seedColorProvider.notifier).set(picked);
@@ -138,47 +145,80 @@ class _SwatchDot extends StatelessWidget {
   }
 }
 
-class _CustomColorDialog extends StatefulWidget {
-  const _CustomColorDialog({required this.initial});
+class _CustomColorSheet extends StatefulWidget {
+  const _CustomColorSheet({required this.initial});
 
   final Color initial;
 
   @override
-  State<_CustomColorDialog> createState() => _CustomColorDialogState();
+  State<_CustomColorSheet> createState() => _CustomColorSheetState();
 }
 
-class _CustomColorDialogState extends State<_CustomColorDialog> {
+class _CustomColorSheetState extends State<_CustomColorSheet> {
   late Color _pickedColor = widget.initial;
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Custom accent color'),
-      content: SingleChildScrollView(
-        child: ColorPicker(
-          pickerColor: _pickedColor,
-          onColorChanged: (Color color) =>
-              setState(() => _pickedColor = color),
-          enableAlpha: false,
-          labelTypes: const [],
-          pickerAreaHeightPercent: 0.7,
+    final ThemeData theme = Theme.of(context);
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          24,
+          8,
+          24,
+          24 + MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Custom accent color',
+                    style: theme.textTheme.headlineSmall,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () =>
+                      setState(() => _pickedColor = AppTheme.seed),
+                  icon: const Icon(Icons.restore),
+                  tooltip: 'Reset to default',
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Full sheet width, not an AlertDialog's constrained content
+            // area - the picker (a LayoutBuilder internally) grows to
+            // fill whatever width it's given, so this alone makes the
+            // whole picker area noticeably larger and easier to use.
+            ColorPicker(
+              pickerColor: _pickedColor,
+              onColorChanged: (Color color) =>
+                  setState(() => _pickedColor = color),
+              enableAlpha: false,
+              labelTypes: const [],
+              pickerAreaHeightPercent: 0.7,
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(
+                  onPressed: () => Navigator.of(context).pop(_pickedColor),
+                  child: const Text('Select'),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () =>
-              setState(() => _pickedColor = AppTheme.seed),
-          child: const Text('Reset to default'),
-        ),
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(context).pop(_pickedColor),
-          child: const Text('Select'),
-        ),
-      ],
     );
   }
 }

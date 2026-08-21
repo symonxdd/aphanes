@@ -8,16 +8,16 @@ import '../persistence/shared_preferences_provider.dart';
 const String _ambientBackdropPrefsKey = 'ambient_backdrop_enabled';
 
 /// Whether the drifting ambient backdrop shows behind every screen.
-/// Defaults to on; a continuous animation has a real (if modest) battery
-/// cost while visible, so it stays a deliberate, disableable choice
-/// rather than something silently unremovable.
+/// Defaults to off pending a rework of the effect itself; a continuous
+/// animation has a real (if modest) battery cost while visible, so it
+/// stays a deliberate, opt-in choice for now rather than on by default.
 class AmbientBackdropController extends Notifier<bool> {
   @override
   bool build() {
     return ref
             .watch(sharedPreferencesProvider)
             .getBool(_ambientBackdropPrefsKey) ??
-        true;
+        false;
   }
 
   Future<void> set(bool enabled) async {
