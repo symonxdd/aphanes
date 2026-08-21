@@ -36,10 +36,12 @@ class AppOperationController extends Notifier<AppOperationState> {
       state = AppOperationFailed(e.message);
     } on CatalogException catch (e) {
       state = AppOperationFailed(e.message);
-    } catch (_) {
-      state = const AppOperationFailed(
-        'Something went wrong. Please try again.',
-      );
+    } catch (e) {
+      // An unclassified exception is a bug in what this catches, not a
+      // real-world condition to word nicely. Shown in full rather than a
+      // generic message: there's no crash reporting in this app, so this
+      // is the only way a failure like this is ever diagnosable at all.
+      state = AppOperationFailed('Something went wrong: $e');
     }
   }
 

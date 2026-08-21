@@ -55,16 +55,15 @@ class _UnreachableMessage extends StatelessWidget {
 }
 
 /// Turns a failed apps-list load into the widget that's actually useful.
-/// [SshConnectionException] means the TV never even answered the
-/// connection attempt - shown via the same [_UnreachableMessage] the
-/// reachability gate itself uses, rather than a generic "couldn't reach
-/// it". [LunaCallException] means the TV *did* answer but rejected the
-/// specific request, a different problem with its own message already.
-Widget _loadErrorWidget(Object error, String deviceName) {
-  if (error is SshConnectionException) {
-    return _UnreachableMessage(deviceName: deviceName);
-  }
+/// This only ever runs once the reachability gate in [_AppsList] has
+/// already passed, so a [SshConnectionException] reaching here can never
+/// be the plain "TV is off" case (that's handled entirely by the gate,
+/// before this ever loads) - it's always something more specific that
+/// happened despite the TV answering, so its own message is shown
+/// directly rather than folded into a generic "not reachable" line.
+Widget _loadErrorWidget(Object error) {
   final String message = switch (error) {
+    SshConnectionException(:final String message) => message,
     LunaCallException(:final String message) => message,
     _ => "Couldn't load this TV's apps.",
   };
@@ -242,7 +241,7 @@ class _AppsList extends ConsumerWidget {
             const SizedBox(height: 160),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: _loadErrorWidget(error, device.name),
+              child: _loadErrorWidget(error),
             ),
           ],
         ),

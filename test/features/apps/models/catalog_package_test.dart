@@ -70,4 +70,44 @@ void main() {
       expect(package.manifest.ipkSha256, isNull);
     },
   );
+
+  test('parses detailIconUri, requirements, rootRequired and installedSize', () {
+    final CatalogPackage package = CatalogPackage.fromJson({
+      'id': 'com.example.rooted',
+      'title': 'Rooted App',
+      'detailIconUri': 'https://example.com/big-icon.png',
+      'requirements': {'webosRelease': '>=5.0'},
+      'manifest': {
+        'version': '1.0.0',
+        'ipkUrl': 'https://example.com/rooted.ipk',
+        'ipkHash': {'sha256': 'abc123'},
+        'ipkSize': 1024,
+        'installedSize': 2048,
+        'rootRequired': true,
+      },
+    });
+
+    expect(package.detailIconUri, 'https://example.com/big-icon.png');
+    expect(package.minWebosRelease, '>=5.0');
+    expect(package.manifest.installedSize, 2048);
+    expect(package.manifest.rootRequired, true);
+  });
+
+  test('defaults rootRequired to false and installedSize/detailIconUri to null', () {
+    final CatalogPackage package = CatalogPackage.fromJson({
+      'id': 'com.example.plain',
+      'title': 'Plain App',
+      'manifest': {
+        'version': '1.0.0',
+        'ipkUrl': 'https://example.com/plain.ipk',
+        'ipkHash': {'sha256': 'abc123'},
+        'ipkSize': 1024,
+      },
+    });
+
+    expect(package.detailIconUri, isNull);
+    expect(package.minWebosRelease, isNull);
+    expect(package.manifest.installedSize, isNull);
+    expect(package.manifest.rootRequired, false);
+  });
 }

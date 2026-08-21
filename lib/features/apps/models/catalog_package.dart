@@ -5,8 +5,11 @@ class CatalogPackage {
     required this.id,
     required this.title,
     required this.iconUri,
+    required this.detailIconUri,
     required this.shortDescription,
     required this.featured,
+    required this.openSource,
+    required this.minWebosRelease,
     required this.manifest,
   });
 
@@ -15,8 +18,18 @@ class CatalogPackage {
       id: json['id'] as String,
       title: json['title'] as String,
       iconUri: json['iconUri'] as String?,
+      // A separate, usually higher-res icon meant for a detail view -
+      // falls back to the list icon when a submission didn't provide one.
+      detailIconUri: json['detailIconUri'] as String?,
       shortDescription: json['shortDescription'] as String? ?? '',
       featured: json['featured'] as bool? ?? false,
+      // The catalog splits submissions into a "main" (open source) pool
+      // and a "non-free" (closed source) one - confirmed from webosbrew's
+      // own submission docs, not guessed from the field name.
+      openSource: (json['pool'] as String? ?? 'main') == 'main',
+      minWebosRelease:
+          (json['requirements'] as Map<String, dynamic>?)?['webosRelease']
+              as String?,
       manifest: CatalogManifest.fromJson(
         json['manifest'] as Map<String, dynamic>,
       ),
@@ -26,8 +39,11 @@ class CatalogPackage {
   final String id;
   final String title;
   final String? iconUri;
+  final String? detailIconUri;
   final String shortDescription;
   final bool featured;
+  final bool openSource;
+  final String? minWebosRelease;
   final CatalogManifest manifest;
 }
 
@@ -40,6 +56,8 @@ class CatalogManifest {
     required this.ipkUrl,
     required this.ipkSha256,
     required this.ipkSize,
+    required this.installedSize,
+    required this.rootRequired,
   });
 
   factory CatalogManifest.fromJson(Map<String, dynamic> json) {
@@ -56,6 +74,10 @@ class CatalogManifest {
       // skipping the integrity check for it.
       ipkSha256: (json['ipkHash'] as Map<String, dynamic>?)?['sha256'] as String?,
       ipkSize: json['ipkSize'] as int,
+      // Unpacked size on the TV, distinct from ipkSize (the download
+      // size) - not every submission reports it.
+      installedSize: json['installedSize'] as int?,
+      rootRequired: json['rootRequired'] as bool? ?? false,
     );
   }
 
@@ -65,4 +87,6 @@ class CatalogManifest {
   final String ipkUrl;
   final String? ipkSha256;
   final int ipkSize;
+  final int? installedSize;
+  final bool rootRequired;
 }

@@ -32,7 +32,12 @@ class LunaCommandService {
     final String command =
         'luna-send-pub -n 1 ${_shellEscape(uri)} '
         '${_shellEscape(jsonEncode(payload))}';
-    final Uint8ListResult result = await _run(client, command);
+    final Uint8ListResult result = await _run(client, command).timeout(
+      const Duration(seconds: 10),
+      onTimeout: () => throw const LunaCallException(
+        'The TV took too long to respond.',
+      ),
+    );
     if (result.exitCode != 0) {
       throw LunaCallException(
         result.stderrText.isEmpty

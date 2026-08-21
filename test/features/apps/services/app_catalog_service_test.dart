@@ -16,6 +16,8 @@ CatalogManifest _manifestFor(Uint8List bytes, {String? shaOverride}) {
     ipkUrl: 'https://repo.webosbrew.org/apps/example.ipk',
     ipkSha256: shaOverride ?? sha256.convert(bytes).toString(),
     ipkSize: bytes.length,
+    installedSize: null,
+    rootRequired: false,
   );
 }
 
@@ -108,6 +110,8 @@ void main() {
         ipkUrl: 'https://example.com/no-hash.ipk',
         ipkSha256: null,
         ipkSize: 42,
+        installedSize: null,
+        rootRequired: false,
       );
 
       expect(
