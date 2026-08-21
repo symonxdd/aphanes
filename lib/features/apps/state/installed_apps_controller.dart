@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/ssh/ssh_connection_service.dart';
 import '../../devices/models/device.dart';
 import '../../devices/state/active_device_controller.dart';
 import '../../devices/state/device_list_controller.dart';
+import '../../devices/state/device_reachability_controller.dart';
 import '../models/installed_app.dart';
 import '../services/apps_service.dart';
 
@@ -26,6 +28,19 @@ class InstalledAppsController extends AsyncNotifier<List<InstalledApp>> {
     final Device? device = _findDevice(devices, activeId);
     if (device == null) {
       return const [];
+    }
+    // A fast TCP probe (a few seconds, worst case) before the slower full
+    // SSH connect+auth attempt (which has its own much longer timeout,
+    // meant for a deliberate user-triggered action, not a tab-open load).
+    // Failing fast here is what keeps "TV's off" from spinning for ages
+    // before the real reason shows up.
+    final bool reachable = await ref.watch(
+      deviceReachabilityProvider(device.id).future,
+    );
+    if (!reachable) {
+      throw const SshConnectionException(
+        "Couldn't reach that TV.",
+      );
     }
     return ref.watch(appsServiceProvider).listInstalled(device);
   }

@@ -5,27 +5,78 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/ssh/ssh_connection_service.dart';
 import '../../../core/ui/ambient_backdrop.dart';
 import '../../devices/models/device.dart';
 import '../../devices/state/active_device_controller.dart';
 import '../../devices/state/device_list_controller.dart';
+import '../../devices/state/device_reachability_controller.dart';
 import '../../devices/ui/pair_device_page.dart';
 import '../../home/state/home_tab_controller.dart';
 import '../models/installed_app.dart';
+import '../services/luna_command_service.dart';
 import '../state/app_operation_controller.dart';
 import '../state/installed_apps_controller.dart';
 import 'catalog_page.dart';
 import 'widgets/installed_app_tile.dart';
 import 'widgets/operation_progress_dialog.dart';
 
+/// Shared with the reachability gate's own error state - one wording and
+/// one styling for "this TV isn't answering", not scattered across both
+/// call sites. Two separately-styled lines: the first reads as the actual
+/// problem, the second is a secondary hint, muted rather than given the
+/// same weight as the first.
+class _UnreachableMessage extends StatelessWidget {
+  const _UnreachableMessage({required this.deviceName});
+
+  final String deviceName;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '"$deviceName" not reachable. Is it turned on?',
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Also, make sure this phone is on the same network as the TV.',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Turns a failed apps-list load into the widget that's actually useful.
+/// [SshConnectionException] means the TV never even answered the
+/// connection attempt - shown via the same [_UnreachableMessage] the
+/// reachability gate itself uses, rather than a generic "couldn't reach
+/// it". [LunaCallException] means the TV *did* answer but rejected the
+/// specific request, a different problem with its own message already.
+Widget _loadErrorWidget(Object error, String deviceName) {
+  if (error is SshConnectionException) {
+    return _UnreachableMessage(deviceName: deviceName);
+  }
+  final String message = switch (error) {
+    LunaCallException(:final String message) => message,
+    _ => "Couldn't load this TV's apps.",
+  };
+  return Text(message, textAlign: TextAlign.center);
+}
+
 class AppsPage extends ConsumerWidget {
   const AppsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<Device>> devicesAsync = ref.watch(
-      deviceListProvider,
-    );
+    final AsyncValue<List<Device>> devicesAsync = ref.watch(deviceListProvider);
 
     return devicesAsync.when(
       data: (List<Device> devices) {
@@ -154,52 +205,92 @@ class _AppsList extends ConsumerWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget _installedAppsBody(BuildContext context, WidgetRef ref) {
     final AsyncValue<List<InstalledApp>> apps = ref.watch(
       installedAppsProvider,
+    );
+    return RefreshIndicator(
+      onRefresh: () => ref.read(installedAppsProvider.notifier).refresh(),
+      child: apps.when(
+        data: (List<InstalledApp> list) => list.isEmpty
+            ? ListView(
+                children: const [
+                  SizedBox(height: 160),
+                  Center(child: Text('No apps installed on this TV yet')),
+                ],
+              )
+            : ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: list.length,
+                separatorBuilder: (BuildContext _, int _) =>
+                    const SizedBox(height: 12),
+                itemBuilder: (BuildContext context, int index) =>
+                    InstalledAppTile(
+                      app: list[index],
+                      onUninstall: () =>
+                          _confirmUninstall(context, ref, list[index]),
+                    ),
+              ),
+        loading: () => ListView(
+          children: const [
+            SizedBox(height: 160),
+            Center(child: CircularProgressIndicator()),
+          ],
+        ),
+        error: (Object error, StackTrace _) => ListView(
+          children: [
+            const SizedBox(height: 160),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: _loadErrorWidget(error, device.name),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Gated on a fast reachability probe before ever touching the
+    // installed-apps list: that list's own load does a full SSH
+    // connect+auth, which has a much longer timeout meant for a
+    // deliberate action, not landing on this tab. Without this gate, an
+    // off TV meant sitting on a bare spinner for the length of that
+    // longer timeout with nothing to look at in the meantime.
+    final AsyncValue<bool> reachable = ref.watch(
+      deviceReachabilityProvider(device.id),
     );
 
     return Stack(
       children: [
         const AmbientBackdrop(),
-        RefreshIndicator(
-          onRefresh: () => ref.read(installedAppsProvider.notifier).refresh(),
-          child: apps.when(
-            data: (List<InstalledApp> list) => list.isEmpty
-                ? ListView(
-                    children: const [
-                      SizedBox(height: 160),
-                      Center(child: Text('No apps installed on this TV yet')),
-                    ],
-                  )
-                : ListView.separated(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: list.length,
-                    separatorBuilder: (BuildContext _, int _) =>
-                        const SizedBox(height: 12),
-                    itemBuilder: (BuildContext context, int index) =>
-                        InstalledAppTile(
-                          app: list[index],
-                          onUninstall: () =>
-                              _confirmUninstall(context, ref, list[index]),
-                        ),
-                  ),
-            loading: () => ListView(
-              children: const [
-                SizedBox(height: 160),
-                Center(child: CircularProgressIndicator()),
-              ],
-            ),
-            error: (Object _, StackTrace _) => ListView(
-              children: const [
-                SizedBox(height: 160),
-                Center(child: Text("Couldn't load this TV's apps.")),
-              ],
-            ),
+        switch (reachable) {
+          AsyncData(:final bool value) when value => _installedAppsBody(
+            context,
+            ref,
           ),
-        ),
+          AsyncData() ||
+          AsyncError() => _UnreachableState(deviceName: device.name),
+          _ => const Center(child: CircularProgressIndicator()),
+        },
       ],
+    );
+  }
+}
+
+class _UnreachableState extends StatelessWidget {
+  const _UnreachableState({required this.deviceName});
+
+  final String deviceName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: _UnreachableMessage(deviceName: deviceName),
+      ),
     );
   }
 }
@@ -240,9 +331,7 @@ class AddAppSheet extends ConsumerWidget {
         run: () => ref
             .read(installOperationProvider.notifier)
             .run(
-              ref
-                  .read(appsServiceProvider)
-                  .installFromFile(device, File(path)),
+              ref.read(appsServiceProvider).installFromFile(device, File(path)),
             ),
       ),
     );
@@ -264,7 +353,9 @@ class AddAppSheet extends ConsumerWidget {
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.storefront_outlined),
               title: const Text('Browse Homebrew catalog'),
-              subtitle: const Text('Community apps, installed from the store'),
+              subtitle: const Text(
+                'Community apps from the public webOS Homebrew store',
+              ),
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(

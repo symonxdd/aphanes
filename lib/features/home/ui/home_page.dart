@@ -14,6 +14,7 @@ import '../../devices/state/active_device_controller.dart';
 import '../../devices/state/device_list_controller.dart';
 import '../../devices/ui/devices_page.dart';
 import '../../devices/ui/pair_device_page.dart';
+import '../../devices/ui/widgets/reachability_dot.dart';
 import '../../files/ui/files_page.dart';
 import '../../settings/ui/settings_sheet.dart';
 import '../../terminal/ui/terminal_page.dart';
@@ -261,11 +262,18 @@ class _TabTitle extends ConsumerWidget {
       children: [
         Text(label),
         if (deviceName != null)
-          Text(
-            deviceName,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                deviceName,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: 6),
+              ReachabilityDot(deviceId: activeId!),
+            ],
           ),
       ],
     );
