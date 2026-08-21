@@ -51,10 +51,12 @@ class PairingController extends Notifier<PairingState> {
       state = PairingSucceeded(host, credentials);
     } on DevmodePairingException catch (e) {
       state = PairingFailed(e.message);
-    } catch (_) {
-      state = const PairingFailed(
-        'Something went wrong while pairing. Please try again.',
-      );
+    } catch (e) {
+      // An unclassified exception is a bug in what this catches, not a
+      // real-world condition to word nicely. Shown in full rather than a
+      // generic message: there's no crash reporting in this app, so this
+      // is the only way a failure like this is ever diagnosable at all.
+      state = PairingFailed('Something went wrong while pairing: $e');
     }
   }
 

@@ -31,6 +31,14 @@ class _PairDevicePageState extends ConsumerState<PairDevicePage> {
   final TextEditingController _nameController = TextEditingController();
   bool _nameControllerInitialized = false;
 
+  // The device is saved the moment pairing succeeds, not when this page's
+  // "Continue" is tapped - dismissing this screen any other way (back
+  // button, swipe) shouldn't lose a pairing that already succeeded. This
+  // id (and the future) let a later name edit update that same row rather
+  // than create a second one.
+  String? _savedDeviceId;
+  Future<void>? _autoSaveFuture;
+
   Timer? _probeDebounce;
   _HostProbeStatus _probeStatus = _HostProbeStatus.idle;
   int _probeToken = 0;
@@ -156,12 +164,13 @@ class _PairDevicePageState extends ConsumerState<PairDevicePage> {
         );
   }
 
-  Future<void> _onSavePressed(PairingSucceeded succeeded) async {
+  // Fires exactly once per successful pairing (guarded by
+  // _nameControllerInitialized below): saves the device under its default
+  // name immediately, before the user has even seen the name field.
+  Future<void> _autoSaveDevice(PairingSucceeded succeeded) {
     final Device device = Device(
       id: const Uuid().v4(),
-      name: _nameController.text.trim().isEmpty
-          ? 'webOS TV'
-          : _nameController.text.trim(),
+      name: succeeded.credentials.model ?? 'webOS TV',
       model: succeeded.credentials.model,
       host: succeeded.host,
       port: DevmodePairingService.devModePort,
@@ -169,7 +178,24 @@ class _PairDevicePageState extends ConsumerState<PairDevicePage> {
       privateKeyPem: succeeded.credentials.privateKeyPem,
       pairedAt: DateTime.now(),
     );
-    await ref.read(deviceListProvider.notifier).add(device);
+    _savedDeviceId = device.id;
+    return ref.read(deviceListProvider.notifier).add(device);
+  }
+
+  Future<void> _onContinuePressed() async {
+    // Guards against the rare case of tapping Continue before the
+    // auto-save (a single secure-storage write) has actually landed -
+    // without this, a rename issued too early could race the add() and
+    // silently find no matching device to update yet.
+    await _autoSaveFuture;
+    final String? id = _savedDeviceId;
+    if (id == null) {
+      return;
+    }
+    final String trimmed = _nameController.text.trim();
+    if (trimmed.isNotEmpty) {
+      await ref.read(deviceListProvider.notifier).rename(id, trimmed);
+    }
     if (mounted) {
       Navigator.of(context).pop();
     }
@@ -179,10 +205,21 @@ class _PairDevicePageState extends ConsumerState<PairDevicePage> {
   Widget build(BuildContext context) {
     final PairingState state = ref.watch(pairingProvider);
 
-    if (state is PairingSucceeded && !_nameControllerInitialized) {
-      _nameController.text = state.credentials.model ?? 'webOS TV';
-      _nameControllerInitialized = true;
-    }
+    // A listener, not an inline check: the actual save is a provider
+    // mutation, and triggering that synchronously from within build()
+    // (rather than in reaction to a state change via listen) risks
+    // Riverpod's "modified a provider while the widget tree was building"
+    // guard on whichever frame this transition first lands in.
+    ref.listen<PairingState>(pairingProvider, (
+      PairingState? previous,
+      PairingState next,
+    ) {
+      if (next is PairingSucceeded && !_nameControllerInitialized) {
+        _nameController.text = next.credentials.model ?? 'webOS TV';
+        _nameControllerInitialized = true;
+        _autoSaveFuture = _autoSaveDevice(next);
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(title: const Text('Pair a device')),
@@ -195,7 +232,7 @@ class _PairDevicePageState extends ConsumerState<PairDevicePage> {
               child: switch (state) {
                 PairingSucceeded() => _NameDeviceForm(
                   nameController: _nameController,
-                  onSave: () => _onSavePressed(state),
+                  onContinue: _onContinuePressed,
                 ),
                 _ => _ConnectForm(
                   formKey: _formKey,
@@ -497,10 +534,13 @@ class _PassphraseStatusIndicator extends StatelessWidget {
 }
 
 class _NameDeviceForm extends StatelessWidget {
-  const _NameDeviceForm({required this.nameController, required this.onSave});
+  const _NameDeviceForm({
+    required this.nameController,
+    required this.onContinue,
+  });
 
   final TextEditingController nameController;
-  final VoidCallback onSave;
+  final VoidCallback onContinue;
 
   @override
   Widget build(BuildContext context) {
@@ -526,7 +566,7 @@ class _NameDeviceForm extends StatelessWidget {
           decoration: const InputDecoration(labelText: 'Name this device'),
         ),
         const SizedBox(height: 24),
-        FilledButton(onPressed: onSave, child: const Text('Save')),
+        FilledButton(onPressed: onContinue, child: const Text('Continue')),
       ],
     );
   }
