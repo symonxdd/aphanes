@@ -238,20 +238,47 @@ class _CatalogDetailSheet extends ConsumerWidget {
               ),
             ],
             const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                OperationProgressDialog.show(
-                  context,
-                  provider: installOperationProvider,
-                  title: 'Installing ${package.title}...',
-                  run: () => ref
-                      .read(installOperationProvider.notifier)
-                      .run(_installStream(ref)),
-                );
-              },
-              child: const Text('Install'),
-            ),
+            // A handful of real catalog entries publish no checksum to
+            // verify against - installing one of those would mean silently
+            // skipping the integrity check this whole flow exists to
+            // enforce, so it's blocked here rather than left to fail
+            // (or worse, succeed unverified) once Install is tapped.
+            if (package.manifest.ipkSha256 == null)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 18,
+                    color: theme.colorScheme.error,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "This package doesn't publish a checksum, so it "
+                      "can't be installed from here.",
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.error,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            else
+              FilledButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  OperationProgressDialog.show(
+                    context,
+                    provider: installOperationProvider,
+                    title: 'Installing ${package.title}...',
+                    run: () => ref
+                        .read(installOperationProvider.notifier)
+                        .run(_installStream(ref)),
+                  );
+                },
+                child: const Text('Install'),
+              ),
           ],
         ),
       ),

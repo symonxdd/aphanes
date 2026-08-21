@@ -51,4 +51,23 @@ void main() {
     expect(package.iconUri, isNull);
     expect(package.manifest.sourceUrl, isNull);
   });
+
+  test(
+    'parses a manifest with no ipkHash instead of throwing '
+    '(regression: com.github.cfernande1470.wireguard, live in the '
+    'catalog with no ipkHash field at all)',
+    () {
+      final CatalogPackage package = CatalogPackage.fromJson({
+        'id': 'com.github.cfernande1470.wireguard',
+        'title': 'WireGuard',
+        'manifest': {
+          'version': '1.0.0',
+          'ipkUrl': 'https://example.com/wireguard.ipk',
+          'ipkSize': 42,
+        },
+      });
+
+      expect(package.manifest.ipkSha256, isNull);
+    },
+  );
 }

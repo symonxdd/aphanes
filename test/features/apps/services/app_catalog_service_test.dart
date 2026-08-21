@@ -90,4 +90,30 @@ void main() {
       );
     },
   );
+
+  test(
+    'downloadAndVerify refuses a manifest with no published hash, without '
+    'downloading anything (regression: some live catalog entries have no '
+    'ipkHash at all)',
+    () async {
+      final MockClient client = MockClient(
+        (http.Request request) async =>
+            throw StateError('should never fetch a manifest with no hash'),
+      );
+      final AppCatalogService service = AppCatalogService(client: client);
+      const CatalogManifest manifest = CatalogManifest(
+        version: '1.0.0',
+        appDescription: '',
+        sourceUrl: null,
+        ipkUrl: 'https://example.com/no-hash.ipk',
+        ipkSha256: null,
+        ipkSize: 42,
+      );
+
+      expect(
+        service.downloadAndVerify(manifest),
+        throwsA(isA<CatalogIntegrityException>()),
+      );
+    },
+  );
 }

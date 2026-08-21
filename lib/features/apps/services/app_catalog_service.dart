@@ -71,6 +71,13 @@ class AppCatalogService {
   /// [CatalogIntegrityException] on a mismatch - the caller must never
   /// install bytes this rejected.
   Future<Uint8List> downloadAndVerify(CatalogManifest manifest) async {
+    final String? expectedSha256 = manifest.ipkSha256;
+    if (expectedSha256 == null) {
+      throw const CatalogIntegrityException(
+        "This package doesn't publish a checksum, so it can't be "
+        'installed from here.',
+      );
+    }
     final http.Response response;
     try {
       response = await _client.get(Uri.parse(manifest.ipkUrl));
@@ -82,7 +89,7 @@ class AppCatalogService {
     }
     final Uint8List bytes = response.bodyBytes;
     final String actual = sha256.convert(bytes).toString();
-    if (actual.toLowerCase() != manifest.ipkSha256.toLowerCase()) {
+    if (actual.toLowerCase() != expectedSha256.toLowerCase()) {
       throw const CatalogIntegrityException(
         'Downloaded package failed its integrity check - not installing.',
       );
