@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:dartssh2/dartssh2.dart';
 
+import 'legacy_ssh_rsa_identity.dart';
+
 /// Thrown with a message specific enough to show inline in the UI, never a
 /// raw exception's toString().
 class SshConnectionException implements Exception {
@@ -54,7 +56,7 @@ class SshConnectionService {
     final SSHClient client = SSHClient(
       socket,
       username: username,
-      identities: SSHKeyPair.fromPem(privateKeyPem),
+      identities: _identitiesFor(privateKeyPem),
       disableHostkeyVerification: true,
     );
 
@@ -65,13 +67,30 @@ class SshConnectionService {
       throw const SshConnectionException(
         'The TV stopped responding while connecting.',
       );
-    } catch (_) {
+    } catch (e) {
       await client.close();
-      throw const SshConnectionException(
-        "Couldn't authenticate with the TV. It may need pairing again.",
+      // An unclassified exception here is a bug in what this catches, not
+      // a real-world condition to word nicely. Shown in full rather than
+      // a generic message: there's no crash reporting in this app, so
+      // this is the only way a failure like this is ever diagnosable at
+      // all.
+      throw SshConnectionException(
+        "Couldn't authenticate with the TV. It may need pairing again: $e",
       );
     }
 
     return client;
+  }
+
+  /// The modern identity(ies) `SSHKeyPair.fromPem` produces, plus a
+  /// classic ssh-rsa (SHA-1) fallback for each RSA one - see
+  /// legacy_ssh_rsa_identity.dart for why that fallback exists.
+  List<SSHIdentity> _identitiesFor(String privateKeyPem) {
+    final List<SSHKeyPair> keyPairs = SSHKeyPair.fromPem(privateKeyPem);
+    return [
+      ...keyPairs,
+      for (final SSHKeyPair keyPair in keyPairs)
+        if (keyPair is RsaPrivateKey) legacySshRsaIdentity(keyPair),
+    ];
   }
 }
