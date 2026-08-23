@@ -111,6 +111,12 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
   @override
   Widget build(BuildContext context) {
     final AsyncValue<List<CatalogPackage>> catalog = ref.watch(catalogProvider);
+    // Whatever's already on the TV, by id - watched here once rather than
+    // separately per tile, and passed down as a plain Set rather than
+    // making every tile watch installedAppsProvider on its own.
+    final Set<String> installedIds =
+        ref.watch(installedAppsProvider).value?.map((a) => a.id).toSet() ??
+        const {};
     return Scaffold(
       appBar: AppBar(
         // Search replaces the title in place, rather than a permanently
@@ -254,10 +260,12 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
                             ? _CatalogGrid(
                                 packages: visible,
                                 device: widget.device,
+                                installedIds: installedIds,
                               )
                             : _CatalogList(
                                 packages: visible,
                                 device: widget.device,
+                                installedIds: installedIds,
                               ),
                       );
                     },
@@ -277,10 +285,15 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
 }
 
 class _CatalogList extends StatelessWidget {
-  const _CatalogList({required this.packages, required this.device});
+  const _CatalogList({
+    required this.packages,
+    required this.device,
+    required this.installedIds,
+  });
 
   final List<CatalogPackage> packages;
   final Device device;
+  final Set<String> installedIds;
 
   @override
   Widget build(BuildContext context) {
@@ -288,20 +301,29 @@ class _CatalogList extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: packages.length,
       separatorBuilder: (BuildContext _, int _) => const SizedBox(height: 8),
-      itemBuilder: (BuildContext context, int index) =>
-          _CatalogListTile(package: packages[index], device: device),
+      itemBuilder: (BuildContext context, int index) => _CatalogListTile(
+        package: packages[index],
+        device: device,
+        installed: installedIds.contains(packages[index].id),
+      ),
     );
   }
 }
 
 class _CatalogListTile extends StatelessWidget {
-  const _CatalogListTile({required this.package, required this.device});
+  const _CatalogListTile({
+    required this.package,
+    required this.device,
+    required this.installed,
+  });
 
   final CatalogPackage package;
   final Device device;
+  final bool installed;
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Card(
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
@@ -320,7 +342,16 @@ class _CatalogListTile extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-        onTap: () => _openDetail(context, package, device),
+        trailing: installed
+            ? Tooltip(
+                message: 'Already installed',
+                child: Icon(
+                  LucideIcons.checkCircle,
+                  color: theme.colorScheme.primary,
+                ),
+              )
+            : null,
+        onTap: () => _openDetail(context, package, device, installed),
       ),
     );
   }
@@ -342,19 +373,30 @@ Future<void> _openDetail(
   BuildContext context,
   CatalogPackage package,
   Device device,
+  bool installed,
 ) async {
   FocusScope.of(context).requestFocus(FocusNode());
-  await _CatalogDetailSheet.show(context, package: package, device: device);
+  await _CatalogDetailSheet.show(
+    context,
+    package: package,
+    device: device,
+    installed: installed,
+  );
   if (context.mounted) {
     FocusScope.of(context).requestFocus(FocusNode());
   }
 }
 
 class _CatalogGrid extends StatelessWidget {
-  const _CatalogGrid({required this.packages, required this.device});
+  const _CatalogGrid({
+    required this.packages,
+    required this.device,
+    required this.installedIds,
+  });
 
   final List<CatalogPackage> packages;
   final Device device;
+  final Set<String> installedIds;
 
   @override
   Widget build(BuildContext context) {
@@ -377,36 +419,77 @@ class _CatalogGrid extends StatelessWidget {
         mainAxisExtent: 144,
       ),
       itemCount: packages.length,
-      itemBuilder: (BuildContext context, int index) =>
-          _CatalogGridTile(package: packages[index], device: device),
+      itemBuilder: (BuildContext context, int index) => _CatalogGridTile(
+        package: packages[index],
+        device: device,
+        installed: installedIds.contains(packages[index].id),
+      ),
     );
   }
 }
 
 class _CatalogGridTile extends StatelessWidget {
-  const _CatalogGridTile({required this.package, required this.device});
+  const _CatalogGridTile({
+    required this.package,
+    required this.device,
+    required this.installed,
+  });
 
   final CatalogPackage package;
   final Device device;
+  final bool installed;
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: () => _openDetail(context, package, device),
+      onTap: () => _openDetail(context, package, device, installed),
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _CatalogIcon(uri: package.iconUri, size: 64, radius: 18),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                _CatalogIcon(uri: package.iconUri, size: 64, radius: 18),
+                if (installed)
+                  Positioned(
+                    right: -4,
+                    bottom: -4,
+                    child: Tooltip(
+                      message: 'Already installed',
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color:
+                                theme.cardTheme.color ??
+                                theme.colorScheme.surface,
+                            width: 2,
+                          ),
+                        ),
+                        child: Icon(
+                          LucideIcons.check600,
+                          size: 13,
+                          color: theme.colorScheme.onPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             const SizedBox(height: 8),
             Text(
               package.title,
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: theme.textTheme.bodyMedium,
             ),
           ],
         ),
@@ -453,22 +536,31 @@ class _CatalogIcon extends StatelessWidget {
 }
 
 class _CatalogDetailSheet extends ConsumerWidget {
-  const _CatalogDetailSheet({required this.package, required this.device});
+  const _CatalogDetailSheet({
+    required this.package,
+    required this.device,
+    required this.installed,
+  });
 
   final CatalogPackage package;
   final Device device;
+  final bool installed;
 
   static Future<void> show(
     BuildContext context, {
     required CatalogPackage package,
     required Device device,
+    required bool installed,
   }) {
     return showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
-      builder: (BuildContext _) =>
-          _CatalogDetailSheet(package: package, device: device),
+      builder: (BuildContext _) => _CatalogDetailSheet(
+        package: package,
+        device: device,
+        installed: installed,
+      ),
     );
   }
 
@@ -489,53 +581,32 @@ class _CatalogDetailSheet extends ConsumerWidget {
     yield* appsService.installBytes(device, bytes);
   }
 
-  /// One continuous, wrapping line of facts (size, requirements, id),
-  /// each with its own small icon - a `Text.rich` of dot-separated
-  /// `WidgetSpan`s, rather than a block per field: it wraps mid-flow onto
-  /// further lines as needed, the same way a sentence would.
-  ///
-  /// Each field's icon+text is one `WidgetSpan` (a `Row`), not a separate
-  /// `WidgetSpan` for the icon plus a `TextSpan` for the text: Flutter's
-  /// line-wrapping can break between two adjacent spans, which is exactly
-  /// what stranded the id field's icon alone at the end of one line with
-  /// its text starting fresh on the next - wrapping icon+text together as
-  /// a single unit means the whole field moves to the next line intact
-  /// if it doesn't fit, never splitting apart.
-  List<InlineSpan> _factSpans(ThemeData theme, TextStyle? mutedStyle) {
+  /// One field per line (size, requirements, id), each with its own
+  /// small icon - a plain Column of rows, not a shared wrapping
+  /// paragraph, so every field reads as its own clean line rather than
+  /// flowing into the next one.
+  Widget _factsColumn(ThemeData theme, TextStyle? mutedStyle) {
     final CatalogManifest manifest = package.manifest;
-    final List<InlineSpan> spans = [];
+    final List<Widget> rows = [];
 
     void addFact(IconData icon, String text, {TextStyle? style}) {
-      if (spans.isNotEmpty) {
-        spans.add(
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Icon(
-                LucideIcons.dot,
-                size: 20,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-        );
-      }
-      spans.add(
-        WidgetSpan(
-          alignment: PlaceholderAlignment.middle,
-          // A WidgetSpan is only given whatever width is left on its
-          // line, up to the paragraph's own width if it lands alone on a
-          // fresh one - a long package id can still exceed that. Flexible
-          // lets the text wrap onto a second line within its own field
-          // instead of overflowing the Row, rather than assuming it'll
-          // always fit on one line.
+      rows.add(
+        Padding(
+          padding: EdgeInsets.only(top: rows.isEmpty ? 0 : 6),
           child: Row(
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, size: 15, color: theme.colorScheme.primary),
-              const SizedBox(width: 4),
-              Flexible(child: Text(text, style: style ?? mutedStyle)),
+              // A couple of px down from a plain top-align: the icon's
+              // own glyph box has no leading space above it, while the
+              // text next to it does (ordinary font metrics), so lining
+              // up both boxes' tops left the icon reading visibly higher
+              // than the text's own first line.
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Icon(icon, size: 15, color: theme.colorScheme.primary),
+              ),
+              const SizedBox(width: 8),
+              Expanded(child: Text(text, style: style ?? mutedStyle)),
             ],
           ),
         ),
@@ -559,7 +630,7 @@ class _CatalogDetailSheet extends ConsumerWidget {
       package.id,
       style: mutedStyle?.copyWith(fontFamily: 'monospace'),
     );
-    return spans;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: rows);
   }
 
   @override
@@ -620,7 +691,7 @@ class _CatalogDetailSheet extends ConsumerWidget {
               style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
-            Text.rich(TextSpan(children: _factSpans(theme, mutedStyle))),
+            _factsColumn(theme, mutedStyle),
             if (manifest.rootRequired) ...[
               const SizedBox(height: 12),
               Row(
@@ -644,6 +715,35 @@ class _CatalogDetailSheet extends ConsumerWidget {
               ),
             ],
             const SizedBox(height: 20),
+            // Checked before the missing-checksum case below: whether
+            // this package can be installed at all is moot once it
+            // already is. Source still shows either way - it's
+            // unrelated to whether installing is possible right now.
+            if (installed) ...[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    LucideIcons.checkCircle,
+                    size: 18,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Already installed on this TV.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (sourceButton != null) ...[
+                const SizedBox(height: 12),
+                Align(alignment: Alignment.centerRight, child: sourceButton),
+              ],
+            ] else
             // A handful of real catalog entries publish no checksum to
             // verify against - installing one of those would mean silently
             // skipping the integrity check this whole flow exists to

@@ -237,8 +237,7 @@ class _AppsList extends ConsumerWidget {
             context,
             ref,
           ),
-          AsyncData() ||
-          AsyncError() => _UnreachableState(deviceName: device.name),
+          AsyncData() || AsyncError() => _UnreachableState(device: device),
           _ => const Center(child: CircularProgressIndicator()),
         },
       ],
@@ -246,17 +245,95 @@ class _AppsList extends ConsumerWidget {
   }
 }
 
-class _UnreachableState extends StatelessWidget {
-  const _UnreachableState({required this.deviceName});
+/// The Apps tab with an off (or unreachable) TV behind it. Offers two
+/// ways back: a plainly visible button, and the same pull-to-refresh
+/// gesture the loaded list above already answers to.
+///
+/// Both, not either. The gesture alone would be invisible here - nothing
+/// about a screen of centered text suggests it scrolls, so nobody would
+/// think to try it - and the button alone would make the gesture work on
+/// one of this tab's two states but not the other.
+class _UnreachableState extends ConsumerStatefulWidget {
+  const _UnreachableState({required this.device});
 
-  final String deviceName;
+  final Device device;
+
+  @override
+  ConsumerState<_UnreachableState> createState() => _UnreachableStateState();
+}
+
+class _UnreachableStateState extends ConsumerState<_UnreachableState> {
+  bool _checking = false;
+
+  Future<void> _recheck() async {
+    if (_checking) {
+      return;
+    }
+    setState(() => _checking = true);
+    ref.invalidate(deviceReachabilityProvider(widget.device.id));
+    try {
+      // The installed-apps list watches this same probe, so a TV that
+      // answers this time is already loading its apps by the time this
+      // widget goes away.
+      await ref.read(
+        deviceReachabilityProvider(widget.device.id).future,
+      );
+    } catch (_) {
+      // A failed probe is a `false` result, not an error, and either way
+      // the rebuilt widget below is what reports it.
+    }
+    // A TV that came back takes this widget off the tree mid-await.
+    if (mounted) {
+      setState(() => _checking = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: UnreachableMessage(deviceName: deviceName),
+    return RefreshIndicator(
+      onRefresh: _recheck,
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return SingleChildScrollView(
+            // This screen is shorter than its viewport and so would not
+            // scroll at all by default, which is exactly the case where
+            // the pull-to-refresh gesture has to keep working.
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 24,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      UnreachableMessage(deviceName: widget.device.name),
+                      const SizedBox(height: 32),
+                      FilledButton.tonalIcon(
+                        onPressed: _checking ? null : _recheck,
+                        icon: _checking
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.refresh),
+                        label: Text(
+                          _checking ? 'Checking...' : 'Check again',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
