@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/ui/ambient_backdrop.dart';
 import '../../../core/ui/aphanes_title.dart';
 import '../../../core/ui/app_icon_glyph.dart';
+import '../../../core/ui/app_splash_overlay.dart';
 import '../../../core/ui/keep_alive_page.dart';
 import '../../../core/ui/shader_warmup.dart';
 import '../../apps/ui/apps_page.dart';
@@ -305,7 +306,7 @@ class _DevicesTitle extends StatelessWidget {
           // result without needing to know that height up front.
           const AspectRatio(
             aspectRatio: 1,
-            child: FittedBox(child: AppIconGlyph(size: 40)),
+            child: FittedBox(child: SplashTapTarget(child: AppIconGlyph(size: 40))),
           ),
           const SizedBox(width: 10),
           _DevicesTitleText(theme: theme),

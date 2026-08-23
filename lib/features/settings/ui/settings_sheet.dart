@@ -6,6 +6,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../../core/ui/ambient_backdrop.dart';
 import '../../../core/ui/aphanes_title.dart';
 import '../../../core/ui/app_icon_glyph.dart';
+import '../../../core/ui/app_splash_overlay.dart';
 import '../../../core/ui/info_sheet.dart';
 import '../../onboarding/ui/onboarding_page.dart';
 import '../state/effective_brightness.dart';
@@ -67,7 +68,7 @@ class SettingsSheet extends ConsumerWidget {
                   children: [
                     const Padding(
                       padding: EdgeInsets.all(4),
-                      child: AppIconGlyph(),
+                      child: SplashTapTarget(child: AppIconGlyph()),
                     ),
                     const SizedBox(width: 9),
                     DefaultTextStyle(
