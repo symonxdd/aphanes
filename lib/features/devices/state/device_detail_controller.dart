@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ssh/ssh_connection_service.dart';
@@ -47,9 +49,14 @@ final deviceDetailProvider = FutureProvider.autoDispose
       // Only the static half is kept. The Developer Mode session is a
       // live countdown and a credential, so it is re-read every time and
       // never stored here.
-      await ref.read(deviceInfoCacheProvider.notifier).put(
-        deviceId,
-        detail.info,
+      //
+      // Deliberately not awaited: writing the cache is a side effect for
+      // the next visit, and nothing on this one waits on it. Awaiting it
+      // put a secure-storage round trip between a finished fetch and the
+      // page being told about it, which is latency the user pays for no
+      // benefit.
+      unawaited(
+        ref.read(deviceInfoCacheProvider.notifier).put(deviceId, detail.info),
       );
       return detail;
     });

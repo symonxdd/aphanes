@@ -220,6 +220,12 @@ void main() {
       addTearDown(c.dispose);
 
       await c.read(deviceDetailProvider('a').future);
+      // The write-through is deliberately not awaited by the provider, so
+      // that a storage round trip never sits between a finished fetch and
+      // the page hearing about it. Yield until it lands.
+      for (int i = 0; i < 20 && store.values['device_info_a'] == null; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
 
       // In memory, ready for the next visit to render immediately.
       expect(c.read(deviceInfoCacheProvider).value, {'a': _info});

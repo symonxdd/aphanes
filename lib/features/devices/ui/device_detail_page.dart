@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -465,12 +467,17 @@ class _LiveDeviceInfo extends ConsumerWidget {
         ),
       );
     }
-    if (detail case AsyncData(:final DeviceDetail value)) {
-      return _DevModeStatusRow(device: device, status: value.devMode);
+    // `.value`, not a match on AsyncData: a provider that is refreshing
+    // reports AsyncLoading while still carrying the previous answer, and
+    // matching on the type alone threw that answer away and fell through
+    // to "Checking..." for the whole of every refetch.
+    final DeviceDetail? loaded = detail.value;
+    if (loaded != null) {
+      return _DevModeStatusRow(device: device, status: loaded.devMode);
     }
-    // Still fetching. With rows already on screen, the Developer Mode row
-    // reports the fetch itself - honest, and what replaces the spinner
-    // that used to greet every single visit.
+    // Nothing fetched yet this session. With rows already on screen, the
+    // Developer Mode row reports the fetch itself - honest, and what
+    // replaces the spinner that used to greet every single visit.
     if (hasRows) {
       return _DevModeStatusRow(
         device: device,
@@ -536,8 +543,13 @@ class _DevModeStatusRow extends ConsumerWidget {
     // Short enough to sit in the value column beside the others. What
     // each one means is the explainer's job, not this row's.
     final String value;
+    final Duration? countdown = current?.remainingDuration;
     if (current == null) {
       value = placeholder ?? 'Checking...';
+    } else if (countdown != null) {
+      // Replaced below by a ticking one. Kept as the value anyway so the
+      // row is correct for a frame, and correct in a screenshot test.
+      value = _formatCountdown(countdown);
     } else if (current.remaining != null) {
       value = current.remaining!;
     } else if (current.hasToken) {
@@ -550,6 +562,12 @@ class _DevModeStatusRow extends ConsumerWidget {
       icon: LucideIcons.shieldCheck,
       label: 'Developer Mode',
       value: value,
+      // Counts down locally from what LG reported, rather than asking
+      // again every second. The endpoint is only consulted once per
+      // visit; this just stops a live session from looking frozen.
+      valueOverride: countdown == null
+          ? null
+          : _SessionCountdown(from: countdown, key: ValueKey(current)),
       onInfoTap: () => DeviceFieldExplainers.developerMode(context),
       labelAction: renewing
           // Sized to the button it replaces, so the row holds still while
@@ -580,6 +598,73 @@ class _DevModeStatusRow extends ConsumerWidget {
   }
 }
 
+/// Renders [d] as a clock, with hours free to run past 24. A Developer
+/// Mode session can be most of a thousand hours long, so days would be
+/// the friendlier unit, but LG reports hours and matching that keeps this
+/// value comparable with what the TV itself shows.
+String _formatCountdown(Duration d) {
+  final Duration clamped = d < Duration.zero ? Duration.zero : d;
+  final String mm = clamped.inMinutes.remainder(60).toString().padLeft(2, '0');
+  final String ss = clamped.inSeconds.remainder(60).toString().padLeft(2, '0');
+  return '${clamped.inHours}:$mm:$ss';
+}
+
+/// Ticks a session's remaining time down once a second.
+///
+/// Purely local. LG's endpoint is asked once when the page loads, and
+/// this counts down from that answer, so a live session visibly runs
+/// rather than sitting frozen at whatever it read on arrival. Being a
+/// second or two adrift after a long visit does not matter for a value
+/// measured in hours; being obviously stationary looked broken.
+class _SessionCountdown extends StatefulWidget {
+  const _SessionCountdown({required this.from, super.key});
+
+  final Duration from;
+
+  @override
+  State<_SessionCountdown> createState() => _SessionCountdownState();
+}
+
+class _SessionCountdownState extends State<_SessionCountdown> {
+  late Duration _remaining = widget.from;
+  Timer? _ticker;
+
+  @override
+  void initState() {
+    super.initState();
+    _ticker = Timer.periodic(const Duration(seconds: 1), (Timer _) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _remaining = _remaining - const Duration(seconds: 1);
+        if (_remaining <= Duration.zero) {
+          _remaining = Duration.zero;
+          _ticker?.cancel();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Text(
+      _remaining == Duration.zero ? 'Expired' : _formatCountdown(_remaining),
+      textAlign: TextAlign.end,
+      style: theme.textTheme.bodyLarge?.copyWith(
+        color: theme.colorScheme.onSurfaceVariant,
+      ),
+    );
+  }
+}
+
 class _DetailRow extends StatelessWidget {
   const _DetailRow({
     required this.icon,
@@ -589,7 +674,14 @@ class _DetailRow extends StatelessWidget {
     this.infoTooltip,
     this.labelAction,
     this.monospaceValue = false,
+    this.valueOverride,
   });
+
+  /// Replaces the rendered [value] while keeping everything else about
+  /// the row identical. For a value that has to animate or tick, which a
+  /// plain string cannot do. [value] is still required, and is what a
+  /// non-animating build of the same row would show.
+  final Widget? valueOverride;
 
   final IconData icon;
   final String label;
@@ -648,14 +740,16 @@ class _DetailRow extends StatelessWidget {
           // overflowed the row instead. This gives it the leftover width
           // to wrap into while still sitting hard against the right edge.
           Expanded(
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontFamily: monospaceValue ? 'monospace' : null,
-              ),
-            ),
+            child:
+                valueOverride ??
+                Text(
+                  value,
+                  textAlign: TextAlign.end,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontFamily: monospaceValue ? 'monospace' : null,
+                  ),
+                ),
           ),
         ],
       ),

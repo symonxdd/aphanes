@@ -31,6 +31,13 @@ class DeviceDetailService {
   final http.Client _http;
 
   static const String _devModeTokenPath = '/var/luna/preferences/devmode_enabled';
+
+  /// Bounds the raw `client.run` calls below. `SshConnectionService` and
+  /// `LunaCommandService` already time out their own work, but dartssh2's
+  /// `run` waits for the session to close with no deadline of its own, so
+  /// a TV that accepts the command and then never closes the channel
+  /// would leave this page reporting "Checking..." indefinitely.
+  static const Duration _commandTimeout = Duration(seconds: 10);
   static final RegExp _tokenPattern = RegExp(r'^[0-9a-zA-Z]+$');
 
   Future<DeviceDetail> fetch(Device device) async {
@@ -148,9 +155,11 @@ class DeviceDetailService {
 
   Future<String?> _fetchSocNameFallback(SSHClient client) async {
     try {
-      final Uint8List output = await client.run(
-        'cat ${LunaCommandService.shellEscape('/etc/prefs/properties/machineName')}',
-      );
+      final Uint8List output = await client
+          .run(
+            'cat ${LunaCommandService.shellEscape('/etc/prefs/properties/machineName')}',
+          )
+          .timeout(_commandTimeout);
       final String text = utf8.decode(output, allowMalformed: true).trim();
       return text.isEmpty ? null : text;
     } catch (_) {
@@ -173,9 +182,9 @@ class DeviceDetailService {
 
   Future<String?> _readDevModeToken(SSHClient client) async {
     try {
-      final Uint8List output = await client.run(
-        'cat ${LunaCommandService.shellEscape(_devModeTokenPath)}',
-      );
+      final Uint8List output = await client
+          .run('cat ${LunaCommandService.shellEscape(_devModeTokenPath)}')
+          .timeout(_commandTimeout);
       final String token = utf8.decode(output, allowMalformed: true).trim();
       return _tokenPattern.hasMatch(token) ? token : null;
     } catch (_) {

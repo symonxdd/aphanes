@@ -184,8 +184,8 @@ void main() {
 
     expect(find.text('04.00.10'), findsOneWidget);
     expect(find.text('03.30.85'), findsNothing);
-    // The remaining time is shown exactly as LG worded it, in the value
-    // column, with no sentence built around it.
-    expect(find.text('2 hours'), findsOneWidget);
+    // "2 hours" parses to a real duration, so the row switches to a
+    // ticking clock rather than echoing LG's wording back.
+    expect(find.text('2:00:00'), findsOneWidget);
   });
 }
