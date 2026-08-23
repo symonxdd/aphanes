@@ -112,7 +112,7 @@ Every screen respects the status bar, navigation bar and display cutouts. This i
 
 ## Every outbound request
 
-Managing a TV happens directly between the app and that TV. The complete list of everything else the app contacts, each only when the screen or action needing it is used:
+Managing a TV happens directly between the app and the TV. The complete list of everything else the app contacts, each only when the screen or action needing it is used:
 
 | Destination | For | Sends |
 |---|---|---|
@@ -121,7 +121,7 @@ Managing a TV happens directly between the app and that TV. The complete list of
 | Whatever host a catalog entry names | That package's `.ipk` download | Nothing about the user |
 | `developer.lge.com` | The Developer Mode remaining-time check | The session token read from the TV |
 
-Only the last transmits anything, and only because there is no local way to learn a session's remaining time. Adding a destination beyond this list is a change to a project constraint, not an implementation detail.
+Only the LG session check sends any data, and what it sends is the session token read from the TV. It is there only because there is no local way to learn how long a session has left. Adding a destination beyond this list is a change to a project constraint, not an implementation detail.
 
 There is no telemetry, no analytics, no crash reporting, and no auto-update mechanism that fetches and runs remote code.
 

@@ -3,10 +3,9 @@
 > Unaffiliated with LG Electronics Inc. or the webOS Open Source Edition
 > project.
 
-A mobile-first manager for LG webOS smart TVs in Developer Mode or with
-Homebrew Channel installed. Pair a TV from a phone, install and uninstall
-homebrew apps on it, and see what firmware, webOS release and Developer
-Mode session it is running.
+A mobile-first Android app for LG webOS TVs in Developer Mode. Pair a TV
+from a phone, install homebrew apps on it, and keep track of how long the
+Developer Mode session has left.
 
 ## Screenshots
 
@@ -32,21 +31,20 @@ labels, and deleting a paired device is hard to find.
 
 ## Status
 
-Early development. Mobile only (Android first) for now; a desktop
-counterpart is planned for later and lives as an empty placeholder in
+The Android app is feature complete for what it set out to do. Working
+today:
+
+- Pair a TV, keep several, and switch between them
+- Install apps from the Homebrew catalog or from a local .ipk
+- See a TV's hardware and firmware, and how long its Developer Mode
+  session has left
+- Renew that session without leaving the couch
+
+Not built: an SFTP file browser and an SSH terminal. Both have a tab
+reserved, hidden by default, and neither is ruled out.
+
+A desktop counterpart is planned and lives as an empty placeholder in
 [/desktop](desktop).
-
-Working today: pairing a TV from its Developer Mode passphrase, keeping
-several paired TVs and switching between them, installing and
-uninstalling apps from the public Homebrew catalog or from an .ipk file
-on the phone, and a device detail page covering model, firmware, webOS
-release, SoC, OTA ID and the Developer Mode session, including renewing
-it.
-
-Not built yet: browsing the TV's filesystem over SFTP, and an SSH
-terminal. Each has a tab reserved in the app, hidden by default and
-switchable on in settings, where it says as much. Neither is ruled out;
-opening an issue is the way to ask for one.
 
 ## Documentation
 
@@ -55,7 +53,7 @@ The full docs site is at **[symonxdd.github.io/aphanes](https://symonxdd.github.
 - [docs/README.md](docs/README.md): project overview and current status
 - [docs/concepts.md](docs/concepts.md): plain-language explanations of every technology involved (Developer Mode, SSH, the luna bus, IPK packages, OTA IDs), plus a glossary
 - [docs/architecture.md](docs/architecture.md): tech stack, folder structure, and the reasoning behind each decision
-- [docs/pairing.md](docs/pairing.md): how the Developer Mode key exchange actually works, and what is deliberately not verified
+- [docs/pairing.md](docs/pairing.md): how the Developer Mode key exchange actually works, and the security choices behind it
 
 ## Getting started
 
@@ -68,14 +66,15 @@ flutter run
 
 ## Privacy and safety
 
-- Managing a TV happens directly between this app and that TV on the
+- Managing a TV happens directly between this app and the TV on the
   local network. No third-party server sits in that path, and device
   lists, files, and credentials never leave the phone. None of it is
   synced to a cloud anywhere.
 - Device credentials are stored via secure platform storage, never in
   plaintext, never logged.
 - No telemetry, analytics, or crash reporting without an explicit,
-  separate opt-in.
+  separate opt-in. Nothing about how the app is used is reported
+  anywhere.
 - Every TV-modifying action (install, uninstall, file write/delete,
   terminal command) happens only when directly triggered.
 
@@ -84,15 +83,15 @@ Three things reach the internet, each only when opened or used:
 - **Browsing the Homebrew app catalog** reads the public listing at
   repo.webosbrew.org, and loads package icons from there. Nothing about
   the phone or its paired TVs is sent.
-- **Installing from that catalog** downloads the package from wherever
+- **Installing an app from that catalog** downloads it from wherever
   the catalog points, which today is GitHub for nearly every entry. Each
   download is verified against the catalog's published SHA-256 and
   refused on a mismatch.
 - **The Developer Mode remaining-time check**, on a device's detail page,
-  asks developer.lge.com, sending the session token read from that TV.
-  It is the only request that transmits anything, and there is no
-  local-only way to obtain that number. Renewing a session does not use
-  it: renewing only tells the TV to open its own Developer Mode app.
+  asks developer.lge.com, sending the session token read from the TV.
+  This is the only one of the three that sends any data, and it is here
+  because nothing local can answer the question. Renewing does not use
+  it: that only tells the TV to open its own Developer Mode app.
 
 ## Credits
 
@@ -100,4 +99,4 @@ The webOS devmode pairing protocol (the TV's key server and its key
 exchange) is implemented from scratch here, informed by reading the
 community's [dev-manager-desktop](https://github.com/webosbrew/dev-manager-desktop)
 and [ares-cli-rs](https://github.com/webosbrew/ares-cli-rs) projects
-(both Apache-2.0), not copied from their source.
+(both Apache-2.0).

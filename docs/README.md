@@ -6,7 +6,7 @@ description: Documentation for webOS Dev Mode Manager, a mobile-first Android ap
 > Unaffiliated with LG Electronics Inc. or the webOS Open Source Edition
 > project.
 
-**webOS Dev Mode Manager** is a mobile-first Android app for managing an LG webOS TV that has Developer Mode enabled. It pairs with a TV over the local network, installs and uninstalls homebrew apps on it, and reports what hardware and firmware that TV is running.
+**webOS Dev Mode Manager** is a mobile-first Android app for LG webOS TVs in Developer Mode. It pairs with a TV over the local network, installs homebrew apps on it, and keeps track of how long the Developer Mode session has left.
 
 The repository and the codebase use the codename **Aphanes**, from the Ancient Greek ἀφανής, meaning unseen or not manifest. The shipped app presents itself as webOS Dev Mode Manager everywhere a person looks.
 
@@ -26,16 +26,16 @@ This project is a rewrite that treats the phone as the primary target rather tha
 
 ## What is not built
 
-Browsing the TV's filesystem over SFTP, and an SSH terminal. Both were in the original scope and both were set aside in favour of the device detail page. Each keeps a tab reserved in the app, hidden by default and switchable on in settings, where it says as much. Neither is ruled out.
+An SFTP file browser and an SSH terminal. Both were in the original scope. Each keeps a tab reserved in the app, hidden by default and switchable on in settings, where it says as much. Neither is ruled out.
 
 ## Where to go next
 
 - [concepts.md](concepts.md) explains every piece of technology involved, in plain language, with a glossary. Start here if terms like luna bus, IPK or Developer Mode session are unfamiliar.
 - [architecture.md](architecture.md) covers the tech stack, folder structure, state management and the reasoning behind each decision.
-- [pairing.md](pairing.md) walks through the Developer Mode key exchange in detail, including what is verified and what deliberately is not.
+- [pairing.md](pairing.md) walks through the Developer Mode key exchange in detail, including the security choices behind it and why some checks other apps make would not help here.
 
 ## Privacy
 
-Managing a TV happens directly between the app and that TV on the local network, with no third party in that path. Device lists, files and credentials never leave the phone, and none of it is synced anywhere. There is no telemetry.
+Managing a TV happens directly between the app and the TV on the local network, with no third party in that path. Device lists, files and credentials never leave the phone, and none of it is synced anywhere. There is no telemetry, meaning nothing about how the app is used is ever reported anywhere.
 
-Three features do reach the internet, each only when opened or used: the Homebrew catalog listing, package downloads, and the Developer Mode remaining-time check. [architecture.md](architecture.md#every-outbound-request) lists all of them, including the one that transmits anything.
+Three features do reach the internet, each only when opened or used: reading the Homebrew catalog listing, downloading an app from that catalog, and checking how long is left on the Developer Mode session. Only the last one sends anything, and what it sends is the session token read from the TV. [architecture.md](architecture.md#every-outbound-request) lists all three in full.

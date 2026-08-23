@@ -24,7 +24,7 @@ Two things about it matter constantly:
 
 **It expires.** Sessions are deliberately temporary, and the webOS Homebrew project documents an overall limit of 1000 hours, with the timer resettable from the Developer Mode app on the TV. When a session lapses, the TV stops accepting developer connections, and apps installed through Developer Mode are removed with it.
 
-**Its remaining time cannot be worked out locally.** Nothing on the TV reports a countdown. The only way to learn how long is left is to ask LG's own session endpoint, sending the session token that was read from the TV. That is the one request this app makes that transmits anything, and it exists only because there is no local alternative.
+**Its remaining time cannot be worked out locally.** Nothing on the TV reports a countdown. The only way to learn how long is left is to ask LG's own session endpoint, sending the session token that was read from the TV. That is the only request this app makes that sends any data anywhere, and it is there only because nothing local can answer the question.
 
 Renewing is different, and needs no such call. It asks the TV to open its own Developer Mode app with an extend flag, which is exactly the same as walking over and reopening that app by hand. Expect it to appear on the TV screen when the button is used.
 
@@ -48,7 +48,11 @@ Pairing is the process of obtaining that private key once. Afterward the key is 
 
 ## The luna bus
 
-webOS is built around a message bus called **luna** (sometimes written as ls2, for LunaService 2). Rather than every part of the system calling every other part directly, services register a name on the bus and receive JSON messages at addresses that look like URLs:
+webOS is built around a message bus called **luna** (sometimes written as ls2, for LunaService 2).
+
+A **bus** here is a shared channel that every part of the system talks over, named after the electrical kind: one line that many components connect to, instead of a separate wire between each pair of them. Nothing has to know where anything else lives, or how to reach it. A component announces a name on the bus, and anyone who wants it sends a message to that name and waits for a reply.
+
+On webOS those names look like URLs:
 
 ```
 luna://com.webos.applicationManager/launch
