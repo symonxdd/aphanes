@@ -41,55 +41,78 @@ class DeviceCard extends ConsumerWidget {
         ],
       ),
     ];
-    return Card(
-      margin: EdgeInsets.zero,
-      clipBehavior: Clip.antiAlias,
-      shape: const RoundedRectangleBorder(),
-      child: ListTile(
-        onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Icon(Icons.tv, color: selected ? theme.colorScheme.primary : null),
-            if (selected)
-              Positioned(
-                // Top-left, not bottom-right: Icons.tv's stand/feet sit
-                // at the bottom of the glyph, and a badge this size
-                // covered them there - the top corner only clips into
-                // the screen area, which reads fine without it.
-                left: -4,
-                top: -6,
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    shape: BoxShape.circle,
-                    // Matches the card's own background, so the badge
-                    // reads as cut into the icon rather than just
-                    // floating on top of it.
-                    border: Border.all(color: theme.cardTheme.color ?? theme.colorScheme.surface, width: 2),
-                  ),
-                  // Material's Icons.check is a single fixed-weight
-                  // glyph with no way to make its stroke bolder.
-                  // LucideIcons.check600 is the same checkmark baked at
-                  // a heavier stroke width (3.0) as a genuinely separate
-                  // bundled font weight - already shipped by
-                  // lucide_icons_flutter, no extra dependency or
-                  // hand-drawn path needed. The heaviest one actually
-                  // bundled - the package's own pubspec.yaml has a
-                  // Lucide700 commented out, so 600 is the ceiling.
-                  child: Icon(LucideIcons.check600, size: 13, color: theme.colorScheme.onPrimary),
-                ),
-              ),
-          ],
-        ),
-        title: Text(device.name, overflow: TextOverflow.ellipsis),
-        subtitle: subtitleLines.isEmpty ? null : Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: subtitleLines),
-        trailing: Tooltip(
-          message: 'Device details',
-          child: InkWell(onTap: onInfoTap, customBorder: const CircleBorder(), child: const Icon(Icons.info_outline)),
+    // No Card, no surface color of its own: the row sits directly on the
+    // page background. The rounded `shape` is only what the tap ripple is
+    // clipped to, not a painted background.
+    return ListTile(
+      onTap: onTap,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      leading: Icon(Icons.tv, color: selected ? theme.colorScheme.primary : null),
+      title: Text(device.name, overflow: TextOverflow.ellipsis),
+      subtitle: subtitleLines.isEmpty ? null : Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: subtitleLines),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (selected) ...[const _SelectedBadge(), const SizedBox(width: 12)],
+          Tooltip(
+            message: 'Device details',
+            child: InkWell(onTap: onInfoTap, customBorder: const CircleBorder(), child: const Icon(Icons.info_outline)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Marks the device the other tabs currently act on. Sized to the info
+/// icon it sits beside, so the two read as one pair of trailing marks
+/// rather than a badge that wandered in from somewhere else.
+///
+/// It used to sit on top of the TV icon, which meant it had to be drawn
+/// with a background-colored ring to cut itself out of the glyph
+/// underneath. Standing on its own here, it needs none of that.
+class _SelectedBadge extends StatelessWidget {
+  const _SelectedBadge();
+
+  /// The box the adjacent info icon occupies. Matched so the two sit on
+  /// the same center line and the row's spacing does not depend on which
+  /// of them is present.
+  static const double _box = 24;
+
+  /// The circle actually painted inside that box. Smaller than the box on
+  /// purpose: Icons.info_outline draws a thin outline that stops short of
+  /// its own edges, so a solid circle filling the full 24 read as clearly
+  /// the larger of the two. This is roughly the diameter that outline
+  /// encloses, which is what makes them look like a matched pair.
+  static const double _circle = 20;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Tooltip(
+      message: 'Selected device',
+      child: SizedBox(
+        width: _box,
+        height: _box,
+        child: Center(
+          child: Container(
+            width: _circle,
+            height: _circle,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary,
+              shape: BoxShape.circle,
+            ),
+        // Material's Icons.check is a single fixed-weight glyph with no
+        // way to make its stroke bolder. LucideIcons.check600 is the same
+        // checkmark baked at a heavier stroke width (3.0) as a genuinely
+        // separate bundled font weight - already shipped by
+        // lucide_icons_flutter, no extra dependency or hand-drawn path
+        // needed. The heaviest one actually bundled: the package's own
+        // pubspec.yaml has a Lucide700 commented out, so 600 is the
+        // ceiling.
+            child: Icon(LucideIcons.check600, size: 13, color: theme.colorScheme.onPrimary),
+          ),
         ),
       ),
     );
