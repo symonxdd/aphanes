@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/persistence/secure_storage_provider.dart';
 import '../models/device.dart';
 import '../services/device_storage_service.dart';
+import 'device_info_cache_controller.dart';
 
 final Provider<DeviceStorageService> deviceStorageServiceProvider =
     Provider<DeviceStorageService>(
@@ -21,7 +22,9 @@ class DeviceListController extends AsyncNotifier<List<Device>> {
   }
 
   Future<void> remove(String deviceId) async {
+    // Deletes the device record and its cached TV info together.
     await ref.read(deviceStorageServiceProvider).delete(deviceId);
+    ref.read(deviceInfoCacheProvider.notifier).forget(deviceId);
     state = AsyncData(
       (await future).where((Device d) => d.id != deviceId).toList(),
     );

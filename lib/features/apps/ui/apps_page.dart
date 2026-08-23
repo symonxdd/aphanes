@@ -13,6 +13,7 @@ import '../../devices/state/active_device_controller.dart';
 import '../../devices/state/device_list_controller.dart';
 import '../../devices/state/device_reachability_controller.dart';
 import '../../devices/ui/pair_device_page.dart';
+import '../../devices/ui/widgets/unreachable_message.dart';
 import '../../home/state/home_tab_controller.dart';
 import '../models/installed_app.dart';
 import '../state/app_operation_controller.dart';
@@ -20,39 +21,6 @@ import '../state/installed_apps_controller.dart';
 import 'catalog_page.dart';
 import 'widgets/installed_app_tile.dart';
 import 'widgets/operation_progress_dialog.dart';
-
-/// Shared with the reachability gate's own error state - one wording and
-/// one styling for "this TV isn't answering", not scattered across both
-/// call sites. Two separately-styled lines: the first reads as the actual
-/// problem, the second is a secondary hint, muted rather than given the
-/// same weight as the first.
-class _UnreachableMessage extends StatelessWidget {
-  const _UnreachableMessage({required this.deviceName});
-
-  final String deviceName;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          '"$deviceName" not reachable. Is it turned on?',
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 6),
-        Text(
-          'Also, make sure this phone is on the same network as the TV.',
-          textAlign: TextAlign.center,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 /// Turns a failed apps-list load into the widget that's actually useful.
 /// This only ever runs once the reachability gate in [_AppsList] has
@@ -288,7 +256,7 @@ class _UnreachableState extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: _UnreachableMessage(deviceName: deviceName),
+        child: UnreachableMessage(deviceName: deviceName),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../../../core/persistence/key_value_store.dart';
 import '../models/device.dart';
+import '../models/device_info.dart';
 
 const String _indexKey = 'device_ids';
 
@@ -36,9 +37,38 @@ class DeviceStorageService {
 
   Future<void> delete(String deviceId) async {
     await _storage.delete(_deviceKey(deviceId));
+    await _storage.delete(_infoKey(deviceId));
     final List<String> ids = await _readIndex();
     ids.remove(deviceId);
     await _writeIndex(ids);
+  }
+
+  /// The last hardware/firmware facts fetched from each paired TV, keyed
+  /// by device id. Read in one pass at startup so the device detail page
+  /// has them synchronously and can render immediately instead of
+  /// spinning while a fresh copy is fetched behind it.
+  ///
+  /// In the same secure store as the device records themselves rather
+  /// than plain prefs. None of these fields is a credential on its own,
+  /// but they are keyed by device id, and the project's rule puts device
+  /// ids in secure storage - so this sits there too rather than
+  /// splitting one device's data across two stores by field.
+  Future<Map<String, DeviceInfo>> loadAllInfo() async {
+    final List<String> ids = await _readIndex();
+    final Map<String, DeviceInfo> infos = {};
+    for (final String id in ids) {
+      final String? raw = await _storage.read(_infoKey(id));
+      if (raw != null) {
+        infos[id] = DeviceInfo.fromJson(
+          jsonDecode(raw) as Map<String, dynamic>,
+        );
+      }
+    }
+    return infos;
+  }
+
+  Future<void> saveInfo(String deviceId, DeviceInfo info) {
+    return _storage.write(_infoKey(deviceId), jsonEncode(info.toJson()));
   }
 
   Future<List<String>> _readIndex() async {
@@ -54,4 +84,6 @@ class DeviceStorageService {
   }
 
   String _deviceKey(String id) => 'device_$id';
+
+  String _infoKey(String id) => 'device_info_$id';
 }
