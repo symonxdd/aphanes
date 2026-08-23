@@ -1,4 +1,4 @@
-import 'package:aphanes/features/apps/services/luna_command_service.dart';
+import 'package:aphanes/core/ssh/luna_command_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

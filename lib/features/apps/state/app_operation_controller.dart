@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/ssh/luna_command_service.dart';
 import '../../../core/ssh/ssh_connection_service.dart';
 import '../models/luna_operation_progress.dart';
 import '../services/app_catalog_service.dart';
 import '../services/apps_service.dart';
-import '../services/luna_command_service.dart';
 import 'app_operation_state.dart';
 import 'installed_apps_controller.dart';
 

@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/ssh/luna_command_service.dart';
 import '../../../core/ssh/ssh_connection_service.dart';
 import '../../../core/ui/ambient_backdrop.dart';
 import '../../devices/models/device.dart';
@@ -14,7 +15,6 @@ import '../../devices/state/device_reachability_controller.dart';
 import '../../devices/ui/pair_device_page.dart';
 import '../../home/state/home_tab_controller.dart';
 import '../models/installed_app.dart';
-import '../services/luna_command_service.dart';
 import '../state/app_operation_controller.dart';
 import '../state/installed_apps_controller.dart';
 import 'catalog_page.dart';

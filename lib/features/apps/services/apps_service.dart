@@ -6,11 +6,11 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:dartssh2/dartssh2.dart';
 
+import '../../../core/ssh/luna_command_service.dart';
 import '../../../core/ssh/ssh_connection_service.dart';
 import '../../devices/models/device.dart';
 import '../models/installed_app.dart';
 import '../models/luna_operation_progress.dart';
-import 'luna_command_service.dart';
 
 /// Thrown when an install or uninstall fails for a reason specific enough
 /// to show inline (a rejected install, a corrupted upload), never a raw

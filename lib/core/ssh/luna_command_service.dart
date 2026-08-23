@@ -21,6 +21,10 @@ class LunaCallException implements Exception {
 /// install/remove calls go over the *public* bus (`luna-send-pub`, not
 /// `luna-send`), confirmed by reading that file directly rather than
 /// assuming from the command name alone.
+///
+/// Lives in core/, not features/apps/: the Apps feature was its first user,
+/// but Devices' own device-info and Developer Mode status calls need the
+/// exact same one-shot luna-send-pub mechanics, not a second copy of it.
 class LunaCommandService {
   /// A single-response call (`luna-send-pub -n 1 <uri> <payload>`), for
   /// `dev/listApps`. Returns the decoded JSON response.
