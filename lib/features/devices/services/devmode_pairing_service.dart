@@ -123,9 +123,9 @@ class DevmodePairingService {
 
   /// Checks whether [passphrase] would successfully decrypt
   /// [encryptedPem] - no network involved, just the same decrypt [pair]
-  /// would eventually do. Runs off the UI thread via [compute]: PBKDF2 key
-  /// derivation is CPU-bound and can take long enough to jank a frame if
-  /// run inline.
+  /// would eventually do. Runs off the UI thread via [compute]: the key
+  /// derivation (OpenSSL's EVP_BytesToKey, see [LegacyPemDecryptor]) is
+  /// CPU-bound and can take long enough to jank a frame if run inline.
   Future<bool> validatePassphrase(String encryptedPem, String passphrase) {
     return compute(_tryDecrypt, (encryptedPem, passphrase));
   }
