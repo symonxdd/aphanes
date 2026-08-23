@@ -117,6 +117,11 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
     final Set<String> installedIds =
         ref.watch(installedAppsProvider).value?.map((a) => a.id).toSet() ??
         const {};
+    // Counted here rather than inside the list builders below, because
+    // the toolbar showing the count is a sibling of those, not a child.
+    final List<CatalogPackage> loaded = catalog.value ?? const [];
+    final int totalCount = loaded.length;
+    final int shownCount = _visiblePackages(loaded).length;
     return Scaffold(
       appBar: AppBar(
         // Search replaces the title in place, rather than a permanently
@@ -222,6 +227,14 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
                             setState(() => _listMode = selection.first),
                       ),
                       const Spacer(),
+                      // Sits in the toolbar rather than taking a row of
+                      // its own: it is a small fact about the list, not a
+                      // heading for it.
+                      _CatalogCount(
+                        shown: shownCount,
+                        total: totalCount,
+                      ),
+                      const SizedBox(width: 4),
                       // Icon reflects the CURRENT view, not the one a tap
                       // switches to: it's read as "you're looking at a
                       // list" the same way the grid icon reads as "you're
@@ -284,6 +297,33 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
   }
 }
 
+/// How many catalog entries are on screen, and out of how many.
+///
+/// Says "50 apps" when everything is shown, and "12 of 50" once a search
+/// or the Favorites filter has narrowed it, so the second number makes
+/// clear that the rest are filtered rather than missing. Renders nothing
+/// at all until the catalog has loaded, rather than flashing a zero.
+class _CatalogCount extends StatelessWidget {
+  const _CatalogCount({required this.shown, required this.total});
+
+  final int shown;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    if (total == 0) {
+      return const SizedBox.shrink();
+    }
+    final ThemeData theme = Theme.of(context);
+    return Text(
+      shown == total ? '$total apps' : '$shown of $total',
+      style: theme.textTheme.labelMedium?.copyWith(
+        color: theme.colorScheme.outline,
+      ),
+    );
+  }
+}
+
 class _CatalogList extends StatelessWidget {
   const _CatalogList({
     required this.packages,
@@ -324,35 +364,43 @@ class _CatalogListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    return Card(
-      margin: EdgeInsets.zero,
-      clipBehavior: Clip.antiAlias,
+    // No Card, no surface of its own: the row sits on the page
+    // background, and `shape` only clips the tap ripple.
+    return ListTile(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        leading: _CatalogIcon(uri: package.iconUri, size: 48, radius: 14),
-        title: Text(package.title),
-        // Only passed when non-empty - an empty subtitle still reserves a
-        // second line's worth of height, which is what made the title sit
-        // off-center for entries with no description.
-        subtitle: package.shortDescription.isEmpty
-            ? null
-            : Text(
-                package.shortDescription,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-        trailing: installed
-            ? Tooltip(
-                message: 'Already installed',
-                child: Icon(
-                  LucideIcons.checkCircle,
-                  color: theme.colorScheme.primary,
-                ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      leading: _CatalogIcon(uri: package.iconUri, size: 48, radius: 14),
+      // One line, always. A long title wrapping to two was the only thing
+      // making one row taller than its neighbours.
+      title: Text(package.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+      // Always a second line, so every row is exactly the same height.
+      // The catalog publishes no short description for any entry at
+      // present, so rather than reserve a blank line for one that never
+      // arrives, the package id fills it: it is the string that actually
+      // identifies an app, and the one worth searching for elsewhere.
+      subtitle: Text(
+        package.shortDescription.isEmpty
+            ? package.id
+            : package.shortDescription,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: package.shortDescription.isEmpty
+            ? theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.outline,
+                fontFamily: 'monospace',
               )
             : null,
-        onTap: () => _openDetail(context, package, device, installed),
       ),
+      trailing: installed
+          ? Tooltip(
+              message: 'Already installed',
+              child: Icon(
+                LucideIcons.checkCircle,
+                color: theme.colorScheme.primary,
+              ),
+            )
+          : null,
+      onTap: () => _openDetail(context, package, device, installed),
     );
   }
 }
@@ -466,10 +514,11 @@ class _CatalogGridTile extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: theme.colorScheme.primary,
                           shape: BoxShape.circle,
+                          // The page background, which is what this tile
+                          // sits on now that nothing draws a card behind
+                          // it, so the badge reads as cut into the icon.
                           border: Border.all(
-                            color:
-                                theme.cardTheme.color ??
-                                theme.colorScheme.surface,
+                            color: theme.scaffoldBackgroundColor,
                             width: 2,
                           ),
                         ),
