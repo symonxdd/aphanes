@@ -14,7 +14,7 @@ The repository and the codebase use the codename **Aphanes**, from the Ancient G
 
 The community already has an excellent tool for this: [dev-manager-desktop](https://github.com/webosbrew/dev-manager-desktop). It is desktop-first, and it shows on a phone. Content draws underneath the system status and navigation bars, the bottom navigation is icon-only with no labels, and removing a paired device is hard to find.
 
-This project is a rewrite that treats the phone as the primary target rather than an afterthought. Its protocol work is informed by reading dev-manager-desktop and [ares-cli-rs](https://github.com/webosbrew/ares-cli-rs), both Apache-2.0, but none of their UI or UX is carried over. That inadequate mobile experience is the entire reason this exists.
+This project is a rewrite that treats the phone as the primary target rather than an afterthought. Its protocol work is informed by reading dev-manager-desktop and [ares-cli-rs](https://github.com/webosbrew/ares-cli-rs), both Apache-2.0. The mobile experience is the entire reason this exists.
 
 ## What works today
 

@@ -96,7 +96,7 @@ Three things reach the internet, each only when opened or used:
 ## Credits
 
 The webOS devmode pairing protocol (the TV's key server and its key
-exchange) is implemented from scratch here, informed by reading the
+exchange) is implemented here, informed by reading the
 community's [dev-manager-desktop](https://github.com/webosbrew/dev-manager-desktop)
 and [ares-cli-rs](https://github.com/webosbrew/ares-cli-rs) projects
 (both Apache-2.0).

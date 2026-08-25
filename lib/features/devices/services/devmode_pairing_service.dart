@@ -47,7 +47,7 @@ class PairedDevmodeCredentials {
 /// characters of the device's NDUID, so it's fixed for a given TV and
 /// will read the same every time that TV's Developer Mode app is opened.
 ///
-/// Protocol, informed by (not copied from) webosbrew/ares-cli-rs's
+/// Protocol, informed by webosbrew/ares-cli-rs's
 /// (Apache-2.0) `common/connection/src/setup.rs`: the TV runs a plain-HTTP
 /// "key server" on [keyServerPort], separate from the SSH port. A bare
 /// `GET /webos_rsa HTTP/1.0` returns a legacy OpenSSL-encrypted RSA private

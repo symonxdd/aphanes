@@ -17,7 +17,7 @@ This page covers *decisions*: what was chosen and why. For explanations of the t
 - **`file_picker`** for choosing a local `.ipk`.
 - **`url_launcher`** for handing links to the system browser.
 - **`lucide_icons_flutter`** for the device detail page's field icons.
-- **`flutter_colorpicker`** for the accent colour setting.
+- **`flutter_colorpicker`** for the accent color setting.
 
 Every third-party package was checked on pub.dev for maintenance recency, popularity and open issues before being added, with the reasoning recorded in the commit that introduced it.
 
@@ -39,7 +39,7 @@ lib/
     files/               placeholder tab
     home/                the shell: app bar, tabs, page view
     onboarding/          first-run screens
-    settings/            theme, accent colour, tab visibility, about
+    settings/            theme, accent color, tab visibility, about
     terminal/            placeholder tab
 ```
 
@@ -88,17 +88,17 @@ The cache lives in secure storage alongside the device records rather than in pl
 
 Device records, private keys included, are persisted entirely through the platform keystore via `DeviceStorageService`. Never plaintext preferences, never logged, never committed.
 
-`SecureKeyValueStore` exists as a one-interface seam over `flutter_secure_storage` so services depending on it can be tested against an in-memory fake. The real implementation has no platform-channel handler under `flutter test` and hangs rather than failing, which makes the seam a practical necessity rather than architectural decoration.
+`SecureKeyValueStore` exists as a one-interface seam over `flutter_secure_storage` so services depending on it can be tested against an in-memory fake. The real implementation has no platform-channel handler under `flutter test` and hangs rather than failing, so without the seam those tests could not run at all.
 
 ## Theming
 
-Three themes derived from one seed colour: light, dark, and OLED.
+Three themes derived from one seed color: light, dark, and OLED.
 
-Light and dark both define an explicit surface ladder rather than leaning on `ColorScheme.fromSeed`'s defaults. That is deliberate: mixing the two theming models meant switching between light and dark was not an interpolated colour change but a flip between flat explicit colours on one side and Material 3's tonal-elevation tint on the other, which read as a glitch rather than a transition.
+Light and dark both define an explicit surface ladder rather than leaning on `ColorScheme.fromSeed`'s defaults. That is deliberate: mixing the two theming models meant switching between light and dark was not an interpolated color change but a flip between flat explicit colors on one side and Material 3's tonal-elevation tint on the other, which read as a glitch rather than a transition.
 
 OLED is the dark palette with every surface forced to true black and `surfaceTint` zeroed. Zeroing that single value is what stops the accent wash on cards, sheets and dialogs, rather than patching each widget's theme individually. It is on by default, but it is only ever read once the resolved theme is already dark, so a phone in light mode is unaffected and never switched on its account.
 
-The accent colour is user-selectable and everything derives from it.
+The accent color is user-selectable and everything derives from it.
 
 ## The shell
 
@@ -129,6 +129,6 @@ There is no telemetry, no analytics, no crash reporting, and no auto-update mech
 
 Tests cover the parts where being wrong is expensive and a widget tree is not needed: the pairing handshake and its PEM decryption, catalog parsing and integrity checking, luna reply parsing, the info cache and its write-through, and the legacy SSH identity.
 
-Widget tests cover behaviour that is easy to regress by accident rather than layout: that a previously opened TV shows its details with no spinner, that a first visit still shows one, that an unreachable TV with stored facts skips the notice, and that an info sheet with no expandable section disposes cleanly.
+Widget tests cover behavior that is easy to regress by accident rather than layout: that a previously opened TV shows its details with no spinner, that a first visit still shows one, that an unreachable TV with stored facts skips the notice, and that an info sheet with no expandable section disposes cleanly.
 
 Nothing in the suite touches a real TV or the network.

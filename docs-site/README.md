@@ -30,7 +30,7 @@ Write links the GitHub way and they work in both places.
 
 ### Screenshots
 
-Images live in [/docs/screenshots](../docs/screenshots/) so the same files serve the root README and any docs page that wants them. Astro processes and optimises images referenced relatively from Markdown, which is what `sharp` is a dependency for.
+Images live in [/docs/screenshots](../docs/screenshots/) so the same files serve the root README and any docs page that wants them. Astro processes and optimizes images referenced relatively from Markdown, which is what `sharp` is a dependency for.
 
 ## Running it locally
 
