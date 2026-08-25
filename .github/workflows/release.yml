@@ -1,0 +1,100 @@
+name: Release
+
+# Started by pushing a v* tag, which `dart run tool/release.dart` does as
+# its last step. Nothing here builds on a normal push.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # A release that fails its own tests is not worth publishing, so
+      # both gates run before anything is built.
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      # Written outside the repo checkout so it cannot be picked up by a
+      # later step or left behind in an artifact.
+      - name: Restore the signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.p12"
+          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/release.p12" >> "$GITHUB_ENV"
+
+      # One architecture, not a universal APK. A universal build carries
+      # native code for all three CPU architectures and a phone uses
+      # exactly one of them, which is the difference between about 57 MB
+      # and 20 MB. arm64 covers every Android phone since roughly 2017.
+      - name: Build the signed APK
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: flutter build apk --release --target-platform android-arm64
+
+      # Refuses to publish an APK carrying the debug key, which is what
+      # the Gradle fallback produces if a secret is missing or misnamed.
+      # Without this the release would look fine and only fail for users,
+      # at install time, much later.
+      #
+      # apksigner rather than reading META-INF by hand: v2 and v3
+      # signatures live in the APK Signing Block, not in the archive, so
+      # unzipping can miss them entirely and report nothing at all.
+      - name: Verify it is not debug-signed
+        run: |
+          APK=build/app/outputs/flutter-apk/app-release.apk
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
+          if [ -z "$APKSIGNER" ]; then
+            echo "::error::apksigner not found, cannot verify the signature."
+            exit 1
+          fi
+          CERTS=$("$APKSIGNER" verify --print-certs "$APK")
+          echo "$CERTS"
+          if echo "$CERTS" | grep -qi "CN=Android Debug"; then
+            echo "::error::APK is debug-signed. Check the ANDROID_* repository secrets."
+            exit 1
+          fi
+
+      - name: Name the APK after its version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          cp build/app/outputs/flutter-apk/app-release.apk "aphanes-$VERSION.apk"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "aphanes-$VERSION.apk" \
+            --title "v$VERSION" \
+            --generate-notes
