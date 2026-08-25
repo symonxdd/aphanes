@@ -64,6 +64,45 @@ flutter pub get
 flutter run
 ```
 
+## Releasing
+
+Cutting a release is one command:
+
+```
+dart run tool/release.dart
+```
+
+It refuses to run on a dirty working tree, then:
+
+1. Asks whether this is a patch, minor or major release, and shows the
+   exact version it would move to
+2. Bumps `version:` in [pubspec.yaml](pubspec.yaml), including the build
+   number after the `+`, which Android requires to increase every time
+3. Commits that one line as `chore(release): bump version to x.y.z`
+4. Tags it `vx.y.z` and pushes the commit and the tag
+
+Pushing the tag is what starts
+[release.yml](.github/workflows/release.yml), which:
+
+- Runs `flutter analyze` and `flutter test`, and stops if either fails
+- Builds an arm64 release APK, signed with the release keystore held in
+  repository secrets
+- Refuses to continue if that APK turns out to be debug-signed, which is
+  what a missing secret would otherwise produce silently
+- Publishes a GitHub release with `aphanes-vx.y.z.apk` attached and
+  notes generated from the commits since the last tag
+
+Progress shows under the repository's Actions tab. Nothing is built
+locally.
+
+### Signing
+
+Release builds are signed from `android/key.properties` locally, or from
+`ANDROID_KEYSTORE_*` repository secrets in CI. Neither is in the
+repository. Without either, a release build falls back to the debug key
+so it still compiles, and the workflow above rejects the result rather
+than publishing it.
+
 ## Privacy and safety
 
 - Managing a TV happens directly between this app and the TV on the

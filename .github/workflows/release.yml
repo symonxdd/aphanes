@@ -88,13 +88,13 @@ jobs:
       - name: Name the APK after its version
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          cp build/app/outputs/flutter-apk/app-release.apk "aphanes-$VERSION.apk"
+          cp build/app/outputs/flutter-apk/app-release.apk "aphanes-v$VERSION.apk"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Publish the release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "aphanes-$VERSION.apk" \
+          gh release create "$GITHUB_REF_NAME" "aphanes-v$VERSION.apk" \
             --title "v$VERSION" \
             --generate-notes
