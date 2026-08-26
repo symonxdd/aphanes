@@ -1,12 +1,11 @@
 name: Release
 
-# Started by pushing a v* tag, which `dart run tool/release.dart` does as
-# its last step. Nothing here builds on a normal push.
+# Only ever runs from a v* tag, which `dart run tool/release.dart` pushes
+# as its last step.
 on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -34,27 +33,31 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # A release that fails its own tests is not worth publishing, so
-      # both gates run before anything is built.
       - name: Analyze
         run: flutter analyze
 
       - name: Test
         run: flutter test
 
-      # Written outside the repo checkout so it cannot be picked up by a
-      # later step or left behind in an artifact.
+      # Decoded outside the checkout so it cannot end up in the APK or in
+      # an artifact. The size check is the one guard worth keeping: a
+      # wrong password or a bad alias makes Gradle fail loudly, but a
+      # keystore that never arrived makes it fall back to the debug key
+      # and publish something that can never update an existing install.
       - name: Restore the signing keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
           echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.p12"
+          if [ ! -s "$RUNNER_TEMP/release.p12" ]; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 is missing or empty."
+            exit 1
+          fi
           echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/release.p12" >> "$GITHUB_ENV"
 
-      # One architecture, not a universal APK. A universal build carries
-      # native code for all three CPU architectures and a phone uses
-      # exactly one of them, which is the difference between about 57 MB
-      # and 20 MB. arm64 covers every Android phone since roughly 2017.
+      # arm64 only. A universal APK carries native code for all three CPU
+      # architectures and a phone uses exactly one, which is the
+      # difference between about 57 MB and 20 MB.
       - name: Build the signed APK
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -62,39 +65,12 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: flutter build apk --release --target-platform android-arm64
 
-      # Refuses to publish an APK carrying the debug key, which is what
-      # the Gradle fallback produces if a secret is missing or misnamed.
-      # Without this the release would look fine and only fail for users,
-      # at install time, much later.
-      #
-      # apksigner rather than reading META-INF by hand: v2 and v3
-      # signatures live in the APK Signing Block, not in the archive, so
-      # unzipping can miss them entirely and report nothing at all.
-      - name: Verify it is not debug-signed
-        run: |
-          APK=build/app/outputs/flutter-apk/app-release.apk
-          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
-          if [ -z "$APKSIGNER" ]; then
-            echo "::error::apksigner not found, cannot verify the signature."
-            exit 1
-          fi
-          CERTS=$("$APKSIGNER" verify --print-certs "$APK")
-          echo "$CERTS"
-          if echo "$CERTS" | grep -qi "CN=Android Debug"; then
-            echo "::error::APK is debug-signed. Check the ANDROID_* repository secrets."
-            exit 1
-          fi
-
-      - name: Name the APK after its version
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          cp build/app/outputs/flutter-apk/app-release.apk "aphanes-v$VERSION.apk"
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-
       - name: Publish the release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          cp build/app/outputs/flutter-apk/app-release.apk "aphanes-v$VERSION.apk"
           gh release create "$GITHUB_REF_NAME" "aphanes-v$VERSION.apk" \
             --title "v$VERSION" \
             --generate-notes

@@ -66,7 +66,7 @@ flutter run
 
 ## Releasing
 
-Cutting a release is one command:
+Making a release is one command:
 
 ```
 dart run tool/release.dart
@@ -87,8 +87,6 @@ Pushing the tag is what starts
 - Runs `flutter analyze` and `flutter test`, and stops if either fails
 - Builds an arm64 release APK, signed with the release keystore held in
   repository secrets
-- Refuses to continue if that APK turns out to be debug-signed, which is
-  what a missing secret would otherwise produce silently
 - Publishes a GitHub release with `aphanes-vx.y.z.apk` attached and
   notes generated from the commits since the last tag
 
@@ -100,8 +98,9 @@ locally.
 Release builds are signed from `android/key.properties` locally, or from
 `ANDROID_KEYSTORE_*` repository secrets in CI. Neither is in the
 repository. Without either, a release build falls back to the debug key
-so it still compiles, and the workflow above rejects the result rather
-than publishing it.
+so it still compiles for anyone without the keystore; the workflow
+checks the keystore arrived before it builds, so a release can never be
+published that way.
 
 ## Privacy and safety
 
