@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --muted-foreground: #6b7280;
+  --accent: #7c5cbf;
+  /* The app icon's own gradient, reused wherever the site needs the
+     project's colour rather than a neutral. */
+  --rose: #fb7185;
+  --pink: #ec4899;
+  /* The hero and every "unseen" band stay this dark in both themes.
+     Pinned rather than themed: the app's own title card fades to black
+     regardless of theme, and the site opens the same way. */
+  --void: #050505;
+}
+
+.dark {
+  --background: #050505;
+  --foreground: #f5f5f5;
+  --muted-foreground: #9ca3af;
+  --accent: #a78bfa;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-rose: var(--rose);
+  --color-pink: var(--pink);
+  --color-void: var(--void);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Matching the app, where every control uses the default cursor. */
+a, button, [role="button"] {
+  cursor: default;
+}
+
+::selection {
+  background: rgba(251, 113, 133, 0.28);
+}
+
+/* Sections fade up as they come into view. Declared here rather than
+   pulled in per component so one rule covers the whole page. */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.rise {
+  animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+}

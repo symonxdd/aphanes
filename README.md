@@ -7,6 +7,10 @@ A mobile-first Android app for LG webOS TVs in Developer Mode. Pair a TV
 from a phone, install homebrew apps on it, and keep track of how long the
 Developer Mode session has left.
 
+**[aphanes-app.vercel.app](https://aphanes-app.vercel.app)** ·
+[Download the APK](https://github.com/symonxdd/aphanes/releases/latest) ·
+[Documentation](https://symonxdd.github.io/aphanes/)
+
 ## Screenshots
 
 | Devices | Devices, OLED | Device detail | Apps | Catalog |

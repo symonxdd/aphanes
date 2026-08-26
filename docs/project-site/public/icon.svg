@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!--
+    The same glyph AppIconGlyph paints in the app, at the same
+    proportions: a rounded screen filled with the rose gradient, with the
+    lower-left triangle cut clean out rather than darkened, so whatever
+    sits behind it shows through.
+  -->
+  <defs>
+    <linearGradient id="screen" x1="46" y1="108" x2="466" y2="404" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FB7185"/>
+      <stop offset="1" stop-color="#EC4899"/>
+    </linearGradient>
+    <mask id="veil">
+      <rect x="46" y="108" width="420" height="297" rx="36" fill="white"/>
+      <path d="M46 405 L46 195 L466 405 Z" fill="black"/>
+    </mask>
+  </defs>
+  <rect x="46" y="108" width="420" height="297" rx="36" fill="url(#screen)" mask="url(#veil)"/>
+</svg>

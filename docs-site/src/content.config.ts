@@ -8,7 +8,10 @@ export const collections = {
 	// GitHub. README.md becomes the site's index/home page.
 	docs: defineCollection({
 		loader: glob({
-			pattern: '**/*.md',
+			// Non-recursive: docs/ also holds project-site/ (a separate Next.js
+			// project, with its own README and node_modules) and screenshots/
+			// (image assets), neither of which should be walked as doc pages.
+			pattern: '*.md',
 			base: '../docs',
 			generateId: ({ entry }) => (entry === 'README.md' ? 'index' : entry.replace(/\.md$/, '')),
 		}),
