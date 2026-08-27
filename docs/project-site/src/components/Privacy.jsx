@@ -13,16 +13,19 @@ const LEAVES = [
   {
     what: 'The Homebrew catalog',
     when: 'Only when you open it',
+    to: 'repo.webosbrew.org, the catalog’s own host',
     sends: 'Nothing about you or your TVs',
   },
   {
     what: 'An app download',
     when: 'Only when you install one',
+    to: 'Whichever host the catalog names, usually GitHub',
     sends: 'Nothing about you or your TVs',
   },
   {
     what: 'The session time check',
     when: 'Only on a device’s detail page',
+    to: 'developer.lge.com, LG’s own server',
     sends: 'The session token read from that TV',
   },
 ];
@@ -59,25 +62,34 @@ export function Privacy() {
             Reaches the internet
           </h3>
           {/* Named in full rather than summarised. Three is a short
-              enough list to simply show. */}
+              enough list to simply show.
+
+              Each one says where it goes as well as what it carries: a
+              request described only by its payload still leaves the
+              obvious question unanswered. */}
           <ul className="mt-5 space-y-4">
-            {LEAVES.map(({ what, when, sends }) => (
+            {LEAVES.map(({ what, when, to, sends }) => (
               <li
                 key={what}
                 className="rounded-xl border border-foreground/10 p-4"
               >
                 <p className="text-sm font-medium">{what}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{when}</p>
-                <p className="mt-2 text-xs text-muted-foreground">
+                <p className="mt-2 text-xs text-muted-foreground">To: {to}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
                   Sends: {sends}
                 </p>
               </li>
             ))}
           </ul>
           <p className="mt-4 text-xs leading-relaxed text-muted-foreground/80">
-            The last one is the only request that sends anything at all,
-            and it exists because nothing on the TV can answer how long a
-            session has left.
+            The last one is the only request that sends anything at all, and
+            it goes to LG. A Developer Mode session is theirs: they issue it,
+            they time it, and their server is the only thing that knows how
+            much of it is left. The TV cannot answer the question, by LG’s
+            design rather than for want of trying, so there is no local check
+            to use instead. The token is sent for that one question and
+            nowhere else.
           </p>
         </div>
       </div>
