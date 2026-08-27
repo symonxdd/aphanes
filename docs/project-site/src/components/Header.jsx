@@ -3,13 +3,12 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SiGithub } from 'react-icons/si';
-import { Download } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useLatestRelease } from '@/hooks/useLatestRelease';
 
 const NAV = [
-  { label: 'What it does', href: '#what' },
   { label: 'Screens', href: '#screens' },
+  { label: 'What it does', href: '#what' },
   { label: 'Pairing', href: '#pairing' },
   { label: 'Privacy', href: '#privacy' },
 ];
@@ -110,8 +109,21 @@ export function Header() {
 
   // Over the dark hero the header borrows light colours; past it, the
   // theme's own.
-  const tone = overHero && !scrolled ? 'text-white/70' : 'text-muted-foreground';
-  const toneStrong = overHero && !scrolled ? 'text-white' : 'text-foreground';
+  // Whole class strings, not interpolated fragments: Tailwind reads the
+  // source for literal class names, so `hover:${something}` compiles to
+  // nothing at all.
+  const onDark = overHero && !scrolled;
+  const tone = onDark ? 'text-white/70' : 'text-muted-foreground';
+  const toneStrong = onDark ? 'text-white' : 'text-foreground';
+  const iconButton = onDark
+    ? 'text-white/70 hover:text-white hover:bg-white/10'
+    : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5';
+  // bg-foreground is near-black in light mode, which disappears against
+  // the hero it floats over. While it is up there the button takes the
+  // same white-on-dark it has in the dark theme, whatever the theme.
+  const downloadButton = onDark
+    ? 'bg-white text-black'
+    : 'bg-foreground text-background';
 
   return (
     <>
@@ -156,21 +168,20 @@ export function Header() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub repository"
-              className={`hidden sm:flex w-9 h-9 items-center justify-center rounded-lg hover:bg-foreground/5 transition-colors ${tone} hover:${toneStrong}`}
+              className={`hidden sm:flex w-9 h-9 items-center justify-center rounded-lg transition-colors ${iconButton}`}
             >
               <SiGithub className="w-4.5 h-4.5" />
             </a>
-            <ThemeToggle />
+            <ThemeToggle overHero={onDark} />
             <a
               href={downloadUrl}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity"
+              className={`hidden sm:inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity ${downloadButton}`}
             >
-              <Download className="w-4 h-4" />
-              Download
+              Download for Android
             </a>
             <button
               onClick={() => setOpen(!open)}
-              className={`md:hidden w-9 h-9 flex items-center justify-center rounded-lg hover:bg-foreground/5 ${tone}`}
+              className={`md:hidden w-9 h-9 flex items-center justify-center rounded-lg transition-colors ${iconButton}`}
               aria-label="Toggle menu"
               aria-expanded={open}
             >
@@ -216,10 +227,9 @@ export function Header() {
               <motion.a
                 variants={menuItem}
                 href={downloadUrl}
-                className="mt-1 flex items-center gap-2 py-3 px-4 rounded-xl bg-foreground text-background font-medium"
+                className="mt-1 py-3 px-4 rounded-xl bg-foreground text-background font-medium"
               >
-                <Download className="w-4 h-4" />
-                Download the APK
+                Download for Android
               </motion.a>
             </div>
           </motion.div>

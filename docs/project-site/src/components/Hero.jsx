@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Download, BookOpen } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { SiGithub } from 'react-icons/si';
 import { useLatestRelease } from '@/hooks/useLatestRelease';
 
@@ -79,9 +79,8 @@ export function Hero() {
           {...rise(0.7)}
           className="mt-12 max-w-md text-base leading-relaxed text-white/70"
         >
-          An LG webOS TV, managed from the phone already in your hand.
-          Pair once, install what you like, and watch the Developer Mode
-          clock without getting up.
+          Pair an LG TV in Developer Mode and install homebrew apps from
+          your phone. Including the one that makes YouTube ad-free.
         </motion.p>
 
         <motion.div
@@ -90,9 +89,8 @@ export function Hero() {
         >
           <a
             href={downloadUrl}
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-medium text-black transition-transform hover:scale-[1.02]"
+            className="inline-flex items-center rounded-xl bg-white px-5 py-3 text-sm font-medium text-black transition-transform hover:scale-[1.02]"
           >
-            <Download className="h-4 w-4" />
             Download for Android
           </a>
           <a
@@ -100,7 +98,7 @@ export function Hero() {
             className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-5 py-3 text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
           >
             <BookOpen className="h-4 w-4" />
-            Read the docs
+            Technical docs
           </a>
           <a
             href="https://github.com/symonxdd/aphanes"
@@ -116,16 +114,10 @@ export function Hero() {
         <motion.p {...rise(0.92)} className="mt-5 text-xs text-white/35">
           {version ? `${version} · ` : ''}
           {size ? `${size} MB · ` : ''}
-          Android 5.0 and up · free and open source
+          free and open source
         </motion.p>
       </div>
 
-      {/* Fades the dark band into whatever the page's theme is below it,
-          so the join reads as one surface rather than two stacked ones. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-background"
-      />
     </section>
   );
 }

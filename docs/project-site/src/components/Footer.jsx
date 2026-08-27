@@ -16,7 +16,7 @@ export function Footer() {
 
         <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
           <a href="https://symonxdd.github.io/aphanes/" className="hover:text-foreground">
-            Documentation
+            Technical docs
           </a>
           <a
             href="https://github.com/symonxdd/aphanes/releases"

@@ -7,9 +7,9 @@ A mobile-first Android app for LG webOS TVs in Developer Mode. Pair a TV
 from a phone, install homebrew apps on it, and keep track of how long the
 Developer Mode session has left.
 
-**[aphanes-app.vercel.app](https://aphanes-app.vercel.app)** ·
-[Download the APK](https://github.com/symonxdd/aphanes/releases/latest) ·
-[Documentation](https://symonxdd.github.io/aphanes/)
+- **Website**: [aphanes-app.vercel.app](https://aphanes-app.vercel.app)
+- **Download**: [the latest APK](https://github.com/symonxdd/aphanes/releases/latest)
+- **Technical documentation**: [symonxdd.github.io/aphanes](https://symonxdd.github.io/aphanes/)
 
 ## Screenshots
 
@@ -50,9 +50,11 @@ reserved, hidden by default, and neither is ruled out.
 A desktop counterpart is planned and lives as an empty placeholder in
 [/desktop](desktop).
 
-## Documentation
+## Technical documentation
 
-The full docs site is at **[symonxdd.github.io/aphanes](https://symonxdd.github.io/aphanes/)**, or browse the same content directly in [docs/](docs/):
+How the app is built and how the webOS side of it works.
+
+The full site is at **[symonxdd.github.io/aphanes](https://symonxdd.github.io/aphanes/)**, or browse the same content directly in [docs/](docs/):
 
 - [docs/README.md](docs/README.md): project overview and current status
 - [docs/concepts.md](docs/concepts.md): plain-language explanations of every technology involved (Developer Mode, SSH, the luna bus, IPK packages, OTA IDs), plus a glossary

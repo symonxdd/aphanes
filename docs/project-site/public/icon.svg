@@ -10,9 +10,25 @@
       <stop stop-color="#FB7185"/>
       <stop offset="1" stop-color="#EC4899"/>
     </linearGradient>
+    <!--
+      Two things here are deliberate, and both are about edges landing on
+      the same pixel twice.
+
+      The white is the whole canvas rather than a copy of the screen
+      shape. A copy would anti-alias against the same outline the screen
+      itself draws, and the two partial coverages multiply into a
+      visibly thinner, darker rim.
+
+      The cut-out overshoots the screen on the left, bottom and right
+      rather than stopping exactly on its edge. Sharing an edge with the
+      shape left roughly half a pixel of gradient surviving along the
+      bottom, which read as a hairline across what should be nothing at
+      all. The hypotenuse keeps its original slope of 0.5, so the cut
+      still falls exactly where the app draws it.
+    -->
     <mask id="veil">
-      <rect x="46" y="108" width="420" height="297" rx="36" fill="white"/>
-      <path d="M46 405 L46 195 L466 405 Z" fill="black"/>
+      <rect width="512" height="512" fill="white"/>
+      <path d="M40 192 L472 408 L472 412 L40 412 Z" fill="black"/>
     </mask>
   </defs>
   <rect x="46" y="108" width="420" height="297" rx="36" fill="url(#screen)" mask="url(#veil)"/>
