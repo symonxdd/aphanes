@@ -100,3 +100,99 @@ a, button, [role="button"] {
 .scroll-slim::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--foreground) 32%, transparent);
 }
+
+/* The hero title going briefly unseen.
+
+   A soft band of transparency crosses the word, so a letter or two blush
+   rose and then vanish before coming back. The name means unseen, so the
+   wordmark does that rather than merely shining.
+
+   The transparency is the gradient's own alpha. Under background-clip:
+   text the gradient is what paints the glyphs, so where it is clear, the
+   letters are simply not drawn.
+
+   Findings from earlier attempts, each of which looked like an
+   improvement and made the effect less visible:
+
+   - A band wider than the word cannot be seen. It changes every letter at
+     once, and the eye adapts to slow uniform change without registering
+     it. What gets noticed is a moving edge, so the band stays narrower
+     than the word it crosses.
+   - Brightness alone was too weak to carry it at a calm speed, and
+     dimming the resting text far enough to fix that left the wordmark
+     looking grey. Removing letters reads instantly at any speed, and
+     costs the resting state nothing: it stays full white.
+
+   The loop is seamless rather than reset: the gradient is a repeating
+   tile four times the width of the word, and one cycle scrolls it by
+   exactly one tile, so the last frame matches the first.
+
+   Three things to keep if this is retuned:
+
+   - `repeat`, not `no-repeat`. An uncovered box paints no glyphs at all,
+     so a gradient that slides past the end takes half the word with it
+     and never brings it back.
+   - `linear`, not an easing curve. Easing starts and ends at zero
+     velocity, which stalls the sweep once per cycle even though the
+     position itself is continuous.
+   - The percentage that buys one tile is scaled by (1 - size), not by
+     the size: -133.333% for a 4x tile, -120% for 6x. Change one number
+     without the other and the seam comes back.
+
+   Only background-position animates. The entrance animation on the same
+   element owns opacity and transform, so the two never fight, and the
+   hero is pinned dark in both themes, which is why the colours here are
+   fixed rather than themed. */
+@keyframes title-veil {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -133.333% 0;
+  }
+}
+
+.title-veil {
+  background-image: linear-gradient(
+    100deg,
+    #ffffff 0%,
+    #ffffff 38%,
+    color-mix(in srgb, var(--rose) 45%, #ffffff) 45%,
+    rgba(255, 255, 255, 0) 48.5%,
+    rgba(255, 255, 255, 0) 51.5%,
+    color-mix(in srgb, var(--rose) 45%, #ffffff) 55%,
+    #ffffff 62%,
+    #ffffff 100%
+  );
+  background-size: 400% 100%;
+  background-repeat: repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: title-veil 9s linear infinite;
+  /* Negative delay, so the first pass arrives just as the entrance
+     animation finishes rather than seconds after it. Most visitors have
+     started scrolling by then and would never see the effect at all.
+
+     The band does not reach the word until 38% into the cycle, so the
+     first pass lands at (0.38 x duration) + delay. Keep that near 0.9s
+     when changing the pace: at nine seconds it is 3.42s, which the delay
+     pulls back to 0.92s. Slowing the sweep therefore needs a larger
+     negative delay, not the same one.
+
+     Must stay after the shorthand, which resets the delay to zero. */
+  animation-delay: -2.5s;
+}
+
+/* Painted plainly, rather than a gradient frozen mid-sweep. Anyone whose
+   system asks for reduced motion keeps a title that is simply always
+   there, which is the right answer for an effect built on hiding it. */
+@media (prefers-reduced-motion: reduce) {
+  .title-veil {
+    animation: none;
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+    color: inherit;
+  }
+}

@@ -42,7 +42,7 @@ export function Hero() {
 
         <motion.h1
           {...rise(0.18)}
-          className="mt-10 text-5xl sm:text-6xl font-light tracking-[0.18em]"
+          className="title-veil mt-10 text-5xl sm:text-6xl font-light tracking-[0.18em]"
         >
           Aphanes
         </motion.h1>
