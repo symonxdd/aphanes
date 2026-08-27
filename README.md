@@ -108,34 +108,17 @@ so it still compiles for anyone without the keystore; the workflow
 checks the keystore arrived before it builds, so a release can never be
 published that way.
 
-## Privacy and safety
+## Privacy
 
-- Managing a TV happens directly between this app and the TV on the
-  local network. No third-party server sits in that path, and device
-  lists, files, and credentials never leave the phone. None of it is
-  synced to a cloud anywhere.
-- Device credentials are stored via secure platform storage, never in
-  plaintext, never logged.
-- No telemetry, analytics, or crash reporting without an explicit,
-  separate opt-in. Nothing about how the app is used is reported
-  anywhere.
-- Every TV-modifying action (install, uninstall, file write/delete,
-  terminal command) happens only when directly triggered.
+- 📺 Talks straight to the TV, over the local network
+- 🔐 Pairing keys stay in the phone's keystore, via
+  [flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage)
+- ☁️ No account, no sync, no telemetry
+- 🌐 Three things reach the internet: the Homebrew catalog, app
+  downloads, and the Developer Mode time check
 
-Three things reach the internet, each only when opened or used:
-
-- **Browsing the Homebrew app catalog** reads the public listing at
-  repo.webosbrew.org, and loads package icons from there. Nothing about
-  the phone or its paired TVs is sent.
-- **Installing an app from that catalog** downloads it from wherever
-  the catalog points, which today is GitHub for nearly every entry. Each
-  download is verified against the catalog's published SHA-256 and
-  refused on a mismatch.
-- **The Developer Mode remaining-time check**, on a device's detail page,
-  asks developer.lge.com, sending the session token read from the TV.
-  This is the only one of the three that sends any data, and it is here
-  because nothing local can answer the question. Renewing does not use
-  it: that only tells the TV to open its own Developer Mode app.
+The [project site](https://aphanes-app.vercel.app/#privacy) covers those
+three in detail.
 
 ## Credits
 
