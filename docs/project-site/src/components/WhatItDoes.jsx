@@ -2,6 +2,7 @@
 
 import { KeyRound, PackagePlus, Tv, Timer, WifiOff, ShieldCheck } from 'lucide-react';
 import { Section } from './Section';
+import { Glossary } from './Glossary';
 
 const FEATURES = [
   {
@@ -31,8 +32,19 @@ const FEATURES = [
   {
     icon: WifiOff,
     title: 'Know when it is off',
-    body:
-      'A fast probe says whether a TV is answering before anything slow is attempted, so a sleeping TV never costs a long wait.',
+    body: (
+      <>
+        A fast{' '}
+        <Glossary word="probe">
+          A quick knock rather than a proper visit. The app opens a bare
+          connection to the TV’s SSH port, waits three seconds at most,
+          then drops it without logging in. An answer means the TV is awake
+          and on the network.
+        </Glossary>{' '}
+        says whether a TV is answering before anything slow is attempted, so
+        a sleeping TV never costs a long wait.
+      </>
+    ),
   },
   {
     icon: ShieldCheck,
