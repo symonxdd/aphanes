@@ -80,7 +80,27 @@ export function Hero() {
           className="mt-12 max-w-md text-base leading-relaxed text-white/70"
         >
           Pair an LG TV in Developer Mode and install homebrew apps from
-          your phone. Including the one that makes YouTube ad-free.
+          your phone.
+        </motion.p>
+
+        {/* Its own line, quieter and a beat later: an aside rather than
+            part of the pitch, and it lands better once the sentence
+            above it has.
+
+            The joke leans on somebody else's work, so it links to it.
+            The underline is faint rather than absent: a link nobody can
+            see is no credit at all. */}
+        <motion.p {...rise(0.78)} className="mt-4 text-sm text-white/40">
+          Including{' '}
+          <a
+            href="https://github.com/webosbrew/youtube-webos"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-white/20 underline-offset-4 transition-colors hover:text-white/70 hover:decoration-white/40"
+          >
+            the one that makes YouTube ad free
+          </a>
+          .
         </motion.p>
 
         <motion.div
