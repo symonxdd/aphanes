@@ -59,8 +59,8 @@ export function WhatItDoes() {
     <Section
       id="what"
       eyebrow="What it does"
-      title="Everything the desktop tool does, shaped for a phone."
-      lead="Built against a real LG TV, on a real phone, for the jobs that actually come up."
+      title="Developer Mode on an LG TV, finally made obvious."
+      lead="Built against a real LG TV, on a real phone."
     >
       <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
         {FEATURES.map(({ icon: Icon, title, body }) => (

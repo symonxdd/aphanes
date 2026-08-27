@@ -12,7 +12,7 @@ export function WhyItExists() {
   return (
     <Section
       eyebrow="Why it exists"
-      title="The tool already existed. It just was not built for a phone."
+      title="A tool already existed. It just was not built for a phone."
       lead="dev-manager-desktop is excellent, and this project reads its protocol work with gratitude. It is desktop-first, though, and on a phone it shows."
     >
       <div className="grid gap-10 md:grid-cols-2">
