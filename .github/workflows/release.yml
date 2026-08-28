@@ -16,7 +16,11 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        with:
+          # The whole history, tags included. The release notes name the
+          # previous tag, and the default shallow fetch has none.
+          fetch-depth: 0
 
       - name: Set up Java
         uses: actions/setup-java@v5
@@ -40,10 +44,9 @@ jobs:
         run: flutter test
 
       # Decoded outside the checkout so it cannot end up in the APK or in
-      # an artifact. The size check is the one guard worth keeping: a
-      # wrong password or a bad alias makes Gradle fail loudly, but a
-      # keystore that never arrived makes it fall back to the debug key
-      # and publish something that can never update an existing install.
+      # an artifact. The size check only improves the error: an empty
+      # keystore makes Gradle fail on its own, but with a stack trace
+      # rather than a sentence naming the secret that never arrived.
       - name: Restore the signing keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -65,12 +68,52 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: flutter build apk --release --target-platform android-arm64
 
+      # The notes are this version's own CHANGELOG.md section, under a
+      # header line, above a compare link. The link is left out of a first
+      # release, which has no earlier tag to compare against.
+      - name: Compose the release notes
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          SECTION=$(awk -v want="## $GITHUB_REF_NAME" '
+            $0 == want { inside = 1; next }
+            inside && /^## / { exit }
+            inside { print }
+          ' CHANGELOG.md | sed 's/^### /## /')
+
+          if [ -z "$(echo "$SECTION" | tr -d '[:space:]')" ]; then
+            echo "::error::CHANGELOG.md has no section for $GITHUB_REF_NAME."
+            exit 1
+          fi
+
+          {
+            echo "📦 New Android version released: $GITHUB_REF_NAME"
+            echo "$SECTION"
+            PREVIOUS=$(git tag --list 'v*' --sort=-version:refname \
+              | grep -vx "$GITHUB_REF_NAME" | head -n 1)
+            if [ -n "$PREVIOUS" ]; then
+              printf -- '---\n\n'
+              echo "**Full Changelog**: https://github.com/$GITHUB_REPOSITORY/compare/$PREVIOUS...$GITHUB_REF_NAME"
+            fi
+          } > "$RUNNER_TEMP/notes.md"
+
+          echo "APK_NAME=aphanes-v$VERSION.apk" >> "$GITHUB_ENV"
+          echo "RELEASE_TITLE=Aphanes v$VERSION" >> "$GITHUB_ENV"
+
+      # Creates the release, or updates it if the tag already has one. A
+      # tag can be pushed more than once, and a run that could only ever
+      # create would fail every time after the first.
       - name: Publish the release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          cp build/app/outputs/flutter-apk/app-release.apk "aphanes-v$VERSION.apk"
-          gh release create "$GITHUB_REF_NAME" "aphanes-v$VERSION.apk" \
-            --title "v$VERSION" \
-            --generate-notes
+          cp build/app/outputs/flutter-apk/app-release.apk "$APK_NAME"
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$APK_NAME" --clobber
+            gh release edit "$GITHUB_REF_NAME" \
+              --title "$RELEASE_TITLE" \
+              --notes-file "$RUNNER_TEMP/notes.md"
+          else
+            gh release create "$GITHUB_REF_NAME" "$APK_NAME" \
+              --title "$RELEASE_TITLE" \
+              --notes-file "$RUNNER_TEMP/notes.md"
+          fi

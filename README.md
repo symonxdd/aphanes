@@ -72,13 +72,23 @@ flutter run
 
 ## Releasing
 
-Making a release is one command:
+A release takes two steps: the changelog entry, then the release itself.
+
+### 1. The changelog entry
+
+[CHANGELOG.md](CHANGELOG.md) holds one section per version, newest
+first. The version being released needs its section written before it is
+tagged. Only changes to the app belong there; documentation and website
+work does not.
+
+### 2. Publishing the release
 
 ```
 dart run tool/release.dart
 ```
 
-It refuses to run on a dirty working tree, then:
+It refuses to run on a dirty working tree, or when CHANGELOG.md has no
+section for the version being released, then:
 
 1. Asks whether this is a patch, minor or major release, and shows the
    exact version it would move to
@@ -91,13 +101,14 @@ Pushing the tag is what starts
 [release.yml](.github/workflows/release.yml), which:
 
 - Runs `flutter analyze` and `flutter test`, and stops if either fails
-- Builds an arm64 release APK, signed with the release keystore held in
-  repository secrets
-- Publishes a GitHub release with `aphanes-vx.y.z.apk` attached and
-  notes generated from the commits since the last tag
+- Builds an arm64 release APK and signs it with the release key, which is
+  kept in this repository's own Actions secrets and described under
+  [Signing](#signing) below
+- Publishes a GitHub release titled `Aphanes vx.y.z`, with
+  `aphanes-vx.y.z.apk` attached and notes taken from that version's
+  section of [CHANGELOG.md](CHANGELOG.md)
 
-Progress shows under the repository's Actions tab. Nothing is built
-locally.
+Progress shows under the repository's Actions tab.
 
 ### Signing
 

@@ -1,4 +1,4 @@
-// Cuts a release: bump the version, commit it, tag it, push.
+// Makes a release: bump the version, commit it, tag it, push.
 //
 // Run with `dart run tool/release.dart`. Pushing the tag is what starts
 // .github/workflows/release.yml, which builds the signed APK and creates
@@ -10,6 +10,7 @@
 import 'dart:io';
 
 const String _pubspecPath = 'pubspec.yaml';
+const String _changelogPath = 'CHANGELOG.md';
 
 /// `version: 1.0.0+1`, where the part after the plus is Android's
 /// versionCode. Play Store and every installer require that number to
@@ -32,6 +33,7 @@ Future<void> main(List<String> args) async {
   stdout.writeln();
 
   final _Version next = _promptForNext(current);
+  _requireChangelogSection(next);
   stdout.writeln();
   stdout.writeln('  $current  ->  $next');
   stdout.writeln('  tag: v${next.semver}');
@@ -67,6 +69,23 @@ Future<void> main(List<String> args) async {
 void _requireRepoRoot() {
   if (!File(_pubspecPath).existsSync()) {
     stderr.writeln('Run this from the repository root.');
+    exit(1);
+  }
+}
+
+/// The release notes are this version's own section of CHANGELOG.md, so
+/// without one the workflow would publish a release saying nothing. It
+/// checks this too, but stopping here costs a moment instead of a whole
+/// build, and leaves nothing tagged to undo.
+void _requireChangelogSection(_Version version) {
+  final File file = File(_changelogPath);
+  final String heading = '## v${version.semver}';
+  final bool present =
+      file.existsSync() &&
+      file.readAsLinesSync().any((String line) => line.trimRight() == heading);
+  if (!present) {
+    stderr.writeln('$_changelogPath has no "$heading" section.');
+    stderr.writeln("Write this version's entry before releasing it.");
     exit(1);
   }
 }
