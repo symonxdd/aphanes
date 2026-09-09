@@ -68,6 +68,29 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: flutter build apk --release --target-platform android-arm64
 
+      # The Play Store takes an App Bundle, never an APK, so a release
+      # builds both. All three architectures here rather than arm64
+      # alone: Play splits the bundle per device itself, so restricting
+      # it would only drop support, not save anyone a download.
+      - name: Build the signed App Bundle
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: flutter build appbundle --release
+
+      # A workflow artifact rather than a release asset. The bundle is
+      # only ever uploaded to Play Console by hand, and attaching it to
+      # the public release would invite people to download a file no
+      # phone can install.
+      - name: Keep the App Bundle for the Play Console upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: play-appbundle
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+          if-no-files-found: error
+
       # The notes are this version's own CHANGELOG.md section, under a
       # header line, above a compare link. The link is left out of a first
       # release, which has no earlier tag to compare against.
