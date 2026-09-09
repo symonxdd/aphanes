@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/project_links.dart';
 import '../../../core/ui/app_icon_glyph.dart';
 import '../../../core/ui/app_splash_overlay.dart';
 import '../state/package_info_provider.dart';
@@ -54,6 +56,8 @@ class AboutSheet extends ConsumerWidget {
               'LG Electronics Inc. or the webOS Open Source Edition project.',
               style: theme.textTheme.bodyMedium,
             ),
+            const SizedBox(height: 4),
+            const _PrivacyPolicyLink(),
             const _ThingsToTry(),
             const SizedBox(height: 24),
             Center(
@@ -78,6 +82,52 @@ class AboutSheet extends ConsumerWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The privacy policy, opened in the system browser.
+///
+/// Google Play wants the policy reachable from inside the app, not only
+/// from the store listing, and this sheet is where a person already
+/// comes to read what the app is. Aligned left under the disclaimer
+/// rather than centred: the two belong together.
+class _PrivacyPolicyLink extends StatelessWidget {
+  const _PrivacyPolicyLink();
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: () => launchUrl(
+          Uri.parse(ProjectLinks.privacyPolicy),
+          mode: LaunchMode.externalApplication,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Privacy policy',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Icon(
+                Icons.open_in_new,
+                size: 14,
+                color: theme.colorScheme.primary,
+              ),
+            ],
+          ),
         ),
       ),
     );
