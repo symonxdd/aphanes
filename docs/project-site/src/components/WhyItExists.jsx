@@ -1,6 +1,7 @@
 'use client';
 
 import { Section } from './Section';
+import { Bullet } from './Bullet';
 
 const PROBLEMS = [
   'Content drew underneath the status bar and the navigation bar.',
@@ -19,10 +20,7 @@ export function WhyItExists() {
         <ul className="space-y-4">
           {PROBLEMS.map((problem) => (
             <li key={problem} className="flex gap-3 text-muted-foreground">
-              <span
-                aria-hidden
-                className="mt-2 h-1 w-1 shrink-0 rounded-full bg-foreground/30"
-              />
+              <Bullet muted />
               <span className="leading-relaxed">{problem}</span>
             </li>
           ))}
