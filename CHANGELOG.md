@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.0.1
+
+### ✨ New
+
+- **The About sheet now links to the privacy policy.** It opens the
+  policy on the project site, so what the app does with a TV's details,
+  and the three requests that ever leave the phone, can be read without
+  going looking for them.
+
+### ⚡ Improved
+
+- **App data no longer travels in Android's automatic backup.** Paired
+  devices, their addresses and their pairing keys were eligible for
+  Google Drive backup and for phone-to-phone transfer. They now stay on
+  the phone they were created on.
+
 ## v1.0.0
 
 Initial release 👏
