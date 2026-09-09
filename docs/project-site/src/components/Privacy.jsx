@@ -1,6 +1,7 @@
 'use client';
 
 import { Section } from './Section';
+import { Bullet } from './Bullet';
 
 const STAYS = [
   'Your paired TVs, their addresses and their names',
@@ -46,11 +47,7 @@ export function Privacy() {
           <ul className="mt-5 space-y-3">
             {STAYS.map((item) => (
               <li key={item} className="flex gap-3 text-sm leading-relaxed">
-                <span
-                  aria-hidden
-                  className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
-                  style={{ background: 'var(--rose)' }}
-                />
+                <Bullet />
                 {item}
               </li>
             ))}
@@ -92,6 +89,22 @@ export function Privacy() {
             nowhere else.
           </p>
         </div>
+      </div>
+
+      {/* This section is the honest summary. The policy is the document
+          the Play listing points at, and a reader who got this far is
+          exactly the one who might want the longer version. */}
+      <div className="mt-12 border-t border-foreground/10 pt-8">
+        <a
+          href="/privacy"
+          className="inline-flex items-center gap-2 text-sm font-medium hover:opacity-70"
+        >
+          Read the full privacy policy
+          <span aria-hidden>&rarr;</span>
+        </a>
+        <p className="mt-2 text-xs text-muted-foreground">
+          The complete document, covering retention, deletion and contact.
+        </p>
       </div>
     </Section>
   );
