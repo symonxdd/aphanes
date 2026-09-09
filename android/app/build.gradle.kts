@@ -43,7 +43,11 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        // Pinned, not inherited: an older Flutter would lower this
+        // silently and Play needs 36. Going to 37 is its own milestone,
+        // since it blocks local network access until
+        // ACCESS_LOCAL_NETWORK is granted at runtime.
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

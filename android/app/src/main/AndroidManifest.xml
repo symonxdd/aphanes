@@ -1,9 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- allowBackup is off because Android would otherwise sweep this
+         app's stored data into Google Drive backup and into
+         phone-to-phone transfer. The pairing keys live in the keystore
+         and would restore unusable, but device credentials are not
+         meant to leave the phone at all, so the whole mechanism stays
+         off. -->
     <application
         android:label="webOS Dev Mode Manager"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:fullBackupContent="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"
