@@ -138,3 +138,9 @@ exchange) is implemented here, informed by reading the
 community's [dev-manager-desktop](https://github.com/webosbrew/dev-manager-desktop)
 and [ares-cli-rs](https://github.com/webosbrew/ares-cli-rs) projects
 (both Apache-2.0).
+
+## License
+
+GPL-3.0. Anyone may use, study, change and share this app, and anyone
+who distributes a changed version must publish its source under the
+same terms. The full text is in [LICENSE](LICENSE).
