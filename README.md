@@ -27,11 +27,17 @@ Developer Mode session has left.
 
 ## Why it exists
 
-This exists to fix the mobile experience of the community's
+This started as a fix for the mobile experience of the community's
 [dev-manager-desktop](https://github.com/webosbrew/dev-manager-desktop),
-which is desktop-first: content draws under the system status and
-navigation bars on a phone, the bottom navigation is icon-only with no
-labels, and deleting a paired device is hard to find.
+which is desktop-first. On a phone, in the first half of 2026, content
+drew under the system status and navigation bars, the bottom navigation
+was icon-only with no labels, and deleting a paired device was hard to
+find.
+
+The first of those was a regression in their Android build, and they
+fixed it in v1.99.19. The rest of the reason stands: this is a phone
+app, designed as one, rather than a desktop app that also runs on a
+phone.
 
 ## Status
 

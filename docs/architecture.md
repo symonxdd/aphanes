@@ -108,7 +108,7 @@ Both tap and swipe drive the same selection. A guard stops `onPageChanged` from 
 
 ### System insets
 
-Every screen respects the status bar, navigation bar and display cutouts. This is the highest UX bar the project holds itself to, because content drawing under system bars on a phone is one of the specific problems this rewrite exists to fix. The app runs edge to edge with the system bars styled to match the current surface.
+Every screen respects the status bar, navigation bar and display cutouts. This is the highest UX bar the project holds itself to: a phone app that draws under the system bars is broken, whatever else it does well. The app runs edge to edge with the system bars styled to match the current surface.
 
 ## Every outbound request
 
