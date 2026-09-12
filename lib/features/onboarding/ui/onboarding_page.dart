@@ -74,8 +74,8 @@ class OnboardingPage extends ConsumerWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Install apps, browse files, open a terminal, '
-                            'and track the Developer Mode session time.',
+                            'Install apps, see what the TV is running, and '
+                            'renew the Developer Mode session.',
                             textAlign: TextAlign.center,
                             style: theme.textTheme.bodyLarge?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
