@@ -134,7 +134,7 @@ export function Hero() {
         <motion.p {...rise(0.92)} className="mt-5 text-xs text-white/35">
           {version ? `${version} · ` : ''}
           {size ? `${size} MB · ` : ''}
-          free and open source
+          free forever · no ads · open source
         </motion.p>
       </div>
 

@@ -91,6 +91,35 @@ export function Privacy() {
         </div>
       </div>
 
+      {/* Price sits next to privacy on purpose: the two questions a
+          person asks about a tool like this are "what does it send" and
+          "what is the catch", and this answers the second one in the
+          same place as the first. The wording matches the README so
+          there is one statement, not two. */}
+      <div className="mt-12 border-t border-foreground/10 pt-8">
+        <h3 className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
+          Free, and always will be
+        </h3>
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed">
+          webOS Dev Mode Manager costs nothing, contains no advertising, and
+          has no paid tier, no subscription and no in-app purchases. That
+          will not change.
+        </p>
+        <p className="mt-3 max-w-2xl text-xs leading-relaxed text-muted-foreground">
+          Official releases come from the project’s{' '}
+          <a
+            href="https://github.com/symonxdd/aphanes/releases"
+            className="underline decoration-foreground/20 underline-offset-4 hover:decoration-foreground/50"
+          >
+            GitHub Releases page
+          </a>{' '}
+          and nowhere else. The license permits anyone to redistribute the
+          app, including for a fee, so a paid copy is not necessarily
+          unlawful. It is simply not an official release, and not supported
+          here.
+        </p>
+      </div>
+
       {/* This section is the honest summary. The policy is the document
           the Play listing points at, and a reader who got this far is
           exactly the one who might want the longer version. */}

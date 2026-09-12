@@ -34,6 +34,12 @@ An SFTP file browser and an SSH terminal. Both were in the original scope. Each 
 - [architecture.md](architecture.md) covers the tech stack, folder structure, state management and the reasoning behind each decision.
 - [pairing.md](pairing.md) walks through the Developer Mode key exchange in detail, including the security choices behind it and why some checks other apps make would not help here.
 
+## Free, and always will be
+
+webOS Dev Mode Manager costs nothing, contains no advertising, and has no paid tier, no subscription and no in-app purchases. That will not change. There is no telemetry, no analytics and no crash reporting either.
+
+Official releases come from the repository's [Releases page](https://github.com/symonxdd/aphanes/releases) and nowhere else. The license permits anyone to redistribute the app, including for a fee, so a paid copy is not necessarily unlawful. It is simply not an official release, and it is not supported by this project.
+
 ## Privacy
 
 Managing a TV happens directly between the app and the TV on the local network, with no third party in that path. Device lists, files and credentials never leave the phone, and none of it is synced anywhere. There is no telemetry, meaning nothing about how the app is used is ever reported anywhere.

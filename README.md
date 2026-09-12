@@ -11,6 +11,18 @@ Developer Mode session has left.
 - **Download**: [the latest APK](https://github.com/symonxdd/aphanes/releases/latest)
 - **Technical documentation**: [symonxdd.github.io/aphanes](https://symonxdd.github.io/aphanes/)
 
+## Free, and always will be
+
+webOS Dev Mode Manager costs nothing, contains no advertising, and has no
+paid tier, no subscription and no in-app purchases. That will not change.
+There is no telemetry, no analytics and no crash reporting either.
+
+Official releases come from this repository's
+[Releases page](https://github.com/symonxdd/aphanes/releases) and nowhere
+else. The license permits anyone to redistribute the app, including for a
+fee, so a paid copy is not necessarily unlawful. It is simply not an
+official release, and it is not supported here.
+
 ## Screenshots
 
 | Devices | Devices, OLED | Device detail | Apps | Catalog |
@@ -147,6 +159,19 @@ and [ares-cli-rs](https://github.com/webosbrew/ares-cli-rs) projects
 
 ## License
 
-GPL-3.0. Anyone may use, study, change and share this app, and anyone
-who distributes a changed version must publish its source under the
-same terms. The full text is in [LICENSE](LICENSE).
+GPL-3.0-or-later. Anyone may use, study, change and share this app, and
+anyone who distributes a changed version must publish its source under
+the same terms, following either version 3 of the GNU General Public
+License or any later version published by the Free Software Foundation.
+The full text of version 3 is in [LICENSE](LICENSE).
+
+### Name and icon
+
+The name "Aphanes", the name "webOS Dev Mode Manager", and the app icon
+are not covered by the license above, which applies to the source code.
+They remain the property of the project author.
+
+Forks and modified builds are welcome, and the license guarantees that
+right. They must be distributed under a different name and a different
+icon, so that nobody can mistake a modified build for an official
+release.
