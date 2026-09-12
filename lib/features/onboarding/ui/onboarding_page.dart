@@ -92,9 +92,19 @@ class OnboardingPage extends ConsumerWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Deliberately small and muted: a factual footnote,
+                        // Deliberately small and muted: factual footnotes,
                         // not a second pitch competing with the tagline
-                        // above.
+                        // above. The price line is a public commitment
+                        // the README and project site also make, and
+                        // this is the one place every user reads it.
+                        Text(
+                          'Free forever. No ads, no tracking.',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
                         Text(
                           'Unaffiliated with LG Electronics Inc. or the '
                           'webOS Open Source Edition project.',

@@ -56,6 +56,16 @@ class AboutSheet extends ConsumerWidget {
               'LG Electronics Inc. or the webOS Open Source Edition project.',
               style: theme.textTheme.bodyMedium,
             ),
+            const SizedBox(height: 12),
+            // The longer form of the first-run screen's one-liner, worded
+            // to match the README. "Only from GitHub" is what lets a person
+            // recognise an unofficial copy when they meet one.
+            Text(
+              'Free of charge, with no advertising, no paid features and no '
+              'tracking, and that will not change. Official releases come '
+              "only from the project's GitHub page.",
+              style: theme.textTheme.bodyMedium,
+            ),
             const SizedBox(height: 4),
             const _PrivacyPolicyLink(),
             const _ThingsToTry(),
