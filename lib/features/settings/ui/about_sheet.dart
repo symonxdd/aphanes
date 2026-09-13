@@ -61,9 +61,9 @@ class AboutSheet extends ConsumerWidget {
             // to match the README. "Only from GitHub" is what lets a person
             // recognise an unofficial copy when they meet one.
             Text(
-              'Free of charge, with no advertising, no paid features and no '
-              'tracking, and that will not change. Official releases come '
-              "only from the project's GitHub page.",
+              'This app will always be free, and free from every kind of '
+              'ad and tracking. Official releases come only from the '
+              "project's GitHub page.",
               style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 4),

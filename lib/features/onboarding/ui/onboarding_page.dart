@@ -74,7 +74,7 @@ class OnboardingPage extends ConsumerWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Install apps, see what the TV is running, and '
+                            "Install apps, check the TV's details, and "
                             'renew the Developer Mode session.',
                             textAlign: TextAlign.center,
                             style: theme.textTheme.bodyLarge?.copyWith(
@@ -98,7 +98,7 @@ class OnboardingPage extends ConsumerWidget {
                         // the README and project site also make, and
                         // this is the one place every user reads it.
                         Text(
-                          'Free forever. No ads, no tracking.',
+                          'No ads. No tracking. Free, forever.',
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
