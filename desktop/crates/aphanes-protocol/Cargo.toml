@@ -1,0 +1,29 @@
+[package]
+name = "aphanes-protocol"
+description = "webOS TV protocol layer for the desktop app: pairing, SSH, luna calls, IPK install"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[lib]
+name = "aphanes_protocol"
+
+[dependencies]
+# SSH client to the TV's own sshd on port 9922. The legacy algorithms that
+# sshd needs (ssh-rsa with SHA-1 signatures, diffie-hellman-group1-sha1,
+# hmac-sha1) are in russh's base build; nothing extra is enabled for them.
+#
+# Crypto backend: `ring` rather than russh's default `aws-lc-rs`, because
+# aws-lc-rs needs NASM (and CMake) on Windows to build, the same kind of
+# extra toolchain that ruled out libssh. ring ships prebuilt assembly and
+# builds with cargo alone on every desktop target.
+russh = { version = "0.63", default-features = false, features = ["flate2", "ring", "rsa"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+
+[lints]
+workspace = true

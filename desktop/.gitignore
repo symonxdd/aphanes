@@ -1,0 +1,19 @@
+# Node
+node_modules
+dist
+dist-ssr
+*.local
+
+# Cargo (workspace target dir lives here, not under src-tauri)
+/target/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
