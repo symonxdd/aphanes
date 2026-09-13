@@ -25,6 +25,7 @@
   --on-primary-container: #22005d;
 
   --error: #b3261e;
+  --on-error: #ffffff;
   --error-container: #f9dedc;
   --on-error-container: #410e0b;
 
@@ -52,6 +53,7 @@
   --on-primary-container: #eaddff;
 
   --error: #f2b8b5;
+  --on-error: #601410;
   --error-container: #8c1d18;
   --on-error-container: #f9dedc;
 
@@ -59,4 +61,17 @@
 
   --scrim: rgba(0, 0, 0, 0.5);
   --dialog-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+/*
+ * OLED: the mobile AppTheme.oled ladder. Every surface goes to true black
+ * and nothing else changes. Only meaningful in dark mode, so the provider
+ * sets the attribute only then.
+ */
+:root[data-theme="dark"][data-oled="true"] {
+  --surface: #000000;
+  --surface-low: #000000;
+  --surface-container: #000000;
+  --surface-high: #000000;
+  --surface-highest: #000000;
 }

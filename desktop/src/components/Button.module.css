@@ -8,11 +8,20 @@
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
-  transition: background-color 120ms ease;
 }
 
 .button:disabled {
   opacity: 0.45;
+}
+
+/* Filled: the single call to action on a screen. */
+.filled {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.filled:not(:disabled):hover {
+  filter: brightness(0.92);
 }
 
 /* Filled tonal: the one primary action in a group. */
@@ -39,12 +48,8 @@
   background: color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
-/* Destructive: the mobile app's Remove device pill. */
+/* Destructive, quiet: the mobile app's Remove device pill. */
 .danger {
-  width: 100%;
-  justify-content: center;
-  height: 44px;
-  border-radius: 22px;
   background: var(--error-container);
   color: var(--error);
 }
@@ -55,4 +60,14 @@
 
 :root[data-theme="dark"] .danger {
   color: var(--on-error-container);
+}
+
+/* Destructive, loud: the confirming button in a confirmation dialog. */
+.filledError {
+  background: var(--error);
+  color: var(--on-error);
+}
+
+.filledError:not(:disabled):hover {
+  filter: brightness(0.92);
 }

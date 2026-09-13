@@ -1,0 +1,34 @@
+/* A Material 3 switch: 52x32 track, a handle that grows when on. */
+.switch {
+  position: relative;
+  width: 52px;
+  height: 32px;
+  border-radius: 16px;
+  border: 2px solid var(--outline);
+  background: var(--surface-highest);
+  flex-shrink: 0;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: var(--outline);
+}
+
+.switch[aria-checked="true"] {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.switch[aria-checked="true"]::after {
+  left: 22px;
+  width: 24px;
+  height: 24px;
+  background: var(--on-primary);
+}

@@ -1,46 +1,61 @@
 .details {
-  max-width: 640px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding-bottom: 8px;
+  gap: 24px;
+  max-width: 820px;
+  padding: 4px 0 8px;
+}
+
+/* The two groups side by side: what was saved at pairing, what the TV
+   reports. Uses the width a desktop has instead of one long column. */
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 48px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
 }
 
 .sectionTitle {
   font-size: 13px;
   font-weight: 600;
   color: var(--primary);
-  padding: 20px 0 8px;
+  padding: 4px 0 6px;
 }
 
 .row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  height: 44px;
+  gap: 12px;
+  height: 40px;
 }
 
 .rowIcon {
+  display: flex;
   color: var(--primary);
 }
 
 .label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 2px;
   flex-grow: 1;
-  font-size: 15px;
-}
-
-.hint {
-  color: var(--on-surface-variant);
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .value {
-  font-size: 15px;
+  font-size: 14px;
   font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  user-select: text;
 }
 
-.remove {
-  padding-top: 28px;
+.actions {
+  display: flex;
 }

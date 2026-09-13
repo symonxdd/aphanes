@@ -19,6 +19,10 @@ interface DialogProps {
  */
 export function Dialog({ open, onClose, title, headerActions, className, children }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
+  // The native close event fires for a programmatic close too. Only a
+  // close the person initiated (Escape, the X, the backdrop) may report
+  // back, or closing one dialog to open another would cancel the second.
+  const closingFromProps = useRef(false);
 
   useEffect(() => {
     const element = ref.current;
@@ -28,15 +32,24 @@ export function Dialog({ open, onClose, title, headerActions, className, childre
     if (open && !element.open) {
       element.showModal();
     } else if (!open && element.open) {
+      closingFromProps.current = true;
       element.close();
     }
   }, [open]);
+
+  const handleClose = () => {
+    if (closingFromProps.current) {
+      closingFromProps.current = false;
+      return;
+    }
+    onClose();
+  };
 
   return (
     <dialog
       ref={ref}
       className={[styles.dialog, className].filter(Boolean).join(" ")}
-      onClose={onClose}
+      onClose={handleClose}
       onClick={(event) => {
         // A backdrop click reports the dialog itself as its target, but so
         // does a click on the dialog's own padding, so check the bounds.

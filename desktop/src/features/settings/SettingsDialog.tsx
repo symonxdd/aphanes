@@ -1,24 +1,30 @@
 import { useEffect, useState } from "react";
-import { Info, Moon, Sun } from "lucide-react";
+import { ChevronRight, Contrast, Info, Moon, RotateCcw, Sun } from "lucide-react";
 import { AppMark } from "../../components/AppMark";
 import { Dialog } from "../../components/Dialog";
 import { IconButton } from "../../components/IconButton";
+import { InfoPopover } from "../../components/InfoPopover";
+import { Switch } from "../../components/Switch";
 import { appVersion } from "../../ipc/commands";
 import { useTheme } from "../../theme/ThemeProvider";
+import { oledTheme } from "../devices/explainers";
 import styles from "./SettingsDialog.module.css";
 
 interface SettingsDialogProps {
   open: boolean;
   onClose: () => void;
+  onAbout: () => void;
+  onShowIntro: () => void;
 }
 
 /**
- * The settings sheet's desktop form. As on mobile, this is one of the two
- * places the Aphanes codename appears as a signature; the shipped name
- * stays visible in the footer line beneath it.
+ * The mobile settings sheet, as a dialog. Same header (the codename as a
+ * signature, with the shipped name in the footer line), same sections in
+ * the same order. The accent colour picker, the ambient backdrop and the
+ * hidden tab switches are not here yet.
  */
-export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
-  const { mode, toggle } = useTheme();
+export function SettingsDialog({ open, onClose, onAbout, onShowIntro }: SettingsDialogProps) {
+  const { mode, toggle, oled, setOled } = useTheme();
   const isDark = mode === "dark";
   const [version, setVersion] = useState<string | null>(null);
 
@@ -32,7 +38,7 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
     <Dialog open={open} onClose={onClose} title="Settings" className={styles.dialog}>
       <div className={styles.brand}>
         <div className={styles.brandRow}>
-          <AppMark width={40} />
+          <AppMark width={34} />
           <span>Aphanes</span>
           <IconButton label={isDark ? "Switch to light mode" : "Switch to dark mode"} onClick={toggle}>
             {isDark ? <Moon size={22} /> : <Sun size={22} />}
@@ -41,27 +47,47 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
         <div className={styles.tagline}>A Symon Software Experience</div>
       </div>
 
-      <div className={styles.sectionTitle}>Appearance</div>
-      <div className={styles.row}>
-        <span className={styles.rowIcon}>{isDark ? <Moon size={22} /> : <Sun size={22} />}</span>
-        <span className={styles.rowLabel}>Theme</span>
-        <span className={styles.rowValue}>{isDark ? "Dark" : "Light"}</span>
-      </div>
+      {isDark && (
+        <>
+          <div className={styles.sectionTitle}>Appearance</div>
+          <div className={styles.row}>
+            <span className={styles.rowIcon}>
+              <Contrast size={22} />
+            </span>
+            <span className={styles.rowLabel}>Enable OLED theme</span>
+            <span className={styles.trailing}>
+              <InfoPopover explainer={oledTheme} label="About OLED theme" />
+              <Switch checked={oled} onChange={setOled} label="Enable OLED theme" />
+            </span>
+          </div>
+        </>
+      )}
 
-      <div className={styles.sectionTitle}>About</div>
-      <div className={styles.row}>
+      <div className={styles.sectionTitle}>General</div>
+      <button type="button" className={styles.row} onClick={onAbout}>
         <span className={styles.rowIcon}>
           <Info size={22} />
         </span>
-        <p className={styles.disclaimer}>
-          Unaffiliated with LG Electronics Inc. or the webOS Open Source Edition project. Free of charge, with no
-          advertising, permanently.
-        </p>
-      </div>
+        <span className={styles.rowLabel}>About</span>
+        <span className={styles.trailing}>
+          <ChevronRight size={22} />
+        </span>
+      </button>
+      <button type="button" className={styles.row} onClick={onShowIntro}>
+        <span className={styles.rowIcon}>
+          <RotateCcw size={22} />
+        </span>
+        <span className={styles.rowLabel}>Show intro again</span>
+        <span className={styles.trailing}>
+          <ChevronRight size={22} />
+        </span>
+      </button>
 
-      <div className={styles.footer}>
-        Aphanes &middot; a webOS Dev Mode Manager{version ? ` · ${version}` : ""}
-      </div>
+      {version && (
+        <div className={styles.footer}>
+          Aphanes &middot; a webOS Dev Mode Manager &middot; {version} ({import.meta.env.DEV ? "dev" : "release"})
+        </div>
+      )}
     </Dialog>
   );
 }

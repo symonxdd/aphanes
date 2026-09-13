@@ -13,6 +13,7 @@ interface CatalogDialogProps {
   packages: CatalogPackage[];
   onClose: () => void;
   onInstall: (pkg: CatalogPackage) => void;
+  onExplain: () => void;
 }
 
 /**
@@ -20,7 +21,7 @@ interface CatalogDialogProps {
  * pushed page. Same controls as mobile: search, Favorites or everything
  * A to Z, one Install button per row.
  */
-export function CatalogDialog({ open, packages, onClose, onInstall }: CatalogDialogProps) {
+export function CatalogDialog({ open, packages, onClose, onInstall, onExplain }: CatalogDialogProps) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("favorites");
 
@@ -39,7 +40,7 @@ export function CatalogDialog({ open, packages, onClose, onInstall }: CatalogDia
       title="Browse catalog"
       className={styles.dialog}
       headerActions={
-        <IconButton label="About the catalog">
+        <IconButton label="About the catalog" onClick={onExplain}>
           <Info size={22} />
         </IconButton>
       }

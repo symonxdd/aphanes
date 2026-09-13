@@ -1,0 +1,69 @@
+.screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0 32px;
+  background: var(--surface);
+}
+
+.top {
+  position: absolute;
+  top: 64px;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.middle {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  padding: 0 32px;
+}
+
+.tagline {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.subline {
+  font-size: 16px;
+  color: var(--on-surface-variant);
+  max-width: 520px;
+}
+
+.bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.footnote {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.cta {
+  margin-top: 14px;
+  width: 280px;
+  justify-content: center;
+}

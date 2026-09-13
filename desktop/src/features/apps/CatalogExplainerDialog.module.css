@@ -1,0 +1,16 @@
+.dialog {
+  width: min(560px, calc(100vw - 48px));
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+  padding-top: 6px;
+}
+
+.paragraph {
+  font-size: 14px;
+  line-height: 1.5;
+  user-select: text;
+}

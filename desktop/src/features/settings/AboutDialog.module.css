@@ -1,0 +1,39 @@
+.dialog {
+  width: min(520px, calc(100vw - 48px));
+}
+
+.mark {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 4px;
+}
+
+.paragraph {
+  font-size: 14px;
+  line-height: 1.5;
+  user-select: text;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  padding: 6px 8px;
+  margin-left: -8px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.link:hover {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.version {
+  padding-top: 8px;
+  font-size: 12px;
+  color: var(--outline);
+  text-align: center;
+}

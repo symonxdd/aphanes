@@ -72,6 +72,9 @@
   flex-grow: 1;
   min-height: 0;
   overflow: auto;
+  /* Reserve the scrollbar's width whether or not it shows, so switching
+     between a short and a long list never shifts the rows sideways. */
+  scrollbar-gutter: stable;
 }
 
 .row {

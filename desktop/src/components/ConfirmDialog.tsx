@@ -17,8 +17,8 @@ interface ConfirmDialogProps {
 
 /**
  * The visible, easy-to-reach confirmation every destructive action gets.
- * The confirming button is the danger style and sits last, so it is never
- * the one a stray Enter lands on.
+ * As on mobile: a plain Cancel, then the destructive verb on a filled
+ * error-coloured button, last, so it is never the one focus lands on.
  */
 export function ConfirmDialog({ request, onClose }: ConfirmDialogProps) {
   return (
@@ -29,8 +29,7 @@ export function ConfirmDialog({ request, onClose }: ConfirmDialogProps) {
           Cancel
         </Button>
         <Button
-          variant="danger"
-          style={{ width: "auto", padding: "0 20px" }}
+          variant="filledError"
           onClick={() => {
             request?.onConfirm();
             onClose();

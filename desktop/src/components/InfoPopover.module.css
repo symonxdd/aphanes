@@ -1,0 +1,63 @@
+.popover {
+  /* The browser positions a popover in the centre by default; the
+     component places it next to its (i) button instead. */
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  width: 380px;
+  max-height: 60vh;
+  overflow: auto;
+  padding: 18px 20px 16px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 20px;
+  background: var(--surface-low);
+  color: var(--on-surface);
+  box-shadow: var(--dialog-shadow);
+}
+
+.popover:not(:popover-open) {
+  display: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.icon {
+  color: var(--primary);
+  display: flex;
+}
+
+.title {
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.body {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--on-surface);
+  white-space: pre-line;
+  user-select: text;
+}
+
+.more {
+  display: block;
+  margin: 8px auto 0;
+  padding: 6px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.more:hover {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.details {
+  margin-top: 8px;
+}
