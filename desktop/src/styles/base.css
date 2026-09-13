@@ -1,0 +1,74 @@
+@import "./tokens.css";
+
+/*
+ * Global rules only: box model, the system font stack, and the handful of
+ * element resets a desktop shell needs. Everything else is scoped to its
+ * component via CSS modules.
+ *
+ * The font is the platform's own (Segoe UI on Windows, San Francisco on
+ * macOS) rather than a webfont: loading one would be an outbound request,
+ * and the app makes none that are not on its closed list.
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family:
+    system-ui,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--on-surface);
+  background: var(--surface);
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+:root[data-theme="dark"] body {
+  color-scheme: dark;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+}
+
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+dialog {
+  color: inherit;
+}
+
+dialog::backdrop {
+  background: var(--scrim);
+}

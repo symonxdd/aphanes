@@ -1,0 +1,62 @@
+/*
+ * Colour tokens, mirroring the mobile app's AppTheme (lib/core/theme/
+ * app_theme.dart): Material 3 roles derived from the #9333EA seed, with the
+ * surface ladder pinned to plain neutral greys rather than the seed-tinted
+ * ones M3 would generate. Light is the default; [data-theme="dark"] on the
+ * root swaps the set. The theme provider sets that attribute, so there is
+ * no prefers-color-scheme block here: "follow the system" is decided in
+ * one place, in code, and written to the attribute.
+ */
+:root {
+  --surface: #ffffff;
+  --surface-low: #f5f5f5;
+  --surface-container: #efefef;
+  --surface-high: #e8e8e8;
+  --surface-highest: #e0e0e0;
+
+  --on-surface: #1c1b1f;
+  --on-surface-variant: #49454f;
+  --outline: #7a757f;
+  --outline-variant: #cac4d0;
+
+  --primary: #6e42a3;
+  --primary-container: #eaddff;
+  --on-primary: #ffffff;
+  --on-primary-container: #22005d;
+
+  --error: #b3261e;
+  --error-container: #f9dedc;
+  --on-error-container: #410e0b;
+
+  --success: #4caf50;
+
+  --scrim: rgba(0, 0, 0, 0.32);
+  --dialog-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+}
+
+:root[data-theme="dark"] {
+  --surface: #121212;
+  --surface-low: #1a1a1a;
+  --surface-container: #202020;
+  --surface-high: #2a2a2a;
+  --surface-highest: #333333;
+
+  --on-surface: #e6e1e5;
+  --on-surface-variant: #cac4d0;
+  --outline: #938f99;
+  --outline-variant: #49454f;
+
+  --primary: #d0bcff;
+  --primary-container: #4f378b;
+  --on-primary: #381e72;
+  --on-primary-container: #eaddff;
+
+  --error: #f2b8b5;
+  --error-container: #8c1d18;
+  --on-error-container: #f9dedc;
+
+  --success: #81c784;
+
+  --scrim: rgba(0, 0, 0, 0.5);
+  --dialog-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}

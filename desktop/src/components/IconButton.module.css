@@ -1,0 +1,20 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  color: var(--on-surface-variant);
+  transition: background-color 120ms ease;
+}
+
+.button:hover {
+  background: color-mix(in srgb, var(--on-surface) 8%, transparent);
+}
+
+.large {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+}

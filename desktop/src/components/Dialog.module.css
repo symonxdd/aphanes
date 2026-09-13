@@ -1,0 +1,36 @@
+.dialog {
+  width: min(720px, calc(100vw - 48px));
+  max-height: calc(100vh - 64px);
+  padding: 20px 24px 16px;
+  border: 0;
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: var(--dialog-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dialog:not([open]) {
+  display: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title {
+  flex-grow: 1;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  overflow: auto;
+}

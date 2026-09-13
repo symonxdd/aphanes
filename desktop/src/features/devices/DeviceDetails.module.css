@@ -1,0 +1,46 @@
+.details {
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 8px;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 20px 0 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 44px;
+}
+
+.rowIcon {
+  color: var(--primary);
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-grow: 1;
+  font-size: 15px;
+}
+
+.hint {
+  color: var(--on-surface-variant);
+}
+
+.value {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.remove {
+  padding-top: 28px;
+}

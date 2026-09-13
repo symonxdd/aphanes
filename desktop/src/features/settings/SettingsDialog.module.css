@@ -1,0 +1,65 @@
+.dialog {
+  width: min(520px, calc(100vw - 48px));
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0 8px;
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.tagline {
+  font-size: 15px;
+  color: var(--primary);
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 12px 0 4px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 52px;
+}
+
+.rowIcon {
+  color: var(--primary);
+}
+
+.rowLabel {
+  flex-grow: 1;
+  font-size: 16px;
+}
+
+.rowValue {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+}
+
+.disclaimer {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--on-surface-variant);
+}
+
+.footer {
+  padding-top: 12px;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  text-align: center;
+}
