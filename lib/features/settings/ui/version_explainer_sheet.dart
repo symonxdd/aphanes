@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
+import '../state/package_info_provider.dart';
 
 /// Explains the two numbers shown next to the app version in the About
-/// sheet: the semver string (0.1.0) and the build number (1). Opened by
-/// tapping that version line.
-class VersionExplainerSheet extends StatelessWidget {
+/// sheet: the semver string and the build number, read from the running
+/// app rather than written into the prose. Opened by tapping that version
+/// line.
+class VersionExplainerSheet extends ConsumerWidget {
   const VersionExplainerSheet({super.key});
 
   static Future<void> show(BuildContext context) {
@@ -16,10 +21,22 @@ class VersionExplainerSheet extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
-    final TextStyle sectionTitleStyle =
-        theme.textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w600);
+    // Falls back to the placeholder shape while package info loads, a
+    // frame or two at most; the sheet is opened from a line that already
+    // showed the real numbers.
+    final PackageInfo? info = ref.watch(packageInfoProvider).value;
+    final String version = info?.version ?? '0.1.0';
+    final String build = info?.buildNumber ?? '1';
+    final bool preOne = version.startsWith('0.');
+    final String buildNote = build == '1'
+        ? ', meaning it has not yet needed a second upload under its '
+              'current version name'
+        : '';
+    final TextStyle sectionTitleStyle = theme.textTheme.titleSmall!.copyWith(
+      fontWeight: FontWeight.w600,
+    );
     final TextStyle bodyStyle = theme.textTheme.bodyMedium!;
     final TextStyle triviaStyle = theme.textTheme.bodySmall!.copyWith(
       color: theme.colorScheme.outline,
@@ -47,12 +64,15 @@ class VersionExplainerSheet extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               'This app shows two numbers together as its version: '
-              '0.1.0 (1). What each one means, and why there are two, '
-              'below.',
+              '$version ($build). What each one means, and why there are '
+              'two, below.',
               style: bodyStyle,
             ),
             const SizedBox(height: 20),
-            Text('Semantic versioning, the 0.1.0 part', style: sectionTitleStyle),
+            Text(
+              'Semantic versioning, the $version part',
+              style: sectionTitleStyle,
+            ),
             const SizedBox(height: 8),
             Text(
               'The three numbers separated by dots follow a convention '
@@ -71,12 +91,21 @@ class VersionExplainerSheet extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'A leading zero, as in this app\'s current 0.1.0, carries a '
-              'specific meaning under the semver spec: everything is '
-              'still considered unstable, and any part of it may change '
-              'at any point, even between small updates. Version 1.0.0 '
-              'is meant to mark the first release treated as a stable, '
-              'public commitment.',
+              preOne
+                  ? 'A leading zero, as in this app\'s current $version, '
+                        'carries a specific meaning under the semver spec: '
+                        'everything is still considered unstable, and any '
+                        'part of it may change at any point, even between '
+                        'small updates. Version 1.0.0 is meant to mark the '
+                        'first release treated as a stable, public '
+                        'commitment.'
+                  : 'A leading zero carries a specific meaning under the '
+                        'semver spec: everything is still considered '
+                        'unstable, and any part of it may change at any '
+                        'point, even between small updates. Version 1.0.0 '
+                        'marks the first release treated as a stable, '
+                        'public commitment, which this app, at $version, '
+                        'has passed.',
               style: bodyStyle,
             ),
             const SizedBox(height: 10),
@@ -93,7 +122,7 @@ class VersionExplainerSheet extends StatelessWidget {
               style: triviaStyle,
             ),
             const SizedBox(height: 20),
-            Text('Build number, the (1) part', style: sectionTitleStyle),
+            Text('Build number, the ($build) part', style: sectionTitleStyle),
             const SizedBox(height: 8),
             Text(
               'Right after the version number sits a second, separate '
@@ -130,8 +159,7 @@ class VersionExplainerSheet extends StatelessWidget {
               'Android\'s versionCode has a hard ceiling of '
               '2,100,000,000, a real limit a handful of very old, '
               'frequently updated apps have run into over the years. '
-              'This app is presently on build 1, meaning it has not yet '
-              'needed a second upload under its current version name.',
+              'This app is presently on build $build$buildNote.',
               style: triviaStyle,
             ),
           ],
