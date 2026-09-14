@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AppMark } from "../../components/AppMark";
 import { Button } from "../../components/Button";
 import styles from "./Onboarding.module.css";
@@ -14,8 +15,17 @@ interface OnboardingProps {
  * exists to show, so they stay however the layout changes.
  */
 export function Onboarding({ onDone }: OnboardingProps) {
+  const [leaving, setLeaving] = useState(false);
+
   return (
-    <div className={styles.screen}>
+    <div
+      className={[styles.screen, leaving && styles.leaving].filter(Boolean).join(" ")}
+      onAnimationEnd={(event) => {
+        if (leaving && event.target === event.currentTarget) {
+          onDone();
+        }
+      }}
+    >
       <div className={styles.top}>
         <AppMark width={96} />
         <div className={styles.title}>Aphanes</div>
@@ -31,7 +41,7 @@ export function Onboarding({ onDone }: OnboardingProps) {
         <div className={styles.footnote}>
           Unaffiliated with LG Electronics Inc. or the webOS Open Source Edition project.
         </div>
-        <Button variant="filled" className={styles.cta} onClick={onDone} autoFocus>
+        <Button variant="filled" className={styles.cta} onClick={() => setLeaving(true)} autoFocus>
           Got it, boss
         </Button>
       </div>

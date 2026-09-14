@@ -79,3 +79,32 @@ button.row:hover {
   color: var(--outline);
   text-align: center;
 }
+
+/* The OLED section unfolds and fades in when dark mode arrives and folds
+   away when it leaves, as on mobile, instead of popping. The grid-row
+   trick animates height without knowing it; the negative margin swallows
+   the dialog's gap while collapsed so nothing is left behind. */
+.reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-bottom: -14px;
+  transition:
+    grid-template-rows 280ms ease,
+    opacity 280ms ease,
+    margin-bottom 280ms ease;
+}
+
+.revealOpen {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-bottom: 0;
+}
+
+.revealInner {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}

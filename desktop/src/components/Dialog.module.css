@@ -11,14 +11,58 @@
   gap: 14px;
   -webkit-user-select: none;
   user-select: none;
+
+  /* Enter and exit: a short fade with a touch of lift. The display and
+     overlay transitions are what let the native element animate out
+     before it leaves the top layer. Nothing here reacts to hover.
+     Lift only, no scale, and a persistent compositor layer: a scaled
+     raster of the scrolling body was being kept after the animation,
+     clipping the bottom edge of the last row until a repaint. */
+  opacity: 0;
+  transform: translateY(8px);
+  will-change: transform, opacity;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    overlay 160ms allow-discrete,
+    display 160ms allow-discrete;
 }
 
+/* display: flex above overrides the browser's own hiding of a closed
+   dialog, so it is restated here; the discrete display transition holds
+   it off until the exit fade has finished. */
 .dialog:not([open]) {
   display: none;
 }
 
+.dialog[open] {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .dialog[open] {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
 .dialog::backdrop {
+  background: transparent;
+  transition:
+    background-color 160ms ease,
+    overlay 160ms allow-discrete,
+    display 160ms allow-discrete;
+}
+
+.dialog[open]::backdrop {
   background: var(--scrim);
+}
+
+@starting-style {
+  .dialog[open]::backdrop {
+    background: transparent;
+  }
 }
 
 .header {

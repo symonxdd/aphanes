@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
 import styles from "./ConfirmDialog.module.css";
@@ -21,9 +22,18 @@ interface ConfirmDialogProps {
  * error-coloured button, last, so it is never the one focus lands on.
  */
 export function ConfirmDialog({ request, onClose }: ConfirmDialogProps) {
+  // The request goes null the instant the dialog closes, but the dialog
+  // is still fading out. Keep showing the last one so the content, and
+  // with it the dialog's size and position, hold still until it is gone.
+  const last = useRef<ConfirmRequest | null>(null);
+  if (request) {
+    last.current = request;
+  }
+  const shown = request ?? last.current;
+
   return (
-    <Dialog open={request !== null} onClose={onClose} title={request?.title ?? ""} className={styles.dialog}>
-      <p className={styles.message}>{request?.message}</p>
+    <Dialog open={request !== null} onClose={onClose} title={shown?.title ?? ""} className={styles.dialog}>
+      <p className={styles.message}>{shown?.message}</p>
       <div className={styles.actions}>
         <Button variant="outlined" onClick={onClose} autoFocus>
           Cancel
@@ -35,7 +45,7 @@ export function ConfirmDialog({ request, onClose }: ConfirmDialogProps) {
             onClose();
           }}
         >
-          {request?.confirmLabel}
+          {shown?.confirmLabel}
         </Button>
       </div>
     </Dialog>

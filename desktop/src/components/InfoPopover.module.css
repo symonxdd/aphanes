@@ -16,10 +16,27 @@
   background: var(--surface-low);
   color: var(--on-surface);
   box-shadow: var(--dialog-shadow);
+
+  /* Enter and exit fade, as for dialogs. */
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease,
+    overlay 120ms allow-discrete,
+    display 120ms allow-discrete;
 }
 
-.popover:not(:popover-open) {
-  display: none;
+.popover:popover-open {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .popover:popover-open {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
 }
 
 .header {

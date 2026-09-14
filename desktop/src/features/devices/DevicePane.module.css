@@ -62,6 +62,18 @@
   scrollbar-gutter: stable;
 }
 
+/* Remounted on every tab change (keyed), so the new content fades in. */
+.tabContent {
+  animation: tab-in 160ms ease;
+}
+
+@keyframes tab-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
 .empty {
   flex-grow: 1;
   display: flex;

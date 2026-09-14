@@ -49,8 +49,8 @@ export function SettingsDialog({ open, onClose, onAbout, onShowIntro }: Settings
         <div className={styles.tagline}>A Symon Software Experience</div>
       </div>
 
-      {isDark && (
-        <div className={styles.section}>
+      <div className={[styles.reveal, isDark && styles.revealOpen].filter(Boolean).join(" ")} inert={!isDark}>
+        <div className={styles.revealInner}>
           <div className={styles.sectionTitle}>Appearance</div>
           <div className={styles.row}>
             <span className={styles.rowIcon}>
@@ -63,7 +63,7 @@ export function SettingsDialog({ open, onClose, onAbout, onShowIntro }: Settings
             </span>
           </div>
         </div>
-      )}
+      </div>
 
       <div className={styles.section}>
         <div className={styles.sectionTitle}>General</div>

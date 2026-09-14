@@ -4,6 +4,25 @@
   height: 100%;
   padding: 0 32px;
   background: var(--surface);
+  animation: fade-in 220ms ease;
+}
+
+/* On the way out the whole screen fades; the app fades in beneath it. */
+.leaving {
+  animation: fade-out 220ms ease forwards;
+  pointer-events: none;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
 }
 
 .top {

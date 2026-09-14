@@ -72,11 +72,13 @@ export function DevicePane({
       <Tabs items={tabs} selected={tab} onSelect={setTab} />
 
       <div className={styles.content}>
-        {tab === "apps" ? (
-          <InstalledApps apps={apps} onUninstall={onUninstall} />
-        ) : (
-          <DeviceDetails device={device} info={info} devMode={devMode} onRemove={() => onRemoveDevice(device)} />
-        )}
+        <div key={tab} className={styles.tabContent}>
+          {tab === "apps" ? (
+            <InstalledApps apps={apps} onUninstall={onUninstall} />
+          ) : (
+            <DeviceDetails device={device} info={info} devMode={devMode} onRemove={() => onRemoveDevice(device)} />
+          )}
+        </div>
       </div>
     </main>
   );
