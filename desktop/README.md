@@ -43,9 +43,10 @@ npm run tauri dev      # run with hot reload
 npm run tauri build    # produce installers under target/release/bundle
 ```
 
+Four checks are expected to pass before every commit:
+`npm run typecheck`, `npm run format:check` (Prettier, 120 columns),
 `cargo clippy --workspace --all-targets -- -D warnings` and
-`cargo fmt --all --check` are expected to pass before every commit, as is
-`npm run typecheck`.
+`cargo fmt --all --check`.
 
 ## References
 

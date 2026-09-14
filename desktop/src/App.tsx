@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { ConfirmDialog, type ConfirmRequest } from "./components/ConfirmDialog";
 import type { CatalogPackage, Device, InstalledApp } from "./data/models";
-import { placeholderApps, placeholderCatalog, placeholderDevices, placeholderDevMode, placeholderInfo } from "./data/placeholder";
+import {
+  placeholderApps,
+  placeholderCatalog,
+  placeholderDevices,
+  placeholderDevMode,
+  placeholderInfo,
+} from "./data/placeholder";
 import { CatalogDialog } from "./features/apps/CatalogDialog";
 import { CatalogExplainerDialog } from "./features/apps/CatalogExplainerDialog";
 import { DevicePane } from "./features/devices/DevicePane";

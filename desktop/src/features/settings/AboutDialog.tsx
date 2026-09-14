@@ -21,7 +21,9 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
 
   useEffect(() => {
     if (open && version === null) {
-      appVersion().then(setVersion).catch(() => setVersion(null));
+      appVersion()
+        .then(setVersion)
+        .catch(() => setVersion(null));
     }
   }, [open, version]);
 
@@ -31,8 +33,8 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
         <AppMark width={56} />
       </div>
       <p className={styles.paragraph}>
-        Aphanes - a webOS Dev Mode Manager, is not affiliated with LG Electronics Inc. or the webOS Open Source
-        Edition project.
+        Aphanes - a webOS Dev Mode Manager, is not affiliated with LG Electronics Inc. or the webOS Open Source Edition
+        project.
       </p>
       <p className={styles.paragraph}>
         Free of charge, with no advertising, no paid features and no tracking, and that will not change. Official

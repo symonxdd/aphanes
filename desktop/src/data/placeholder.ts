@@ -42,10 +42,46 @@ export const placeholderApps: InstalledApp[] = [
 ];
 
 export const placeholderCatalog: CatalogPackage[] = [
-  { id: "youtube.leanback.v4", title: "YouTube AdFree", shortDescription: "youtube.leanback.v4", favorite: true, installed: true },
-  { id: "org.jellyfin.webos", title: "Jellyfin", shortDescription: "A webOS client to connect to a Jellyfin server", favorite: true, installed: true },
-  { id: "org.xbmc.kodi", title: "Kodi", shortDescription: "Award-winning free and open source media player", favorite: true, installed: true },
-  { id: "twitch.adamffdev.v1", title: "Twitch AdFree", shortDescription: "twitch.adamffdev.v1", favorite: true, installed: false },
-  { id: "org.piccap", title: "PicCap", shortDescription: "Hyperion Sender App, Ambilight for webOS", favorite: true, installed: false },
-  { id: "com.moonlight", title: "Moonlight", shortDescription: "Open source NVIDIA GameStream client", favorite: false, installed: false },
+  {
+    id: "youtube.leanback.v4",
+    title: "YouTube AdFree",
+    shortDescription: "youtube.leanback.v4",
+    favorite: true,
+    installed: true,
+  },
+  {
+    id: "org.jellyfin.webos",
+    title: "Jellyfin",
+    shortDescription: "A webOS client to connect to a Jellyfin server",
+    favorite: true,
+    installed: true,
+  },
+  {
+    id: "org.xbmc.kodi",
+    title: "Kodi",
+    shortDescription: "Award-winning free and open source media player",
+    favorite: true,
+    installed: true,
+  },
+  {
+    id: "twitch.adamffdev.v1",
+    title: "Twitch AdFree",
+    shortDescription: "twitch.adamffdev.v1",
+    favorite: true,
+    installed: false,
+  },
+  {
+    id: "org.piccap",
+    title: "PicCap",
+    shortDescription: "Hyperion Sender App, Ambilight for webOS",
+    favorite: true,
+    installed: false,
+  },
+  {
+    id: "com.moonlight",
+    title: "Moonlight",
+    shortDescription: "Open source NVIDIA GameStream client",
+    favorite: false,
+    installed: false,
+  },
 ];

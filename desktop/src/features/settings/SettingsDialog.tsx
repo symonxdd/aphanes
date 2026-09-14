@@ -30,7 +30,9 @@ export function SettingsDialog({ open, onClose, onAbout, onShowIntro }: Settings
 
   useEffect(() => {
     if (open && version === null) {
-      appVersion().then(setVersion).catch(() => setVersion(null));
+      appVersion()
+        .then(setVersion)
+        .catch(() => setVersion(null));
     }
   }, [open, version]);
 

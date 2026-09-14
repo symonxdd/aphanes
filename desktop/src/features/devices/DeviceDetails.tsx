@@ -40,7 +40,12 @@ export function DeviceDetails({ device, info, devMode, onRemove }: DeviceDetails
           <div className={styles.sectionTitle}>From the TV</div>
           <Row icon={<Tv size={20} />} label="Model" value={info.modelName} explainer={explain.model} />
           <Row icon={<Cpu size={20} />} label="Firmware" value={info.firmwareVersion} explainer={explain.firmware} />
-          <Row icon={<Tv size={20} />} label="webOS version" value={info.webosVersion} explainer={explain.webosVersion} />
+          <Row
+            icon={<Tv size={20} />}
+            label="webOS version"
+            value={info.webosVersion}
+            explainer={explain.webosVersion}
+          />
           <Row icon={<Microchip size={20} />} label="SoC" value={info.socName} explainer={explain.soc} />
           <Row icon={<Hash size={20} />} label="OTA ID" value={info.otaId} explainer={explain.otaId} />
           <Row

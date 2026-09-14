@@ -9,7 +9,9 @@ interface IconButtonProps extends ComponentProps<"button"> {
 }
 
 export function IconButton({ label, size = "regular", children, className, ...rest }: IconButtonProps) {
-  const classes = [styles.button, size === "large" && styles.large, size === "small" && styles.small, className].filter(Boolean).join(" ");
+  const classes = [styles.button, size === "large" && styles.large, size === "small" && styles.small, className]
+    .filter(Boolean)
+    .join(" ");
   return (
     <button type="button" className={classes} aria-label={label} title={label} {...rest}>
       {children}

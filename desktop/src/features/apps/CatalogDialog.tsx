@@ -29,7 +29,9 @@ export function CatalogDialog({ open, packages, onClose, onInstall, onExplain }:
     const needle = query.trim().toLowerCase();
     return packages
       .filter((pkg) => filter === "all" || pkg.favorite)
-      .filter((pkg) => needle === "" || pkg.title.toLowerCase().includes(needle) || pkg.id.toLowerCase().includes(needle))
+      .filter(
+        (pkg) => needle === "" || pkg.title.toLowerCase().includes(needle) || pkg.id.toLowerCase().includes(needle),
+      )
       .sort((a, b) => a.title.localeCompare(b.title));
   }, [packages, query, filter]);
 
@@ -56,11 +58,21 @@ export function CatalogDialog({ open, packages, onClose, onInstall, onExplain }:
           />
         </label>
         <div className={styles.segments} role="group" aria-label="Filter">
-          <button type="button" className={styles.segment} aria-pressed={filter === "favorites"} onClick={() => setFilter("favorites")}>
+          <button
+            type="button"
+            className={styles.segment}
+            aria-pressed={filter === "favorites"}
+            onClick={() => setFilter("favorites")}
+          >
             <Star size={18} />
             <span>Favorites</span>
           </button>
-          <button type="button" className={styles.segment} aria-pressed={filter === "all"} onClick={() => setFilter("all")}>
+          <button
+            type="button"
+            className={styles.segment}
+            aria-pressed={filter === "all"}
+            onClick={() => setFilter("all")}
+          >
             <ArrowDownAZ size={18} />
             <span>A to Z</span>
           </button>

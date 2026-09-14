@@ -48,7 +48,14 @@ export function InfoPopover({ explainer, label }: InfoPopoverProps) {
       <IconButton ref={buttonRef} size="small" label={label ?? `What is "${explainer.title}"?`} onClick={open}>
         <Info size={18} />
       </IconButton>
-      <div ref={popoverRef} id={id} popover="auto" className={styles.popover} role="dialog" aria-labelledby={`${id}-title`}>
+      <div
+        ref={popoverRef}
+        id={id}
+        popover="auto"
+        className={styles.popover}
+        role="dialog"
+        aria-labelledby={`${id}-title`}
+      >
         <div className={styles.header}>
           <span className={styles.icon}>{explainer.icon}</span>
           <span id={`${id}-title`} className={styles.title}>

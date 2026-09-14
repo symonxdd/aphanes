@@ -23,12 +23,7 @@ body,
 }
 
 body {
-  font-family:
-    system-ui,
-    "Segoe UI",
-    Roboto,
-    "Helvetica Neue",
-    sans-serif;
+  font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   font-size: 14px;
   line-height: 1.4;
   color: var(--on-surface);
