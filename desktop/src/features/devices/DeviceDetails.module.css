@@ -6,17 +6,17 @@
   padding: 4px 0 8px;
 }
 
-/* The two groups side by side: what was saved at pairing, what the TV
-   reports. Uses the width a desktop has instead of one long column. */
-.columns {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 48px;
-}
-
+/* Each group is a two-column grid of rows, so the width a desktop has is
+   used without any one row stretching its value far from its label. */
 .group {
   display: flex;
   flex-direction: column;
+}
+
+.rows {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 48px;
 }
 
 .sectionTitle {
@@ -53,9 +53,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  user-select: text;
 }
 
 .actions {
   display: flex;
+  justify-content: center;
+  padding-top: 4px;
 }

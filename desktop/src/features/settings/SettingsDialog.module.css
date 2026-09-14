@@ -24,11 +24,21 @@
   color: var(--primary);
 }
 
+/* Rows carry their own side padding, unlike mobile's edge-to-edge tiles,
+   so the hover tint has room around the icon and the trailing control.
+   Section titles share the inset to stay aligned with the row icons. */
 .sectionTitle {
   font-size: 13px;
   font-weight: 600;
   color: var(--primary);
-  padding: 8px 0 2px;
+  padding: 8px 12px 2px;
+}
+
+/* Rows in a section sit tight together, as mobile's list tiles do. */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .row {
@@ -37,6 +47,7 @@
   gap: 14px;
   min-height: 48px;
   width: 100%;
+  padding: 0 12px;
   text-align: left;
   border-radius: 12px;
 }

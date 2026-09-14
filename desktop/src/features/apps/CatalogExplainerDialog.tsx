@@ -16,7 +16,7 @@ export function CatalogExplainerDialog({ open, onClose }: CatalogExplainerDialog
         by hobbyists for a device that was never designed to run it, and that its manufacturer doesn't officially
         support. It's used the same way across game consoles, routers, and plenty of other hardware, not just webOS TVs.
       </p>
-      <p className={styles.paragraph}>
+      <p className={styles.trivia}>
         <strong>Trivia.</strong> The term traces back to the Homebrew Computer Club, a hobbyist group that met in Menlo
         Park, California starting in 1975 - Steve Wozniak first showed off an early Apple computer there.
       </p>

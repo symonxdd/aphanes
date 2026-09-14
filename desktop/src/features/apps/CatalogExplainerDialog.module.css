@@ -1,5 +1,8 @@
+/* Same frame as the catalog dialog it opens from, so it reads as the
+   same place and the prose gets the full measure. */
 .dialog {
-  width: min(560px, calc(100vw - 48px));
+  width: min(720px, calc(100vw - 48px));
+  height: min(580px, calc(100vh - 64px));
 }
 
 .sectionTitle {
@@ -12,5 +15,12 @@
 .paragraph {
   font-size: 14px;
   line-height: 1.5;
-  user-select: text;
+}
+
+/* As on mobile: a size down and in the outline colour, a footnote rather
+   than part of the explanation. */
+.trivia {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--outline);
 }

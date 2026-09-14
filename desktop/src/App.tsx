@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ConfirmDialog, type ConfirmRequest } from "./components/ConfirmDialog";
+import { FullscreenLayer } from "./components/FullscreenLayer";
 import type { CatalogPackage, Device, InstalledApp } from "./data/models";
 import {
   placeholderApps,
@@ -28,6 +29,9 @@ type Overlay = "catalog" | "catalogExplainer" | "settings" | "about" | null;
  */
 export default function App() {
   const [introOpen, setIntroOpen] = useState(() => !readOnboardingDone());
+  // A replay from settings shows the intro above the still-open settings
+  // dialog, as mobile pushes it over the sheet, and lands back on it.
+  const [introReplay, setIntroReplay] = useState(false);
   const devices = placeholderDevices;
   const [selectedId, setSelectedId] = useState<string | null>(devices[0]?.id ?? null);
   const [overlay, setOverlay] = useState<Overlay>(null);
@@ -98,11 +102,11 @@ export default function App() {
         open={overlay === "settings"}
         onClose={() => setOverlay(null)}
         onAbout={() => setOverlay("about")}
-        onShowIntro={() => {
-          setOverlay(null);
-          setIntroOpen(true);
-        }}
+        onShowIntro={() => setIntroReplay(true)}
       />
+      <FullscreenLayer open={introReplay} onCancel={() => setIntroReplay(false)}>
+        <Onboarding onDone={() => setIntroReplay(false)} />
+      </FullscreenLayer>
       <AboutDialog open={overlay === "about"} onClose={() => setOverlay("settings")} />
       <ConfirmDialog request={confirm} onClose={() => setConfirm(null)} />
     </div>

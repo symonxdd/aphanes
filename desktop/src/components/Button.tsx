@@ -11,7 +11,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export function Button({ variant = "outlined", icon, children, className, ...rest }: ButtonProps) {
-  const classes = [styles.button, styles[variant], className].filter(Boolean).join(" ");
+  const classes = [styles.button, styles[variant], icon && styles.withIcon, className].filter(Boolean).join(" ");
   return (
     <button type="button" className={classes} {...rest}>
       {icon}

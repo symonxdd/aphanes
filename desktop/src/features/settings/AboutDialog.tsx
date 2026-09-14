@@ -37,8 +37,11 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
         project.
       </p>
       <p className={styles.paragraph}>
-        Free of charge, with no advertising, no paid features and no tracking, and that will not change. Official
-        releases come only from the project's GitHub page.
+        This app will always be free, and free from every kind of ad and tracking. Official releases come only from the{" "}
+        <button type="button" className={styles.inlineLink} onClick={() => openInBrowser(projectLinks.repository)}>
+          project's GitHub page
+        </button>
+        .
       </p>
       <button type="button" className={styles.link} onClick={() => openInBrowser(projectLinks.privacyPolicy)}>
         <span>Privacy policy</span>

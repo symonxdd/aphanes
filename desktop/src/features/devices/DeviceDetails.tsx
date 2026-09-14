@@ -15,16 +15,17 @@ interface DeviceDetailsProps {
 }
 
 /**
- * The same two groups as the mobile device detail page, side by side:
- * what the app stored at pairing time, then what the TV reports about
- * itself. Every label carries the same explainer as on mobile.
+ * The same two groups as the mobile device detail page, one above the
+ * other: what the app stored at pairing time, then what the TV reports
+ * about itself, each laid out in two columns. Every label carries the
+ * same explainer as on mobile.
  */
 export function DeviceDetails({ device, info, devMode, onRemove }: DeviceDetailsProps) {
   return (
     <div className={styles.details}>
-      <div className={styles.columns}>
-        <div className={styles.group}>
-          <div className={styles.sectionTitle}>Pairing</div>
+      <div className={styles.group}>
+        <div className={styles.sectionTitle}>Pairing</div>
+        <div className={styles.rows}>
           <Row icon={<Network size={20} />} label="IP address" value={device.host} explainer={explain.ipAddress} />
           <Row icon={<Calendar size={20} />} label="Paired at" value={device.pairedAt} explainer={explain.pairedAt} />
           <Row
@@ -35,9 +36,11 @@ export function DeviceDetails({ device, info, devMode, onRemove }: DeviceDetails
             explainerLabel={`Why "${device.username}"?`}
           />
         </div>
+      </div>
 
-        <div className={styles.group}>
-          <div className={styles.sectionTitle}>From the TV</div>
+      <div className={styles.group}>
+        <div className={styles.sectionTitle}>From the TV</div>
+        <div className={styles.rows}>
           <Row icon={<Tv size={20} />} label="Model" value={info.modelName} explainer={explain.model} />
           <Row icon={<Cpu size={20} />} label="Firmware" value={info.firmwareVersion} explainer={explain.firmware} />
           <Row

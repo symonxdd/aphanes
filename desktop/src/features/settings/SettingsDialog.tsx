@@ -50,7 +50,7 @@ export function SettingsDialog({ open, onClose, onAbout, onShowIntro }: Settings
       </div>
 
       {isDark && (
-        <>
+        <div className={styles.section}>
           <div className={styles.sectionTitle}>Appearance</div>
           <div className={styles.row}>
             <span className={styles.rowIcon}>
@@ -62,28 +62,30 @@ export function SettingsDialog({ open, onClose, onAbout, onShowIntro }: Settings
               <Switch checked={oled} onChange={setOled} label="Enable OLED theme" />
             </span>
           </div>
-        </>
+        </div>
       )}
 
-      <div className={styles.sectionTitle}>General</div>
-      <button type="button" className={styles.row} onClick={onAbout}>
-        <span className={styles.rowIcon}>
-          <Info size={22} />
-        </span>
-        <span className={styles.rowLabel}>About</span>
-        <span className={styles.trailing}>
-          <ChevronRight size={22} />
-        </span>
-      </button>
-      <button type="button" className={styles.row} onClick={onShowIntro}>
-        <span className={styles.rowIcon}>
-          <RotateCcw size={22} />
-        </span>
-        <span className={styles.rowLabel}>Show intro again</span>
-        <span className={styles.trailing}>
-          <ChevronRight size={22} />
-        </span>
-      </button>
+      <div className={styles.section}>
+        <div className={styles.sectionTitle}>General</div>
+        <button type="button" className={styles.row} onClick={onAbout}>
+          <span className={styles.rowIcon}>
+            <Info size={22} />
+          </span>
+          <span className={styles.rowLabel}>About</span>
+          <span className={styles.trailing}>
+            <ChevronRight size={22} />
+          </span>
+        </button>
+        <button type="button" className={styles.row} onClick={onShowIntro}>
+          <span className={styles.rowIcon}>
+            <RotateCcw size={22} />
+          </span>
+          <span className={styles.rowLabel}>Show intro again</span>
+          <span className={styles.trailing}>
+            <ChevronRight size={22} />
+          </span>
+        </button>
+      </div>
 
       {version && (
         <div className={styles.footer}>

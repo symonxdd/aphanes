@@ -7,6 +7,9 @@
   width: 380px;
   max-height: 60vh;
   overflow: auto;
+  scrollbar-gutter: stable;
+  -webkit-user-select: none;
+  user-select: none;
   padding: 18px 20px 16px;
   border: 1px solid var(--outline-variant);
   border-radius: 20px;
@@ -41,7 +44,6 @@
   line-height: 1.5;
   color: var(--on-surface);
   white-space: pre-line;
-  user-select: text;
 }
 
 .more {

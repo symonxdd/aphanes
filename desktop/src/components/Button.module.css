@@ -3,11 +3,17 @@
   align-items: center;
   gap: 8px;
   height: 40px;
-  padding: 0 20px 0 16px;
+  padding: 0 20px;
   border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
+}
+
+/* A leading icon reads as wider than it is, so the left inset shrinks
+   to keep the pair visually centred. */
+.withIcon {
+  padding-left: 16px;
 }
 
 .button:disabled {

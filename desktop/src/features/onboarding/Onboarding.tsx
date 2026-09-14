@@ -23,11 +23,11 @@ export function Onboarding({ onDone }: OnboardingProps) {
       <div className={styles.middle}>
         <div className={styles.tagline}>Manage your webOS TV's Developer Mode.</div>
         <div className={styles.subline}>
-          Install apps, see what the TV is running, and renew the Developer Mode session.
+          Install apps, check the TV's details, and renew the Developer Mode session.
         </div>
       </div>
       <div className={styles.bottom}>
-        <div className={styles.footnote}>Free forever. No ads, no tracking.</div>
+        <div className={styles.footnote}>No ads. No tracking. Free, forever.</div>
         <div className={styles.footnote}>
           Unaffiliated with LG Electronics Inc. or the webOS Open Source Edition project.
         </div>

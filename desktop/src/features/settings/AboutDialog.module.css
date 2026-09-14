@@ -11,7 +11,6 @@
 .paragraph {
   font-size: 14px;
   line-height: 1.5;
-  user-select: text;
 }
 
 .link {
@@ -19,8 +18,8 @@
   align-items: center;
   gap: 4px;
   align-self: flex-start;
-  padding: 6px 8px;
-  margin-left: -8px;
+  padding: 3px 8px;
+  margin: -3px 0 -3px -8px;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
@@ -36,4 +35,15 @@
   font-size: 12px;
   color: var(--outline);
   text-align: center;
+}
+
+/* A link inside a sentence: the accent, underlined only on hover, opening
+   in the system browser like every other outward link. */
+.inlineLink {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.inlineLink:hover {
+  text-decoration: underline;
 }
