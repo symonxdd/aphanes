@@ -83,17 +83,26 @@ class DevmodeSetupSheet extends StatelessWidget {
               ),
             const SizedBox(height: 20),
             Row(
+              // Icon on the first line rather than the block's middle, so
+              // it reads as the start of the note.
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.info_outline,
-                  size: 16,
-                  color: theme.colorScheme.primary,
+                Padding(
+                  // bodySmall's 16px line box fits the icon exactly; the
+                  // offset is optical, letters sitting below the box's
+                  // middle to leave room for descenders.
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'One-time setup. Not needed again unless Developer '
-                    'Mode\'s session (about 1000 hours) expires.',
+                    'One-time setup. If the session ever expires, after '
+                    'about 1000 hours, only step 3 is needed again.',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w500,

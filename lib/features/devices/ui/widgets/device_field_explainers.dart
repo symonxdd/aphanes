@@ -150,9 +150,14 @@ abstract final class DeviceFieldExplainers {
           "Developer Mode is LG's own switch for letting a TV run "
           'software that did not come from the LG Content Store. It is '
           'what makes everything else in this app possible.\n\n'
-          'Sessions are deliberately temporary. Once one lapses the TV '
-          'stops accepting developer connections until it is renewed, and '
-          'apps installed through Developer Mode are removed with it. '
+          'Sessions are deliberately temporary. LG gives no reason, but '
+          'Developer Mode exists for testing apps rather than keeping them '
+          'installed for good, and the timer is what enforces that. Once a '
+          'session expires the TV stops accepting developer connections '
+          'until it is renewed, and apps installed through Developer Mode '
+          'are removed with it. Only Developer Mode itself has to be '
+          'switched on again on the TV; the account, the app and this '
+          "app's pairing all survive. "
           'Renewing does not mean pairing again: it asks the TV to open '
           'its own Developer Mode app with an extend flag, which is the '
           'same thing as reopening that app on the TV by hand. Expect '
