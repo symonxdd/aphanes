@@ -55,6 +55,49 @@
   white-space: nowrap;
 }
 
+/* The revealed key sits under the Pairing rows, full width, with the copy
+   button pinned to its top corner. The user-select override matters: the
+   page turns selection off for everything but typed text, and a key that
+   cannot be selected is only half revealed. */
+.key {
+  position: relative;
+  margin-top: 8px;
+  padding: 12px 48px 12px 14px;
+  border-radius: 14px;
+  background: var(--surface-container);
+}
+
+.key > button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.keyText {
+  margin: 0;
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--on-surface);
+  white-space: pre;
+  overflow-x: auto;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.keyError {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--error);
+}
+
+.valueMono {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  letter-spacing: 0.08em;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
 .actions {
   display: flex;
   justify-content: center;

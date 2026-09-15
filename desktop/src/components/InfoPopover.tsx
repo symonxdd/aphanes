@@ -40,7 +40,7 @@ export function InfoPopover({ explainer, label }: InfoPopoverProps) {
     }
     setShowDetails(false);
     popover.showPopover();
-    place(button, popover);
+    placePopover(button, popover);
   };
 
   return (
@@ -76,8 +76,8 @@ export function InfoPopover({ explainer, label }: InfoPopoverProps) {
   );
 }
 
-/** Puts the card below the button, left-aligned to it, kept inside the window. */
-function place(button: HTMLElement, popover: HTMLElement): void {
+/** Puts the card below its anchor, left-aligned to it, kept inside the window. */
+export function placePopover(button: HTMLElement, popover: HTMLElement): void {
   const anchor = button.getBoundingClientRect();
   const size = popover.getBoundingClientRect();
   const viewportWidth = document.documentElement.clientWidth;

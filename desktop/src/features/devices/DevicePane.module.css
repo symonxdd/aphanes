@@ -90,3 +90,7 @@
   font-weight: 500;
   color: var(--on-surface);
 }
+
+.emptyAction {
+  margin-top: 12px;
+}

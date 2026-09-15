@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import { SplashProvider } from "./features/splash/SplashProvider";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import "./styles/base.css";
 
@@ -12,7 +13,9 @@ if (!root) {
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <ThemeProvider>
-      <App />
+      <SplashProvider>
+        <App />
+      </SplashProvider>
     </ThemeProvider>
   </React.StrictMode>,
 );

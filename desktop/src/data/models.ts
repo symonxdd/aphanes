@@ -3,13 +3,15 @@
  * codebases read alike. They will be filled from aphanes-protocol through
  * Tauri commands; for now the shell renders placeholder values.
  */
+/** Mirrors DeviceRecord in src-tauri/src/store.rs; the key stays in Rust. */
 export interface Device {
   id: string;
   name: string;
   host: string;
+  port: number;
   username: string;
-  pairedAt: string;
-  reachable: boolean;
+  /** Milliseconds since the Unix epoch. */
+  pairedAt: number;
 }
 
 export interface DeviceInfo {

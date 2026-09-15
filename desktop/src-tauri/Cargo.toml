@@ -23,6 +23,13 @@ tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 serde = { workspace = true }
 serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+# Private keys go in the OS keychain (Credential Manager, Keychain, Secret
+# Service), never in a file. Device metadata, which holds no secret, is a
+# JSON file in the app data dir.
+keyring = "4"
+uuid = { version = "1", features = ["v4"] }
 
 [lints]
 workspace = true

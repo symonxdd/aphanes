@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { ChevronRight, Contrast, Info, Moon, RotateCcw, Sun } from "lucide-react";
+import { AphanesTitle } from "../../components/AphanesTitle";
 import { AppMark } from "../../components/AppMark";
 import { Dialog } from "../../components/Dialog";
+import { SplashTapTarget } from "../splash/SplashTapTarget";
 import { IconButton } from "../../components/IconButton";
 import { InfoPopover } from "../../components/InfoPopover";
 import { Switch } from "../../components/Switch";
@@ -40,9 +42,15 @@ export function SettingsDialog({ open, onClose, onAbout, onShowIntro }: Settings
     <Dialog open={open} onClose={onClose} title="Settings" className={styles.dialog}>
       <div className={styles.brand}>
         <div className={styles.brandRow}>
-          <AppMark width={34} />
-          <span>Aphanes</span>
-          <IconButton label={isDark ? "Switch to light mode" : "Switch to dark mode"} onClick={toggle}>
+          <SplashTapTarget>
+            <AppMark width={34} />
+          </SplashTapTarget>
+          <AphanesTitle className={styles.brandTitle} />
+          <IconButton
+            label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            className={styles.brandTheme}
+            onClick={toggle}
+          >
             {isDark ? <Moon size={22} /> : <Sun size={22} />}
           </IconButton>
         </div>

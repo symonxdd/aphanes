@@ -25,5 +25,15 @@ serde_json = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 
+# The devmode key server hands out a traditional OpenSSL-encrypted PEM
+# (Proc-Type / DEK-Info headers). These RustCrypto crates, at the versions
+# russh already depends on, decrypt it: EVP_BytesToKey is iterated MD5,
+# the body is CBC with PKCS#7 padding under AES or triple DES.
+aes = "0.9"
+cbc = "0.2"
+des = "0.9"
+md5 = "0.8"
+data-encoding = "2"
+
 [lints]
 workspace = true

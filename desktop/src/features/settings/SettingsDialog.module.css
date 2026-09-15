@@ -13,9 +13,21 @@
 .brandRow {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 6px;
   font-size: 24px;
   font-weight: 600;
+}
+
+/* The word sits a little further from the app mark than from the theme
+   button, so the two read as a lockup rather than a crowded row. */
+.brandTitle {
+  margin-left: 11px;
+}
+
+/* The word's visual centre sits below its line box's, so the theme button
+   drops a touch to line up with it. */
+.brandTheme {
+  margin-top: 3px;
 }
 
 .tagline {

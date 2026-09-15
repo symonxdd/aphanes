@@ -1,29 +1,10 @@
-import type { CatalogPackage, Device, DeviceInfo, DevModeStatus, InstalledApp } from "./models";
+import type { CatalogPackage, DeviceInfo, DevModeStatus, InstalledApp } from "./models";
 
 /**
- * Stand-in data so the shell has something to lay out. Every value here is
- * replaced by a Tauri command once the protocol crate is wired in; nothing
- * in this file is ever shown to a person in a release build.
+ * Stand-in data so the shell has something to lay out. Devices are real
+ * already; every value here is replaced by a Tauri command as the protocol
+ * crate grows. Nothing in this file is ever shown in a release build.
  */
-export const placeholderDevices: Device[] = [
-  {
-    id: "tv-1",
-    name: "webOS TV",
-    host: "10.0.0.3",
-    username: "prisoner",
-    pairedAt: "Aug 23, 2026 13:37",
-    reachable: true,
-  },
-  {
-    id: "tv-2",
-    name: "Bedroom TV",
-    host: "10.0.0.7",
-    username: "prisoner",
-    pairedAt: "Sep 2, 2026 21:05",
-    reachable: false,
-  },
-];
-
 export const placeholderInfo: DeviceInfo = {
   modelName: "65UN70006LA",
   firmwareVersion: "04.64.00",

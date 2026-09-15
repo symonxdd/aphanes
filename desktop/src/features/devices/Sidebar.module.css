@@ -2,7 +2,7 @@
   width: 268px;
   flex-shrink: 0;
   height: 100%;
-  background: var(--surface-low);
+  background: var(--sidebar);
   display: flex;
   flex-direction: column;
   gap: 28px;

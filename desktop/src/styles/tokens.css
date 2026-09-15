@@ -13,6 +13,8 @@
   --surface-container: #efefef;
   --surface-high: #e8e8e8;
   --surface-highest: #e0e0e0;
+  /* The rail sits a step below the content in both themes. */
+  --sidebar: #f5f5f5;
 
   --on-surface: #1c1b1f;
   --on-surface-variant: #49454f;
@@ -33,6 +35,11 @@
 
   --scrim: rgba(0, 0, 0, 0.32);
   --dialog-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+  /* The page is blurred while a dialog is open, in every theme: the edge
+     is read from sharp against soft rather than from a stroke, so none
+     unless a theme sets one. */
+  --scrim-blur: 3px;
+  --dialog-border: 0;
 }
 
 :root[data-theme="dark"] {
@@ -41,6 +48,7 @@
   --surface-container: #202020;
   --surface-high: #2a2a2a;
   --surface-highest: #333333;
+  --sidebar: #0e0e0e;
 
   --on-surface: #e6e1e5;
   --on-surface-variant: #cac4d0;
@@ -64,9 +72,11 @@
 }
 
 /*
- * OLED: the mobile AppTheme.oled ladder. Every surface goes to true black
- * and nothing else changes. Only meaningful in dark mode, so the provider
- * sets the attribute only then.
+ * OLED: the mobile AppTheme.oled ladder. Every surface goes to true black.
+ * Only meaningful in dark mode, so the provider sets the attribute only
+ * then. The dialog and the page behind it are both true black, so on top
+ * of the shared backdrop blur a faint white line keeps the corners defined
+ * on sparse dialogs.
  */
 :root[data-theme="dark"][data-oled="true"] {
   --surface: #000000;
@@ -74,4 +84,6 @@
   --surface-container: #000000;
   --surface-high: #000000;
   --surface-highest: #000000;
+  --sidebar: #000000;
+  --dialog-border: 1px solid rgba(255, 255, 255, 0.1);
 }

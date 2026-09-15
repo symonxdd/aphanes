@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Hand, Hash, MousePointerClick } from "lucide-react";
 import { AppMark } from "../../components/AppMark";
 import { Dialog } from "../../components/Dialog";
+import { SplashTapTarget } from "../splash/SplashTapTarget";
 import { projectLinks } from "../../data/projectLinks";
 import { appVersion, openInBrowser } from "../../ipc/commands";
 import styles from "./AboutDialog.module.css";
@@ -9,6 +10,8 @@ import styles from "./AboutDialog.module.css";
 interface AboutDialogProps {
   open: boolean;
   onClose: () => void;
+  /** The version line opens the explainer; App owns that dialog. */
+  onExplainVersion: (version: string | null) => void;
 }
 
 /**
@@ -16,7 +19,7 @@ interface AboutDialogProps {
  * build says it is the desktop one; nothing else about the app's identity
  * differs between the two.
  */
-export function AboutDialog({ open, onClose }: AboutDialogProps) {
+export function AboutDialog({ open, onClose, onExplainVersion }: AboutDialogProps) {
   const [version, setVersion] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,7 +33,9 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
   return (
     <Dialog open={open} onClose={onClose} title="About" className={styles.dialog}>
       <div className={styles.mark}>
-        <AppMark width={56} />
+        <SplashTapTarget>
+          <AppMark width={56} />
+        </SplashTapTarget>
       </div>
       <p className={styles.paragraph}>
         Aphanes - a webOS Dev Mode Manager, is not affiliated with LG Electronics Inc. or the webOS Open Source Edition
@@ -47,10 +52,41 @@ export function AboutDialog({ open, onClose }: AboutDialogProps) {
         <span>Privacy policy</span>
         <ExternalLink size={14} />
       </button>
+      <div className={styles.divider} />
+      <div className={styles.tryTitle}>Things to try</div>
+      <ul className={styles.tryList}>
+        <li className={styles.tryRow}>
+          <span className={styles.tryIcon}>
+            <SplashTapTarget>
+              <AppMark width={18} />
+            </SplashTapTarget>
+          </span>
+          <span>Click the app icon</span>
+        </li>
+        <li className={styles.tryRow}>
+          <span className={styles.tryIcon}>
+            <MousePointerClick size={18} />
+          </span>
+          <span>Click the Aphanes name</span>
+        </li>
+        <li className={styles.tryRow}>
+          <span className={styles.tryIcon}>
+            <Hand size={18} />
+          </span>
+          <span>Hold the Aphanes name</span>
+        </li>
+        <li className={styles.tryRow}>
+          <span className={styles.tryIcon}>
+            <Hash size={18} />
+          </span>
+          <span>Click the version below</span>
+        </li>
+      </ul>
+
       {version && (
-        <div className={styles.version}>
+        <button type="button" className={styles.version} onClick={() => onExplainVersion(version)}>
           {version} &middot; desktop &middot; {import.meta.env.DEV ? "dev" : "release"}
-        </div>
+        </button>
       )}
     </Dialog>
   );

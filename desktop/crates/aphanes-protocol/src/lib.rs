@@ -12,10 +12,12 @@
 //! exchange, `common/connection/src/luna/luna.rs` for the luna bus calls).
 //! ares-cli-rs is a reference to read, never a dependency to link.
 //!
-//! Planned modules, none built yet:
+//! Modules, built and planned:
 //!
-//! - `pairing`: the devmode key exchange against the TV's key server on
-//!   port 9991, and the SSH key it yields.
+//! - [`pairing`]: the devmode key exchange against the TV's key server on
+//!   port 9991, and the SSH key it yields. Built.
+//! - [`reachability`]: a TCP connect to the SSH port, to show whether a
+//!   TV is there at all. Built.
 //! - `ssh`: one authenticated connection per user-triggered action to the
 //!   TV's sshd on port 9922, offering the legacy `ssh-rsa` (SHA-1)
 //!   signature the TV needs alongside the modern one.
@@ -30,6 +32,8 @@
 //! and the few named hosts the app is allowed to reach.
 
 mod error;
+pub mod pairing;
+pub mod reachability;
 
 pub use error::Error;
 

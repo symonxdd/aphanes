@@ -2,7 +2,7 @@
   width: min(720px, calc(100vw - 48px));
   max-height: calc(100vh - 64px);
   padding: 20px 24px 16px;
-  border: 0;
+  border: var(--dialog-border);
   border-radius: 28px;
   background: var(--surface);
   box-shadow: var(--dialog-shadow);
@@ -49,19 +49,23 @@
 
 .dialog::backdrop {
   background: transparent;
+  backdrop-filter: blur(0);
   transition:
     background-color 160ms ease,
+    backdrop-filter 160ms ease,
     overlay 160ms allow-discrete,
     display 160ms allow-discrete;
 }
 
 .dialog[open]::backdrop {
   background: var(--scrim);
+  backdrop-filter: blur(var(--scrim-blur));
 }
 
 @starting-style {
   .dialog[open]::backdrop {
     background: transparent;
+    backdrop-filter: blur(0);
   }
 }
 
