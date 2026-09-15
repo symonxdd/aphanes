@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.0.2
+
+### ⚡ Improved
+
+- **The first-run screen now says what the app does, one thing per
+  line.** Three short rows replaced the paragraph that used to run under
+  the title, and the first of them names the app that makes YouTube ad
+  free, since that is what many people come looking for.
+- The same screen promises, in writing, that the app is free forever
+  with no ads and no tracking. The About sheet says it at greater
+  length, and names GitHub as the only place official releases come
+  from, so a paid copy found elsewhere can be recognized for what it is.
+- The first-run screen no longer promises a file browser and a terminal.
+  Neither is built, and both tabs already said so.
+- The "Before pairing" checklist is clearer about what expiring costs:
+  when a Developer Mode session runs out, after about 1000 hours, only
+  turning Developer Mode back on is needed. The account, the app on the
+  TV and the pairing all survive.
+- The Developer Mode explainer now says why sessions expire at all, and
+  what an expired one takes with it.
+- The version line in the About sheet explains the real version and
+  build number rather than the example it used to quote.
+
 ## v1.0.1
 
 ### ✨ New
