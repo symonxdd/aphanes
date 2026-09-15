@@ -84,7 +84,7 @@ jobs:
       # the public release would invite people to download a file no
       # phone can install.
       - name: Keep the App Bundle for the Play Console upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: play-appbundle
           path: build/app/outputs/bundle/release/app-release.aab
