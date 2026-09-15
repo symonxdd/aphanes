@@ -12,6 +12,9 @@
   border: 0;
   background: transparent;
   overflow: hidden;
+  /* Same as Dialog: a top-layer element does not take the body's rule. */
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .layer:not([open]) {

@@ -31,6 +31,11 @@ export function Dialog({ open, onClose, title, headerActions, className, childre
     }
     if (open && !element.open) {
       element.showModal();
+      // React's autoFocus never reaches the DOM as an attribute, and this
+      // element stays mounted while closed, so the native focusing steps
+      // land on the header's first button. A dialog that opens with a
+      // text field opens on that field instead.
+      element.querySelector<HTMLElement>("input:not([disabled]), textarea:not([disabled])")?.focus();
     } else if (!open && element.open) {
       closingFromProps.current = true;
       element.close();

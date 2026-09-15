@@ -12,11 +12,12 @@
   "app": {
     "windows": [
       {
-        "title": "webOS Dev Mode Manager",
+        "title": "Aphanes: webOS Dev Mode Manager",
         "width": 1056,
         "height": 630,
         "minWidth": 640,
-        "minHeight": 480
+        "minHeight": 480,
+        "center": true
       }
     ],
     "security": {
