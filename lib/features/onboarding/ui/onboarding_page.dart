@@ -133,7 +133,7 @@ class OnboardingPage extends ConsumerWidget {
                           // so it sits with the pitch rather than with the
                           // button.
                           Text(
-                            'No ads, no tracking, and free forever.',
+                            'No ads, no tracking, free forever.',
                             textAlign: TextAlign.center,
                             style: theme.textTheme.labelLarge?.copyWith(
                               color: theme.colorScheme.onSurface,
