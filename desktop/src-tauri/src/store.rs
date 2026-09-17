@@ -1,9 +1,10 @@
 //! Where paired TVs live on this computer, split the way the constraints
 //! demand: the private key and the passphrase in the OS keychain through
-//! `keyring`, never in a file; everything that is not a secret (name, address, when it was
-//! paired) in one JSON file in the app data directory. Mobile keeps the
-//! whole record in secure storage; here the keychain's per-entry size
-//! limits make the split the safer shape.
+//! `keyring`, never in a file; everything that is not a secret (name,
+//! address, when it was paired, what the TV last said about itself) in
+//! one JSON file in the app data directory. Mobile keeps the whole record
+//! in secure storage; here the keychain's per-entry size limits make the
+//! split the safer shape.
 //!
 //! No Tauri types in this module: it takes the directory as a path, so it
 //! can be tested against a temporary one.
@@ -12,6 +13,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use aphanes_protocol::devmode::DeviceInfo;
 use serde::{Deserialize, Serialize};
 
 /// The keychain service name, a technical identifier, so the codename.
@@ -29,6 +31,14 @@ pub struct DeviceRecord {
     pub username: String,
     /// Milliseconds since the Unix epoch, formatted by the frontend.
     pub paired_at: u64,
+    /// What the TV reported about itself on the last successful fetch,
+    /// so the details tab renders at once on later visits while a fresh
+    /// fetch runs behind it. None of it changes without a firmware
+    /// update. The Developer Mode session is deliberately not kept here:
+    /// it is a countdown, so a stored copy would be wrong rather than
+    /// stale.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub info: Option<DeviceInfo>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -48,6 +58,14 @@ pub enum StoreError {
 }
 
 pub type StoreResult<T> = Result<T, StoreError>;
+
+/// Everything needed to open an SSH session to one device.
+pub struct Connection {
+    pub host: String,
+    pub port: u16,
+    pub username: String,
+    pub private_key_pem: String,
+}
 
 /// The device list plus the keychain, rooted at one directory.
 pub struct DeviceStore {
@@ -86,6 +104,7 @@ impl DeviceStore {
             port,
             username: username.to_string(),
             paired_at: now_millis(),
+            info: None,
         };
         // As bytes, not text: the Windows store keeps text as UTF-16 and
         // caps an entry at 2560 bytes, which a 2048-bit RSA PEM overshoots
@@ -114,6 +133,57 @@ impl DeviceStore {
         let updated = record.clone();
         self.write_all(&all)?;
         Ok(updated)
+    }
+
+    /// Changes the address a device is reached at. The pairing key does
+    /// not depend on it, so this is the recovery path for a TV that was
+    /// handed a new address (usually by DHCP) without pairing again.
+    pub fn update_host(&self, id: &str, host: &str) -> StoreResult<DeviceRecord> {
+        let mut all = self.load_all()?;
+        let record = all
+            .iter_mut()
+            .find(|d| d.id == id)
+            .ok_or(StoreError::NotFound)?;
+        record.host = host.to_string();
+        let updated = record.clone();
+        self.write_all(&all)?;
+        Ok(updated)
+    }
+
+    /// Records what a TV just reported. A no-op when it reported nothing
+    /// usable, and when it matches what is already stored, which is the
+    /// normal outcome.
+    pub fn save_info(&self, id: &str, info: &DeviceInfo) -> StoreResult<()> {
+        if info.is_empty() {
+            return Ok(());
+        }
+        let mut all = self.load_all()?;
+        let record = all
+            .iter_mut()
+            .find(|d| d.id == id)
+            .ok_or(StoreError::NotFound)?;
+        if record.info.as_ref() == Some(info) {
+            return Ok(());
+        }
+        record.info = Some(info.clone());
+        self.write_all(&all)
+    }
+
+    /// The connection details for a device, key included, for the protocol
+    /// crate. The key is read from the keychain at the moment of the call
+    /// and goes no further than the connection it opens.
+    pub fn connection(&self, id: &str) -> StoreResult<Connection> {
+        let record = self
+            .load_all()?
+            .into_iter()
+            .find(|d| d.id == id)
+            .ok_or(StoreError::NotFound)?;
+        Ok(Connection {
+            host: record.host,
+            port: record.port,
+            username: record.username,
+            private_key_pem: self.private_key(id)?,
+        })
     }
 
     pub fn remove(&self, id: &str) -> StoreResult<()> {
@@ -213,13 +283,31 @@ mod tests {
             port: 9922,
             username: "prisoner".into(),
             paired_at: 1_700_000_000_000,
+            info: None,
         }];
         store.write_all(&all).unwrap();
         assert_eq!(store.load_all().unwrap(), all);
+        let info = DeviceInfo {
+            model_name: Some("65UN70006LA".into()),
+            ..DeviceInfo::default()
+        };
+        store.save_info("a", &info).unwrap();
+        assert_eq!(store.load_all().unwrap()[0].info.as_ref(), Some(&info));
+        store.save_info("a", &DeviceInfo::default()).unwrap();
+        assert_eq!(store.load_all().unwrap()[0].info.as_ref(), Some(&info));
         assert_eq!(store.rename("a", "Bedroom").unwrap().name, "Bedroom");
         assert_eq!(store.load_all().unwrap()[0].name, "Bedroom");
         assert!(matches!(
             store.rename("zzz", "x"),
+            Err(StoreError::NotFound)
+        ));
+        assert_eq!(
+            store.update_host("a", "192.168.1.80").unwrap().host,
+            "192.168.1.80"
+        );
+        assert_eq!(store.load_all().unwrap()[0].host, "192.168.1.80");
+        assert!(matches!(
+            store.update_host("zzz", "10.0.0.1"),
             Err(StoreError::NotFound)
         ));
         store.remove("a").unwrap();

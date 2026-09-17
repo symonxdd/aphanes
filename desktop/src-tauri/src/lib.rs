@@ -14,6 +14,7 @@ use store::DeviceStore;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             let dir = app.path().app_data_dir()?;
             app.manage(AppState {
@@ -30,8 +31,19 @@ pub fn run() {
             commands::validate_passphrase,
             commands::pair_device,
             commands::rename_device,
+            commands::update_device_host,
             commands::device_private_key,
             commands::device_passphrase,
+            commands::fetch_device_detail,
+            commands::list_installed_apps,
+            commands::renew_dev_mode,
+            commands::fetch_catalog,
+            commands::fetch_app_description,
+            commands::list_running_apps,
+            commands::launch_app,
+            commands::remove_app,
+            commands::install_from_catalog,
+            commands::install_from_file,
             commands::remove_device,
         ])
         .run(tauri::generate_context!())

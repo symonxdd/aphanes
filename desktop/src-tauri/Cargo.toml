@@ -30,6 +30,9 @@ tokio = { workspace = true }
 # JSON file in the app data dir.
 keyring = "4"
 uuid = { version = "1", features = ["v4"] }
+# The native file picker for "Install .ipk". Tauri's own first-party
+# plugin; the frontend only ever asks it to open, never to save.
+tauri-plugin-dialog = "2"
 
 [lints]
 workspace = true
