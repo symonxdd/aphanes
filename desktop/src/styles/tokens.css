@@ -36,10 +36,11 @@
   --scrim: rgba(0, 0, 0, 0.32);
   --dialog-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
   /* The page is blurred while a dialog is open, in every theme: the edge
-     is read from sharp against soft rather than from a stroke, so none
-     unless a theme sets one. */
+     is read from sharp against soft rather than from a stroke, so the
+     border is invisible unless a theme colors it. Its width is always
+     there, so coloring it never moves the dialog's content. */
   --scrim-blur: 3px;
-  --dialog-border: 0;
+  --dialog-border-color: transparent;
 }
 
 :root[data-theme="dark"] {
@@ -85,5 +86,5 @@
   --surface-high: #000000;
   --surface-highest: #000000;
   --sidebar: #000000;
-  --dialog-border: 1px solid rgba(255, 255, 255, 0.1);
+  --dialog-border-color: rgba(255, 255, 255, 0.1);
 }

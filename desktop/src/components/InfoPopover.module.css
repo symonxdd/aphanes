@@ -2,6 +2,8 @@
   /* The browser positions a popover in the centre by default; the
      component places it next to its (i) button instead. */
   position: fixed;
+  /* Its own weight, whatever its (i) sits in (a bold label, a pill). */
+  font-weight: 400;
   inset: auto;
   margin: 0;
   width: 380px;
@@ -64,19 +66,15 @@
 }
 
 .more {
-  display: block;
-  margin: 8px auto 0;
-  padding: 6px 12px;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--primary);
+  margin-top: 8px;
 }
 
-.more:hover {
-  background: color-mix(in srgb, var(--primary) 8%, transparent);
-}
-
+/* The gap above the details arrives with them, so a folded panel takes
+   no room under the toggle. */
 .details {
+  margin-top: 0;
+}
+
+.detailsOpen {
   margin-top: 8px;
 }

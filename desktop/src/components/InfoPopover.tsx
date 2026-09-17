@@ -1,6 +1,7 @@
 import { useId, useRef, useState, type ReactNode } from "react";
 import { Info } from "lucide-react";
 import { IconButton } from "./IconButton";
+import { ReadMore } from "./ReadMore";
 import styles from "./InfoPopover.module.css";
 
 export interface Explainer {
@@ -64,12 +65,14 @@ export function InfoPopover({ explainer, label }: InfoPopoverProps) {
         </div>
         <p className={styles.body}>{explainer.body}</p>
         {explainer.details && (
-          <>
-            <button type="button" className={styles.more} onClick={() => setShowDetails((value) => !value)}>
-              {showDetails ? "Collapse" : "Read more"}
-            </button>
-            {showDetails && <p className={[styles.body, styles.details].join(" ")}>{explainer.details}</p>}
-          </>
+          <ReadMore
+            open={showDetails}
+            onToggle={() => setShowDetails((value) => !value)}
+            buttonClassName={styles.more}
+            panelClassName={[styles.details, showDetails && styles.detailsOpen].filter(Boolean).join(" ")}
+          >
+            <p className={styles.body}>{explainer.details}</p>
+          </ReadMore>
         )}
       </div>
     </>

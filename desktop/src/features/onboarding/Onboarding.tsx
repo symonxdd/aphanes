@@ -49,7 +49,7 @@ export function Onboarding({ onDone }: OnboardingProps) {
         {/* The price line is a public commitment the README and project
             site also make, and this is the one place every user reads it.
             It closes the pitch, so it sits with the pitch. */}
-        <div className={styles.promise}>No ads, no tracking, and free forever.</div>
+        <div className={styles.promise}>No ads, no tracking, free forever.</div>
       </div>
       <div className={styles.bottom}>
         <Button variant="filled" className={styles.cta} onClick={() => setLeaving(true)} autoFocus>

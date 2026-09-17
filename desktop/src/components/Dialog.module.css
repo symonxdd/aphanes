@@ -1,8 +1,19 @@
+/* The dialog is its own scroll area, with the header stuck to its top:
+   a body longer than the dialog scrolls under the header, which frosts
+   over it, and the frosted band spans the whole width because nothing
+   sits between it and the edges. The dialog has no top padding of its
+   own; the header carries it, so the band reaches the top edge. The
+   right padding is 6px less than the left because the scrollbar gutter,
+   always reserved, takes that 6px inside the edge. The bottom padding is
+   the body's, not the dialog's: padding after a body that has overflowed
+   its box would sit under the overflow rather than after it. */
 .dialog {
   width: min(720px, calc(100vw - 48px));
   max-height: calc(100vh - 64px);
-  padding: 20px 24px 16px;
-  border: var(--dialog-border);
+  padding: 0 18px 0 24px;
+  overflow: auto;
+  scrollbar-gutter: stable;
+  border: 1px solid var(--dialog-border-color);
   border-radius: 28px;
   background: var(--surface);
   box-shadow: var(--dialog-shadow);
@@ -69,10 +80,26 @@
   }
 }
 
+/* Bleeds into the dialog's padding on both sides, up to the scrollbar
+   gutter on the right, so the band is edge to edge. */
 .header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
+  margin: 0 -18px 0 -24px;
+  padding: 20px 18px 14px 24px;
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.titleIcon {
+  display: flex;
+  flex-shrink: 0;
 }
 
 .title {
@@ -81,18 +108,21 @@
   font-weight: 500;
 }
 
-/* The body scrolls, so it also clips. Its box reaches 8px into the
-   dialog's padding on both sides while its content is inset back by the
-   same 8px: alignment is unchanged, and a hover tint that pokes past the
-   text (a text link's, say) is no longer cut off. */
+/* A body taller than the dialog makes the dialog scroll, header and
+   all; a hover tint that pokes past the text is never cut off, since
+   the dialog's clipping edge is out past its padding. */
 .body {
   display: flex;
   flex-direction: column;
   gap: 14px;
   flex-grow: 1;
+  flex-shrink: 0;
+  padding-bottom: 16px;
+}
+
+/* The catalog's kind of body: bounded to the dialog, its own list
+   scrolling inside it under its search box, the dialog itself still. */
+.bodyScrollsInside {
+  flex-shrink: 1;
   min-height: 0;
-  margin: 0 -8px;
-  padding: 0 8px;
-  overflow: auto;
-  scrollbar-gutter: stable;
 }

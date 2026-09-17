@@ -54,7 +54,10 @@
   background: color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
-/* Destructive, quiet: the mobile app's Remove device pill. */
+/* Destructive, quiet: the mobile app's Remove device pill. Dark mode
+   drops the fill, as mobile does: the dark error container reads far
+   more intense than the light one, so dark keeps only the text and icon
+   in the error color, with a faint tint on hover. */
 .danger {
   background: var(--error-container);
   color: var(--error);
@@ -65,7 +68,12 @@
 }
 
 :root[data-theme="dark"] .danger {
-  color: var(--on-error-container);
+  background: transparent;
+}
+
+:root[data-theme="dark"] .danger:not(:disabled):hover {
+  filter: none;
+  background: color-mix(in srgb, var(--error) 10%, transparent);
 }
 
 /* Destructive, loud: the confirming button in a confirmation dialog. */

@@ -1,13 +1,21 @@
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
 import styles from "./ConfirmDialog.module.css";
 
 export interface ConfirmRequest {
+  /** Beside the title: the thing the question is about, e.g. an app's icon. */
+  icon?: ReactNode;
   title: string;
   message: string;
-  /** The destructive verb on the confirming button, e.g. "Uninstall". */
+  /** The verb on the confirming button, e.g. "Uninstall". */
   confirmLabel: string;
+  /**
+   * "destructive" (the default) puts the verb on the error color, for
+   * anything that removes; "plain" keeps the ordinary filled button, for
+   * a heads-up before something that only needs a second look.
+   */
+  tone?: "destructive" | "plain";
   onConfirm: () => void;
 }
 
@@ -32,14 +40,20 @@ export function ConfirmDialog({ request, onClose }: ConfirmDialogProps) {
   const shown = request ?? last.current;
 
   return (
-    <Dialog open={request !== null} onClose={onClose} title={shown?.title ?? ""} className={styles.dialog}>
+    <Dialog
+      open={request !== null}
+      onClose={onClose}
+      title={shown?.title ?? ""}
+      titleIcon={shown?.icon}
+      className={styles.dialog}
+    >
       <p className={styles.message}>{shown?.message}</p>
       <div className={styles.actions}>
         <Button variant="outlined" onClick={onClose} autoFocus>
           Cancel
         </Button>
         <Button
-          variant="filledError"
+          variant={shown?.tone === "plain" ? "filled" : "filledError"}
           onClick={() => {
             request?.onConfirm();
             onClose();
