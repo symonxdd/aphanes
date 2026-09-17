@@ -25,6 +25,17 @@ serde_json = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 
+# HTTPS to developer.lge.com for the Developer Mode session's remaining
+# time, the one request this crate makes to anything but the TV. TLS is
+# rustls on `ring`, the same backend russh uses and for the same reason:
+# reqwest's default provider (aws-lc-rs) needs NASM and CMake to build on
+# Windows. `rustls-no-provider` leaves the provider choice to this crate,
+# which registers ring once at first use (see devmode.rs). Certificates
+# are verified against the OS trust store through rustls-platform-verifier,
+# which that feature brings in.
+reqwest = { version = "0.13", default-features = false, features = ["rustls-no-provider", "json"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+
 # The devmode key server hands out a traditional OpenSSL-encrypted PEM
 # (Proc-Type / DEK-Info headers). These RustCrypto crates, at the versions
 # russh already depends on, decrypt it: EVP_BytesToKey is iterated MD5,
@@ -34,6 +45,8 @@ cbc = "0.2"
 des = "0.9"
 md5 = "0.8"
 data-encoding = "2"
+russh-sftp = "3"
+sha2 = "0.11"
 
 [lints]
 workspace = true
