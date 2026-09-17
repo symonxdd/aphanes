@@ -62,22 +62,19 @@ class AppCatalogService {
           .map(CatalogPackage.fromJson)
           .toList();
     } catch (_) {
-      throw const CatalogException('The app catalog sent an unexpected response.');
+      throw const CatalogException(
+        'The app catalog sent an unexpected response.',
+      );
     }
   }
 
-  /// Downloads [manifest]'s .ipk and verifies it against the manifest's
-  /// published SHA-256 before returning it. Throws
+  /// Downloads [manifest]'s .ipk and, when the manifest publishes a
+  /// SHA-256, verifies the bytes against it before returning them. Throws
   /// [CatalogIntegrityException] on a mismatch - the caller must never
-  /// install bytes this rejected.
+  /// install bytes this rejected. The rare manifest with no published
+  /// hash downloads unchecked; the install UI says so before starting.
   Future<Uint8List> downloadAndVerify(CatalogManifest manifest) async {
     final String? expectedSha256 = manifest.ipkSha256;
-    if (expectedSha256 == null) {
-      throw const CatalogIntegrityException(
-        "This package doesn't publish a checksum, so it can't be "
-        'installed from here.',
-      );
-    }
     final http.Response response;
     try {
       response = await _client.get(Uri.parse(manifest.ipkUrl));
@@ -88,6 +85,9 @@ class AppCatalogService {
       throw const CatalogException("Couldn't download that package.");
     }
     final Uint8List bytes = response.bodyBytes;
+    if (expectedSha256 == null) {
+      return bytes;
+    }
     final String actual = sha256.convert(bytes).toString();
     if (actual.toLowerCase() != expectedSha256.toLowerCase()) {
       throw const CatalogIntegrityException(

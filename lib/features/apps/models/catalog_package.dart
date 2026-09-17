@@ -69,9 +69,9 @@ class CatalogManifest {
       // A handful of real catalog entries publish no ipkHash at all (e.g.
       // com.github.cfernande1470.wireguard, confirmed live) - nullable
       // rather than required, so one such entry doesn't take down parsing
-      // of the whole catalog. AppsService/the install UI refuse to install
-      // a package with no hash to verify against, rather than silently
-      // skipping the integrity check for it.
+      // of the whole catalog. Such a package downloads unchecked, and the
+      // install UI says so before starting, rather than skipping the
+      // integrity check silently.
       ipkSha256: (json['ipkHash'] as Map<String, dynamic>?)?['sha256'] as String?,
       ipkSize: json['ipkSize'] as int,
       // Unpacked size on the TV, distinct from ipkSize (the download

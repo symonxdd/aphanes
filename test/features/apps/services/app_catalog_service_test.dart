@@ -24,7 +24,10 @@ CatalogManifest _manifestFor(Uint8List bytes, {String? shaOverride}) {
 void main() {
   test('fetchCatalog parses the packages array', () async {
     final MockClient client = MockClient((http.Request request) async {
-      expect(request.url.toString(), 'https://repo.webosbrew.org/api/apps.json');
+      expect(
+        request.url.toString(),
+        'https://repo.webosbrew.org/api/apps.json',
+      );
       return http.Response(
         jsonEncode({
           'paging': {'page': 0},
@@ -94,13 +97,11 @@ void main() {
   );
 
   test(
-    'downloadAndVerify refuses a manifest with no published hash, without '
-    'downloading anything (regression: some live catalog entries have no '
-    'ipkHash at all)',
+    'downloadAndVerify returns the bytes unchecked for a manifest with no '
+    'published hash (some live catalog entries have no ipkHash at all)',
     () async {
       final MockClient client = MockClient(
-        (http.Request request) async =>
-            throw StateError('should never fetch a manifest with no hash'),
+        (http.Request request) async => http.Response.bytes([1, 2, 3], 200),
       );
       final AppCatalogService service = AppCatalogService(client: client);
       const CatalogManifest manifest = CatalogManifest(
@@ -114,10 +115,9 @@ void main() {
         rootRequired: false,
       );
 
-      expect(
-        service.downloadAndVerify(manifest),
-        throwsA(isA<CatalogIntegrityException>()),
-      );
+      final Uint8List result = await service.downloadAndVerify(manifest);
+
+      expect(result, Uint8List.fromList([1, 2, 3]));
     },
   );
 }

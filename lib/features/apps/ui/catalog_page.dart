@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -230,10 +231,7 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
                       // Sits in the toolbar rather than taking a row of
                       // its own: it is a small fact about the list, not a
                       // heading for it.
-                      _CatalogCount(
-                        shown: shownCount,
-                        total: totalCount,
-                      ),
+                      _CatalogCount(shown: shownCount, total: totalCount),
                       const SizedBox(width: 4),
                       // Icon reflects the CURRENT view, not the one a tap
                       // switches to: it's read as "you're looking at a
@@ -613,6 +611,38 @@ class _CatalogDetailSheet extends ConsumerWidget {
     );
   }
 
+  Future<void> _install(
+    BuildContext context,
+    WidgetRef ref,
+    bool unchecked,
+  ) async {
+    if (unchecked && !await _confirmUncheckedInstall(context, package)) {
+      return;
+    }
+    if (!context.mounted) {
+      return;
+    }
+    // Read out of ref while it's still valid, before popping this sheet -
+    // see _installStream's own comment for why.
+    final AppCatalogService catalogService = ref.read(
+      appCatalogServiceProvider,
+    );
+    final AppsService appsService = ref.read(appsServiceProvider);
+    final AppOperationController installController = ref.read(
+      installOperationProvider.notifier,
+    );
+    Navigator.of(context).pop();
+    unawaited(
+      OperationProgressDialog.show(
+        context,
+        provider: installOperationProvider,
+        title: 'Installing ${package.title}...',
+        run: () =>
+            installController.run(_installStream(catalogService, appsService)),
+      ),
+    );
+  }
+
   // Takes the services themselves, not a WidgetRef: this is an async*
   // generator, so its body (including everything past the first await)
   // keeps running long after the Install button's own onPressed returns -
@@ -687,7 +717,7 @@ class _CatalogDetailSheet extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final CatalogManifest manifest = package.manifest;
     final String? sourceUrl = manifest.sourceUrl;
-    final bool canInstall = manifest.ipkSha256 != null;
+    final bool unchecked = manifest.ipkSha256 == null;
     final TextStyle? mutedStyle = theme.textTheme.bodySmall?.copyWith(
       color: theme.colorScheme.onSurfaceVariant,
     );
@@ -792,40 +822,32 @@ class _CatalogDetailSheet extends ConsumerWidget {
                 const SizedBox(height: 12),
                 Align(alignment: Alignment.centerRight, child: sourceButton),
               ],
-            ] else
-            // A handful of real catalog entries publish no checksum to
-            // verify against - installing one of those would mean silently
-            // skipping the integrity check this whole flow exists to
-            // enforce, so it's blocked here rather than left to fail
-            // (or worse, succeed unverified) once Install is tapped.
-            // Source still shows even then (own row): it's unrelated to
-            // whether installing is possible.
-            if (!canInstall) ...[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    LucideIcons.circleAlert,
-                    size: 18,
-                    color: theme.colorScheme.error,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      "This package doesn't publish a checksum, so it "
-                      "can't be installed from here.",
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.error,
+            ] else ...[
+              // A handful of real catalog entries publish no checksum to
+              // verify against. Such a package still installs, but the
+              // sheet says so here and Install asks once more before
+              // starting, rather than skipping the check silently.
+              if (unchecked) ...[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      LucideIcons.shieldQuestion,
+                      size: 18,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'The catalog publishes no checksum for this '
+                        "package, so its download can't be checked.",
+                        style: mutedStyle,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              if (sourceButton != null) ...[
+                  ],
+                ),
                 const SizedBox(height: 12),
-                Align(alignment: Alignment.centerRight, child: sourceButton),
               ],
-            ] else
               // End-aligned, not stretched to full width: easier to reach
               // with a thumb than a button spanning the sheet. Source
               // sits directly to Install's left, in the same row, rather
@@ -838,37 +860,48 @@ class _CatalogDetailSheet extends ConsumerWidget {
                     const SizedBox(width: 8),
                   ],
                   FilledButton(
-                    onPressed: () {
-                      // Read out of ref while it's still valid, before
-                      // popping this sheet - see _installStream's own
-                      // comment for why.
-                      final AppCatalogService catalogService = ref.read(
-                        appCatalogServiceProvider,
-                      );
-                      final AppsService appsService = ref.read(
-                        appsServiceProvider,
-                      );
-                      final AppOperationController installController = ref
-                          .read(installOperationProvider.notifier);
-                      Navigator.of(context).pop();
-                      OperationProgressDialog.show(
-                        context,
-                        provider: installOperationProvider,
-                        title: 'Installing ${package.title}...',
-                        run: () => installController.run(
-                          _installStream(catalogService, appsService),
-                        ),
-                      );
-                    },
+                    onPressed: () => _install(context, ref, unchecked),
                     child: const Text('Install'),
                   ),
                 ],
               ),
+            ],
           ],
         ),
       ),
     );
   }
+}
+
+/// The heads-up before an unchecked download: what cannot be checked,
+/// and where the file comes from. Plain, not alarming.
+Future<bool> _confirmUncheckedInstall(
+  BuildContext context,
+  CatalogPackage package,
+) async {
+  final String host = Uri.tryParse(package.manifest.ipkUrl)?.host ?? '';
+  final bool? confirmed = await showDialog<bool>(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      title: Text('Install "${package.title}"?'),
+      content: Text(
+        'The catalog publishes no checksum for this package, so the '
+        "download can't be checked before it goes to the TV. "
+        '${host.isEmpty ? '' : 'It comes from $host.'}',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text('Install'),
+        ),
+      ],
+    ),
+  );
+  return confirmed ?? false;
 }
 
 /// Formats a byte count for display, e.g. `7.1 MB` or `108 KB`.
