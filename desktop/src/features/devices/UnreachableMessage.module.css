@@ -1,0 +1,19 @@
+.message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--on-surface-variant);
+  font-size: 14px;
+}
+
+.message p {
+  margin: 0;
+}
+
+.title {
+  font-size: 16px;
+  color: var(--on-surface);
+}

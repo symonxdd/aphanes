@@ -75,6 +75,8 @@
   scrollbar-gutter: stable;
 }
 
+/* The row's icon and text open the package's page; the version and the
+   Install button sit beside them. The whole row tints on hover. */
 .row {
   display: flex;
   align-items: center;
@@ -82,7 +84,7 @@
   height: 68px;
   /* Rows keep their height; the list scrolls instead of squeezing them. */
   flex-shrink: 0;
-  padding: 0 8px 0 4px;
+  padding: 0 8px 0 0;
   border-radius: 12px;
 }
 
@@ -90,12 +92,29 @@
   background: color-mix(in srgb, var(--on-surface) 4%, transparent);
 }
 
-.icon {
-  width: 48px;
-  height: 48px;
+.open {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-grow: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 4px;
   border-radius: 12px;
-  background: var(--surface-highest);
-  flex-shrink: 0;
+  color: inherit;
+  text-align: left;
+}
+
+.open:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.version {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .text {
@@ -139,4 +158,29 @@
   padding: 48px 16px;
   text-align: center;
   color: var(--on-surface-variant);
+}
+
+.errorText {
+  color: var(--error);
+  margin-bottom: 16px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  border-right-color: transparent;
+  animation: spin 800ms linear infinite;
+}
+
+.refreshing svg {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

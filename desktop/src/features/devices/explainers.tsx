@@ -140,8 +140,7 @@ export const pairingKey: Explainer = {
   body:
     "The credential this app presents to the TV every time it connects. Pairing fetched it once from the TV's " +
     "key server, unlocked it locally with the passphrase shown on the TV screen, and saved the unlocked key " +
-    "in this computer's own credential store. The passphrase itself is not kept: it was only needed to unlock " +
-    "the key, and has no use afterwards.\n\n" +
+    "in this computer's own credential store.\n\n" +
     "From then on, every action on this TV (listing apps, installing, uninstalling, reading device details) " +
     'starts by logging in to the TV\'s SSH server on port 9922 as the built-in "prisoner" account, using this ' +
     "key as proof of identity. It plays the role a password would, which is also the reason to treat it like " +

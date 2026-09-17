@@ -55,22 +55,36 @@
   color: var(--on-surface-variant);
 }
 
+/* The scroll area reaches 22px into the pane's right padding, with its
+   content inset back by 16px: the values stay aligned with the header,
+   and the scrollbar sits out in the margin with a gap from them instead
+   of hugging the last character of every row. */
 .content {
   flex-grow: 1;
   min-height: 0;
+  margin-right: -22px;
+  padding-right: 16px;
   overflow: auto;
   scrollbar-gutter: stable;
 }
 
-/* Remounted on every tab change (keyed), so the new content fades in. */
+/* Remounted on every tab change (keyed), so the new content fades in.
+   Fills the scroll area, so a tab can pin something to its bottom. The
+   entrance settles down from above, as a popover does, rather than
+   rising from below: a tab already fills the area, so any lift from
+   below overflows it for the length of the animation and flashes a
+   scrollbar, while overflow past the top is never scrollable. */
 .tabContent {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
   animation: tab-in 160ms ease;
 }
 
 @keyframes tab-in {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(-4px);
   }
 }
 
@@ -93,4 +107,15 @@
 
 .emptyAction {
   margin-top: 12px;
+}
+
+/* The refresh button's icon turns while a fetch is running. */
+.refreshing svg {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

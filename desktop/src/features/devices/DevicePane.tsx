@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Info, LayoutGrid, Plus, Search, Tv, Upload } from "lucide-react";
+import { Info, LayoutGrid, Plus, RefreshCw, Search, Tv, Upload } from "lucide-react";
 import { Button } from "../../components/Button";
+import { IconButton } from "../../components/IconButton";
 import { Tabs, type TabItem } from "../../components/Tabs";
-import type { Device, DeviceInfo, DevModeStatus, InstalledApp } from "../../data/models";
+import type { Device, DeviceDetail, InstalledApp } from "../../data/models";
 import { InstalledApps } from "../apps/InstalledApps";
 import { DeviceDetails } from "./DeviceDetails";
 import { reachabilityLabel } from "./Sidebar";
+import type { Remote } from "./useDeviceData";
 import styles from "./DevicePane.module.css";
 
 type TabId = "apps" | "details";
@@ -20,13 +22,16 @@ interface DevicePaneProps {
   ready: boolean;
   device: Device | null;
   reachable: boolean | undefined;
-  info: DeviceInfo;
-  devMode: DevModeStatus;
-  apps: InstalledApp[];
+  detail: Remote<DeviceDetail>;
+  apps: Remote<InstalledApp[]>;
   onPair: () => void;
+  /** Probes the TV again and, if it answers, fetches everything afresh. */
+  onRefresh: () => void;
   onBrowseCatalog: () => void;
   onInstallIpk: () => void;
+  onOpenApp: (app: InstalledApp) => void;
   onUninstall: (app: InstalledApp) => void;
+  onEditHost: (device: Device) => void;
   onRemoveDevice: (device: Device) => void;
 }
 
@@ -35,13 +40,15 @@ export function DevicePane({
   ready,
   device,
   reachable,
-  info,
-  devMode,
+  detail,
   apps,
   onPair,
+  onRefresh,
   onBrowseCatalog,
   onInstallIpk,
+  onOpenApp,
   onUninstall,
+  onEditHost,
   onRemoveDevice,
 }: DevicePaneProps) {
   const [tab, setTab] = useState<TabId>("apps");
@@ -65,6 +72,8 @@ export function DevicePane({
     );
   }
 
+  const refreshing = reachable === undefined || detail.loading || apps.loading;
+
   return (
     <main className={styles.pane}>
       <div className={styles.header}>
@@ -76,6 +85,15 @@ export function DevicePane({
             <span className={styles.host}>&middot; {device.host}</span>
           </div>
         </div>
+        <IconButton
+          label="Refresh"
+          tooltip
+          className={refreshing ? styles.refreshing : undefined}
+          disabled={refreshing}
+          onClick={onRefresh}
+        >
+          <RefreshCw size={20} />
+        </IconButton>
         <Button variant="outlined" icon={<Upload size={18} />} onClick={onInstallIpk}>
           Install .ipk
         </Button>
@@ -89,9 +107,21 @@ export function DevicePane({
       <div className={styles.content}>
         <div key={tab} className={styles.tabContent}>
           {tab === "apps" ? (
-            <InstalledApps apps={apps} onUninstall={onUninstall} />
+            <InstalledApps
+              device={device}
+              apps={apps}
+              reachable={reachable}
+              onOpen={onOpenApp}
+              onUninstall={onUninstall}
+            />
           ) : (
-            <DeviceDetails device={device} info={info} devMode={devMode} onRemove={() => onRemoveDevice(device)} />
+            <DeviceDetails
+              device={device}
+              detail={detail}
+              reachable={reachable}
+              onEditHost={() => onEditHost(device)}
+              onRemove={() => onRemoveDevice(device)}
+            />
           )}
         </div>
       </div>
