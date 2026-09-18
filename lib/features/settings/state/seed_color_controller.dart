@@ -12,9 +12,9 @@ const String _seedColorPrefsKey = 'seed_color_argb';
 class SeedColorController extends Notifier<Color> {
   @override
   Color build() {
-    final int? argb = ref.watch(sharedPreferencesProvider).getInt(
-      _seedColorPrefsKey,
-    );
+    final int? argb = ref
+        .watch(sharedPreferencesProvider)
+        .getInt(_seedColorPrefsKey);
     return argb == null ? AppTheme.seed : Color(argb);
   }
 

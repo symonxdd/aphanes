@@ -167,9 +167,8 @@ class _DeviceListState extends ConsumerState<_DeviceList> {
                   ref.read(activeDeviceProvider.notifier).select(device.id),
               onInfoTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
-                  builder: (BuildContext _) => DeviceDetailPage(
-                    deviceId: device.id,
-                  ),
+                  builder: (BuildContext _) =>
+                      DeviceDetailPage(deviceId: device.id),
                 ),
               ),
             ),

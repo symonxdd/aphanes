@@ -5,8 +5,10 @@ import '../../../core/persistence/shared_preferences_provider.dart';
 const String _hasSeenOnboardingPrefsKey = 'has_seen_onboarding';
 
 /// Whether the user has already been shown the onboarding screen.
-final NotifierProvider<OnboardingController, bool> onboardingControllerProvider =
-    NotifierProvider<OnboardingController, bool>(OnboardingController.new);
+final NotifierProvider<OnboardingController, bool>
+onboardingControllerProvider = NotifierProvider<OnboardingController, bool>(
+  OnboardingController.new,
+);
 
 class OnboardingController extends Notifier<bool> {
   @override

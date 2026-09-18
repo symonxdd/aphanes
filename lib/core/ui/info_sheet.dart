@@ -124,10 +124,7 @@ class _InfoSheetState extends State<InfoSheet>
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    widget.title,
-                    style: theme.textTheme.titleLarge,
-                  ),
+                  child: Text(widget.title, style: theme.textTheme.titleLarge),
                 ),
               ],
             ),

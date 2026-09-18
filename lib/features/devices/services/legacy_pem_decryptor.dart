@@ -135,10 +135,14 @@ abstract final class LegacyPemDecryptor {
     Uint8List iv,
     Uint8List ciphertext,
   ) {
-    final PaddedBlockCipher cipher = PaddedBlockCipherImpl(
-      PKCS7Padding(),
-      CBCBlockCipher(engine),
-    )..init(false, PaddedBlockCipherParameters(ParametersWithIV(KeyParameter(key), iv), null));
+    final PaddedBlockCipher cipher =
+        PaddedBlockCipherImpl(PKCS7Padding(), CBCBlockCipher(engine))..init(
+          false,
+          PaddedBlockCipherParameters(
+            ParametersWithIV(KeyParameter(key), iv),
+            null,
+          ),
+        );
     return cipher.process(ciphertext);
   }
 
@@ -191,7 +195,9 @@ abstract final class LegacyPemDecryptor {
     final String body = base64.encode(der);
     final StringBuffer pem = StringBuffer('-----BEGIN $type-----\n');
     for (int i = 0; i < body.length; i += 64) {
-      pem.writeln(body.substring(i, i + 64 > body.length ? body.length : i + 64));
+      pem.writeln(
+        body.substring(i, i + 64 > body.length ? body.length : i + 64),
+      );
     }
     pem.write('-----END $type-----\n');
     return pem.toString();

@@ -72,7 +72,8 @@ class CatalogManifest {
       // of the whole catalog. Such a package downloads unchecked, and the
       // install UI says so before starting, rather than skipping the
       // integrity check silently.
-      ipkSha256: (json['ipkHash'] as Map<String, dynamic>?)?['sha256'] as String?,
+      ipkSha256:
+          (json['ipkHash'] as Map<String, dynamic>?)?['sha256'] as String?,
       ipkSize: json['ipkSize'] as int,
       // Unpacked size on the TV, distinct from ipkSize (the download
       // size) - not every submission reports it.

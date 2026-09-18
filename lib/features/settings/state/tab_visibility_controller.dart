@@ -11,9 +11,9 @@ const String _terminalTabVisiblePrefsKey = 'terminal_tab_visible';
 class FilesTabVisibilityController extends Notifier<bool> {
   @override
   bool build() {
-    return ref.watch(sharedPreferencesProvider).getBool(
-          _filesTabVisiblePrefsKey,
-        ) ??
+    return ref
+            .watch(sharedPreferencesProvider)
+            .getBool(_filesTabVisiblePrefsKey) ??
         false;
   }
 
@@ -26,19 +26,18 @@ class FilesTabVisibilityController extends Notifier<bool> {
 }
 
 final NotifierProvider<FilesTabVisibilityController, bool>
-filesTabVisibleProvider =
-    NotifierProvider<FilesTabVisibilityController, bool>(
-      FilesTabVisibilityController.new,
-    );
+filesTabVisibleProvider = NotifierProvider<FilesTabVisibilityController, bool>(
+  FilesTabVisibilityController.new,
+);
 
 /// Whether the Terminal tab shows in the bottom nav. Off by default, for
 /// the same reason as [filesTabVisibleProvider].
 class TerminalTabVisibilityController extends Notifier<bool> {
   @override
   bool build() {
-    return ref.watch(sharedPreferencesProvider).getBool(
-          _terminalTabVisiblePrefsKey,
-        ) ??
+    return ref
+            .watch(sharedPreferencesProvider)
+            .getBool(_terminalTabVisiblePrefsKey) ??
         false;
   }
 

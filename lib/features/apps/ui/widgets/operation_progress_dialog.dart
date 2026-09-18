@@ -42,7 +42,8 @@ class OperationProgressDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppOperationState state = ref.watch(provider);
-    final bool running = state is AppOperationIdle || state is AppOperationRunning;
+    final bool running =
+        state is AppOperationIdle || state is AppOperationRunning;
     return PopScope(
       canPop: !running,
       child: AlertDialog(
@@ -67,19 +68,21 @@ class OperationProgressDialog extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     return switch (state) {
       AppOperationIdle() => const _ProgressRow(label: 'Starting...'),
-      AppOperationRunning(:final LunaOperationProgress progress) => switch (progress) {
-        LunaOperationUploading(:final sentBytes, :final totalBytes) => _ProgressRow(
-          label:
-              'Uploading... '
-              '${totalBytes == 0 ? 0 : ((sentBytes / totalBytes) * 100).clamp(0, 100).toStringAsFixed(0)}%',
-          value: totalBytes == 0 ? null : sentBytes / totalBytes,
-        ),
-        LunaOperationVerifying() => const _ProgressRow(
-          label: 'Verifying upload...',
-        ),
-        LunaOperationWorking(:final message) => _ProgressRow(label: message),
-        LunaOperationSucceeded() => const _ProgressRow(label: 'Finishing...'),
-      },
+      AppOperationRunning(:final LunaOperationProgress progress) =>
+        switch (progress) {
+          LunaOperationUploading(:final sentBytes, :final totalBytes) =>
+            _ProgressRow(
+              label:
+                  'Uploading... '
+                  '${totalBytes == 0 ? 0 : ((sentBytes / totalBytes) * 100).clamp(0, 100).toStringAsFixed(0)}%',
+              value: totalBytes == 0 ? null : sentBytes / totalBytes,
+            ),
+          LunaOperationVerifying() => const _ProgressRow(
+            label: 'Verifying upload...',
+          ),
+          LunaOperationWorking(:final message) => _ProgressRow(label: message),
+          LunaOperationSucceeded() => const _ProgressRow(label: 'Finishing...'),
+        },
       AppOperationSucceeded() => Row(
         children: [
           Icon(Icons.check_circle, color: theme.colorScheme.primary),

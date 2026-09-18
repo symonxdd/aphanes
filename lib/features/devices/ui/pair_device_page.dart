@@ -390,9 +390,7 @@ class _ConnectForm extends ConsumerWidget {
                 : const Text('Pair'),
           ),
           const SizedBox(height: 40),
-          Center(
-            child: DevmodeSetupLink(highlighted: state is PairingFailed),
-          ),
+          Center(child: DevmodeSetupLink(highlighted: state is PairingFailed)),
         ],
       ),
     );

@@ -7,9 +7,18 @@ void main() {
   group('remainingDuration', () {
     test('reads a clock, with hours allowed past 24', () {
       // Observed on a real TV, which is what pinned the format down.
-      expect(parse('999:52:55'), const Duration(hours: 999, minutes: 52, seconds: 55));
-      expect(parse('999:59:59'), const Duration(hours: 999, minutes: 59, seconds: 59));
-      expect(parse('4:05:09'), const Duration(hours: 4, minutes: 5, seconds: 9));
+      expect(
+        parse('999:52:55'),
+        const Duration(hours: 999, minutes: 52, seconds: 55),
+      );
+      expect(
+        parse('999:59:59'),
+        const Duration(hours: 999, minutes: 59, seconds: 59),
+      );
+      expect(
+        parse('4:05:09'),
+        const Duration(hours: 4, minutes: 5, seconds: 9),
+      );
       expect(parse(' 12:00:00 '), const Duration(hours: 12));
     });
 
@@ -17,8 +26,10 @@ void main() {
       expect(parse('45 minutes'), const Duration(minutes: 45));
       expect(parse('3 days 4 hours'), const Duration(days: 3, hours: 4));
       expect(parse('12h 30m'), const Duration(hours: 12, minutes: 30));
-      expect(parse('1 hour, 2 minutes, 3 seconds'),
-          const Duration(hours: 1, minutes: 2, seconds: 3));
+      expect(
+        parse('1 hour, 2 minutes, 3 seconds'),
+        const Duration(hours: 1, minutes: 2, seconds: 3),
+      );
     });
 
     test('gives up on anything it does not recognise', () {

@@ -76,9 +76,9 @@ Future<void> _pumpPage(
         deviceReachabilityProvider(
           _id,
         ).overrideWith((Ref _) async => reachable),
-        deviceDetailProvider(_id).overrideWith(
-          (Ref _) => (fetch ?? Completer<DeviceDetail>()).future,
-        ),
+        deviceDetailProvider(
+          _id,
+        ).overrideWith((Ref _) => (fetch ?? Completer<DeviceDetail>()).future),
       ],
       child: const MaterialApp(home: DeviceDetailPage(deviceId: _id)),
     ),

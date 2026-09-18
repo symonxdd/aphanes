@@ -136,13 +136,16 @@ void main() {
     expect(await service.probe('127.0.0.1'), isFalse);
   });
 
-  test('probe returns false, not an exception, for an unreachable host', () async {
-    final DevmodePairingService service = DevmodePairingService(
-      keyServerPort: 1,
-    );
+  test(
+    'probe returns false, not an exception, for an unreachable host',
+    () async {
+      final DevmodePairingService service = DevmodePairingService(
+        keyServerPort: 1,
+      );
 
-    expect(await service.probe('127.0.0.1'), isFalse);
-  });
+      expect(await service.probe('127.0.0.1'), isFalse);
+    },
+  );
 
   test('validatePassphrase returns true for the correct passphrase', () async {
     final DevmodePairingService service = DevmodePairingService();

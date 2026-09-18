@@ -58,7 +58,12 @@ abstract final class DeviceFieldExplainers {
   }
 
   static Future<void> pairedAt(BuildContext context) {
-    return InfoSheet.show(context, icon: LucideIcons.calendar, title: 'Paired at', body: "When the TV's pairing key was retrieved and saved on this phone.");
+    return InfoSheet.show(
+      context,
+      icon: LucideIcons.calendar,
+      title: 'Paired at',
+      body: "When the TV's pairing key was retrieved and saved on this phone.",
+    );
   }
 
   static Future<void> model(BuildContext context) {

@@ -25,7 +25,10 @@ class ReachabilityDot extends ConsumerWidget {
       ),
       AsyncData() => (theme.colorScheme.error, "Can't reach the TV right now"),
       AsyncError() => (theme.colorScheme.error, "Can't reach the TV right now"),
-      _ => (theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4), 'Checking...'),
+      _ => (
+        theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+        'Checking...',
+      ),
     };
 
     return Tooltip(

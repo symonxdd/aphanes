@@ -153,10 +153,9 @@ void main() {
       final ProviderContainer c = container(store);
       await c.read(deviceInfoCacheProvider.future);
 
-      await c.read(deviceInfoCacheProvider.notifier).put(
-        'a',
-        const DeviceInfo(),
-      );
+      await c
+          .read(deviceInfoCacheProvider.notifier)
+          .put('a', const DeviceInfo());
 
       expect(c.read(deviceInfoCacheProvider).value, isEmpty);
       expect(store.writes, 0);

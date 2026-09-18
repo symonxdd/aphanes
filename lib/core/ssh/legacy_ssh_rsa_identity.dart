@@ -30,11 +30,12 @@ import 'package:pointycastle/export.dart' as pc;
 /// which isn't part of its public API - only `SSHRawHostKey`/
 /// `SSHRawSignature` (both exported) carry the resulting bytes.
 SSHIdentity legacySshRsaIdentity(RsaPrivateKey key) {
-  final Uint8List publicKeyBlob = (BytesBuilder()
-        ..add(sshString(utf8.encode('ssh-rsa')))
-        ..add(sshMpint(key.e))
-        ..add(sshMpint(key.n)))
-      .toBytes();
+  final Uint8List publicKeyBlob =
+      (BytesBuilder()
+            ..add(sshString(utf8.encode('ssh-rsa')))
+            ..add(sshMpint(key.e))
+            ..add(sshMpint(key.n)))
+          .toBytes();
 
   return SSHIdentity.custom(
     type: 'ssh-rsa',
@@ -55,10 +56,11 @@ SSHIdentity legacySshRsaIdentity(RsaPrivateKey key) {
         ),
       );
       final Uint8List rawSignature = signer.generateSignature(data).bytes;
-      final Uint8List signatureBlob = (BytesBuilder()
-            ..add(sshString(utf8.encode('ssh-rsa')))
-            ..add(sshString(rawSignature)))
-          .toBytes();
+      final Uint8List signatureBlob =
+          (BytesBuilder()
+                ..add(sshString(utf8.encode('ssh-rsa')))
+                ..add(sshString(rawSignature)))
+              .toBytes();
       return SSHRawSignature(signatureBlob);
     },
   );

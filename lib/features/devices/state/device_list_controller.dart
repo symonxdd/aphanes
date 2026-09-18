@@ -66,7 +66,6 @@ class DeviceListController extends AsyncNotifier<List<Device>> {
 }
 
 final AsyncNotifierProvider<DeviceListController, List<Device>>
-deviceListProvider =
-    AsyncNotifierProvider<DeviceListController, List<Device>>(
-      DeviceListController.new,
-    );
+deviceListProvider = AsyncNotifierProvider<DeviceListController, List<Device>>(
+  DeviceListController.new,
+);

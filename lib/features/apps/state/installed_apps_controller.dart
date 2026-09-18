@@ -38,9 +38,7 @@ class InstalledAppsController extends AsyncNotifier<List<InstalledApp>> {
       deviceReachabilityProvider(device.id).future,
     );
     if (!reachable) {
-      throw const SshConnectionException(
-        "Couldn't reach that TV.",
-      );
+      throw const SshConnectionException("Couldn't reach that TV.");
     }
     return ref.watch(appsServiceProvider).listInstalled(device);
   }

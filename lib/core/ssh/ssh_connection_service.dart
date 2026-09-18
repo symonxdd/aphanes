@@ -48,9 +48,7 @@ class SshConnectionService {
         "Couldn't reach that TV. Check it's on the same network.",
       );
     } on TimeoutException {
-      throw const SshConnectionException(
-        'Connection to the TV timed out.',
-      );
+      throw const SshConnectionException('Connection to the TV timed out.');
     }
 
     final SSHClient client = SSHClient(

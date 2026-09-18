@@ -306,7 +306,9 @@ class _DevicesTitle extends StatelessWidget {
           // result without needing to know that height up front.
           const AspectRatio(
             aspectRatio: 1,
-            child: FittedBox(child: SplashTapTarget(child: AppIconGlyph(size: 40))),
+            child: FittedBox(
+              child: SplashTapTarget(child: AppIconGlyph(size: 40)),
+            ),
           ),
           const SizedBox(width: 10),
           _DevicesTitleText(theme: theme),

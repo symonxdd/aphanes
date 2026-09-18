@@ -26,9 +26,6 @@ void main() {
   });
 
   test('escapes an embedded single quote', () {
-    expect(
-      LunaCommandService.shellEscape("it's here"),
-      r"""'it'\''s here'""",
-    );
+    expect(LunaCommandService.shellEscape("it's here"), r"""'it'\''s here'""");
   });
 }

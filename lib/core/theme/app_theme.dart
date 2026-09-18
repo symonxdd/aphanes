@@ -11,9 +11,10 @@ abstract final class AppTheme {
   // color picker (see accent_color_sheet.dart) falls back to.
   static const Color seed = Color(0xFF9333EA);
 
-  static final InputDecorationTheme _inputDecorationTheme = InputDecorationTheme(
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-  );
+  static final InputDecorationTheme _inputDecorationTheme =
+      InputDecorationTheme(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+      );
 
   // M3's default AppBar tints and grows a shadow when content scrolls
   // under it. Disabled everywhere via the theme (rather than per-AppBar)
@@ -34,17 +35,16 @@ abstract final class AppTheme {
   // the same switch, which is what read as a visible glitch rather than a
   // clean transition.
   static ThemeData light(Color seedColor) {
-    final ColorScheme scheme = ColorScheme.fromSeed(
-      seedColor: seedColor,
-    ).copyWith(
-      surface: const Color(0xFFFFFFFF),
-      surfaceContainerLowest: const Color(0xFFFFFFFF),
-      surfaceContainerLow: const Color(0xFFF5F5F5),
-      surfaceContainer: const Color(0xFFEFEFEF),
-      surfaceContainerHigh: const Color(0xFFE8E8E8),
-      surfaceContainerHighest: const Color(0xFFE0E0E0),
-      surfaceTint: Colors.transparent,
-    );
+    final ColorScheme scheme = ColorScheme.fromSeed(seedColor: seedColor)
+        .copyWith(
+          surface: const Color(0xFFFFFFFF),
+          surfaceContainerLowest: const Color(0xFFFFFFFF),
+          surfaceContainerLow: const Color(0xFFF5F5F5),
+          surfaceContainer: const Color(0xFFEFEFEF),
+          surfaceContainerHigh: const Color(0xFFE8E8E8),
+          surfaceContainerHighest: const Color(0xFFE0E0E0),
+          surfaceTint: Colors.transparent,
+        );
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
@@ -72,21 +72,22 @@ abstract final class AppTheme {
   // tertiary/error (buttons, accents) stay exactly as the seed derives
   // them.
   static ThemeData dark(Color seedColor) {
-    final ColorScheme scheme = ColorScheme.fromSeed(
-      seedColor: seedColor,
-      brightness: Brightness.dark,
-    ).copyWith(
-      // Material's own canonical #121212 base - the bottom sheet / card
-      // tier below stays at #1A1A1A on purpose, so a screen's own
-      // background still reads as a step below whatever's raised above it.
-      surface: const Color(0xFF121212),
-      surfaceContainerLowest: const Color(0xFF080808),
-      surfaceContainerLow: const Color(0xFF1A1A1A),
-      surfaceContainer: const Color(0xFF202020),
-      surfaceContainerHigh: const Color(0xFF2A2A2A),
-      surfaceContainerHighest: const Color(0xFF333333),
-      surfaceTint: Colors.transparent,
-    );
+    final ColorScheme scheme =
+        ColorScheme.fromSeed(
+          seedColor: seedColor,
+          brightness: Brightness.dark,
+        ).copyWith(
+          // Material's own canonical #121212 base - the bottom sheet / card
+          // tier below stays at #1A1A1A on purpose, so a screen's own
+          // background still reads as a step below whatever's raised above it.
+          surface: const Color(0xFF121212),
+          surfaceContainerLowest: const Color(0xFF080808),
+          surfaceContainerLow: const Color(0xFF1A1A1A),
+          surfaceContainer: const Color(0xFF202020),
+          surfaceContainerHigh: const Color(0xFF2A2A2A),
+          surfaceContainerHighest: const Color(0xFF333333),
+          surfaceTint: Colors.transparent,
+        );
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
@@ -114,22 +115,23 @@ abstract final class AppTheme {
   /// clean on OLED panels, rather than dark mode's usual dark grey with a
   /// faint primary-colored wash on raised surfaces.
   static ThemeData oled(Color seedColor) {
-    final ColorScheme scheme = ColorScheme.fromSeed(
-      seedColor: seedColor,
-      brightness: Brightness.dark,
-    ).copyWith(
-      surface: Colors.black,
-      surfaceContainerLowest: Colors.black,
-      surfaceContainerLow: Colors.black,
-      surfaceContainer: Colors.black,
-      surfaceContainerHigh: Colors.black,
-      surfaceContainerHighest: Colors.black,
-      // The single lever every M3 widget's default elevation-tint overlay
-      // reads from - zeroing it here is what actually stops the "accent
-      // wash" on bottom sheets, cards, dialogs, menus, etc., rather than
-      // having to patch each widget's own theme individually.
-      surfaceTint: Colors.transparent,
-    );
+    final ColorScheme scheme =
+        ColorScheme.fromSeed(
+          seedColor: seedColor,
+          brightness: Brightness.dark,
+        ).copyWith(
+          surface: Colors.black,
+          surfaceContainerLowest: Colors.black,
+          surfaceContainerLow: Colors.black,
+          surfaceContainer: Colors.black,
+          surfaceContainerHigh: Colors.black,
+          surfaceContainerHighest: Colors.black,
+          // The single lever every M3 widget's default elevation-tint overlay
+          // reads from - zeroing it here is what actually stops the "accent
+          // wash" on bottom sheets, cards, dialogs, menus, etc., rather than
+          // having to patch each widget's own theme individually.
+          surfaceTint: Colors.transparent,
+        );
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,

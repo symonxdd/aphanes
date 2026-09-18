@@ -295,9 +295,7 @@ class _UnreachableStateState extends ConsumerState<_UnreachableState> {
       // The installed-apps list watches this same probe, so a TV that
       // answers this time is already loading its apps by the time this
       // widget goes away.
-      await ref.read(
-        deviceReachabilityProvider(widget.device.id).future,
-      );
+      await ref.read(deviceReachabilityProvider(widget.device.id).future);
     } catch (_) {
       // A failed probe is a `false` result, not an error, and either way
       // the rebuilt widget below is what reports it.
@@ -343,9 +341,7 @@ class _UnreachableStateState extends ConsumerState<_UnreachableState> {
                                 ),
                               )
                             : const Icon(Icons.refresh),
-                        label: Text(
-                          _checking ? 'Checking...' : 'Check again',
-                        ),
+                        label: Text(_checking ? 'Checking...' : 'Check again'),
                       ),
                     ],
                   ),

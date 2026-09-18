@@ -109,9 +109,10 @@ class DeviceDetailPage extends ConsumerWidget {
     WidgetRef ref,
     Device device,
   ) async {
-    final List<Device> otherDevices = (ref.read(deviceListProvider).value ?? const [])
-        .where((Device d) => d.id != device.id)
-        .toList();
+    final List<Device> otherDevices =
+        (ref.read(deviceListProvider).value ?? const [])
+            .where((Device d) => d.id != device.id)
+            .toList();
     final String? newHost = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
@@ -120,7 +121,9 @@ class DeviceDetailPage extends ConsumerWidget {
           _EditHostSheet(currentHost: device.host, otherDevices: otherDevices),
     );
     if (newHost != null && context.mounted) {
-      await ref.read(deviceListProvider.notifier).updateHost(device.id, newHost);
+      await ref
+          .read(deviceListProvider.notifier)
+          .updateHost(device.id, newHost);
     }
   }
 
@@ -148,7 +151,8 @@ class DeviceDetailPage extends ConsumerWidget {
     // Watched (not a constructor snapshot): re-derives the live device on
     // every rebuild, so editing the host or renaming it updates this page
     // immediately, rather than only after leaving and reopening it.
-    final List<Device> devices = ref.watch(deviceListProvider).value ?? const [];
+    final List<Device> devices =
+        ref.watch(deviceListProvider).value ?? const [];
     Device? found;
     for (final Device d in devices) {
       if (d.id == deviceId) {
@@ -898,9 +902,7 @@ class _EditHostSheetState extends State<_EditHostSheet>
               TextFormField(
                 controller: _controller,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: "TV's IP address",
-                ),
+                decoration: const InputDecoration(labelText: "TV's IP address"),
                 onFieldSubmitted: (String _) => _save(),
                 validator: (String? value) {
                   final String host = value?.trim() ?? '';
@@ -925,10 +927,7 @@ class _EditHostSheetState extends State<_EditHostSheet>
                     child: const Text('Cancel'),
                   ),
                   const SizedBox(width: 8),
-                  FilledButton(
-                    onPressed: _save,
-                    child: const Text('Save'),
-                  ),
+                  FilledButton(onPressed: _save, child: const Text('Save')),
                 ],
               ),
             ],

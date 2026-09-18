@@ -14,7 +14,9 @@ RsaPrivateKey _generateTestKey() {
   final pc.FortunaRandom random = pc.FortunaRandom();
   random.seed(
     pc.KeyParameter(
-      Uint8List.fromList(List<int>.generate(32, (int i) => (i * 37 + 11) % 256)),
+      Uint8List.fromList(
+        List<int>.generate(32, (int i) => (i * 37 + 11) % 256),
+      ),
     ),
   );
   final pc.RSAKeyGenerator generator = pc.RSAKeyGenerator()
@@ -106,11 +108,12 @@ void main() {
       final SSHIdentity identity = legacySshRsaIdentity(key);
 
       final Uint8List encoded = identity.toPublicKey().encode();
-      final Uint8List expected = (BytesBuilder()
-            ..add(sshString(utf8.encode('ssh-rsa')))
-            ..add(sshMpint(key.e))
-            ..add(sshMpint(key.n)))
-          .toBytes();
+      final Uint8List expected =
+          (BytesBuilder()
+                ..add(sshString(utf8.encode('ssh-rsa')))
+                ..add(sshMpint(key.e))
+                ..add(sshMpint(key.n)))
+              .toBytes();
       expect(encoded, expected);
     });
 
@@ -148,9 +151,7 @@ void main() {
         );
         verifier.init(
           false,
-          pc.PublicKeyParameter<pc.RSAPublicKey>(
-            pc.RSAPublicKey(key.n, key.e),
-          ),
+          pc.PublicKeyParameter<pc.RSAPublicKey>(pc.RSAPublicKey(key.n, key.e)),
         );
         expect(
           verifier.verifySignature(message, pc.RSASignature(rawSignature)),

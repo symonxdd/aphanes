@@ -30,7 +30,8 @@ class DeviceDetailService {
   final LunaCommandService _luna;
   final http.Client _http;
 
-  static const String _devModeTokenPath = '/var/luna/preferences/devmode_enabled';
+  static const String _devModeTokenPath =
+      '/var/luna/preferences/devmode_enabled';
 
   /// Bounds the raw `client.run` calls below. `SshConnectionService` and
   /// `LunaCommandService` already time out their own work, but dartssh2's

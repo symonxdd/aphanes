@@ -134,7 +134,8 @@ class _SwatchDot extends StatelessWidget {
         child: selected
             ? Icon(
                 Icons.check,
-                color: ThemeData.estimateBrightnessForColor(color) ==
+                color:
+                    ThemeData.estimateBrightnessForColor(color) ==
                         Brightness.dark
                     ? Colors.white
                     : Colors.black,
@@ -181,8 +182,7 @@ class _CustomColorSheetState extends State<_CustomColorSheet> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () =>
-                      setState(() => _pickedColor = AppTheme.seed),
+                  onPressed: () => setState(() => _pickedColor = AppTheme.seed),
                   icon: const Icon(Icons.restore),
                   tooltip: 'Reset to default',
                 ),

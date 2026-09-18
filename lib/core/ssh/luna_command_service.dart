@@ -38,9 +38,8 @@ class LunaCommandService {
         '${_shellEscape(jsonEncode(payload))}';
     final Uint8ListResult result = await _run(client, command).timeout(
       const Duration(seconds: 10),
-      onTimeout: () => throw const LunaCallException(
-        'The TV took too long to respond.',
-      ),
+      onTimeout: () =>
+          throw const LunaCallException('The TV took too long to respond.'),
     );
     if (result.exitCode != 0) {
       throw LunaCallException(

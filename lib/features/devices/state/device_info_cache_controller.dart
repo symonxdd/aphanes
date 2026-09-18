@@ -45,12 +45,10 @@ class DeviceInfoCacheController extends AsyncNotifier<Map<String, DeviceInfo>> {
     if (current == null || !current.containsKey(deviceId)) {
       return;
     }
-    state = AsyncData(
-      <String, DeviceInfo>{
-        for (final MapEntry<String, DeviceInfo> entry in current.entries)
-          if (entry.key != deviceId) entry.key: entry.value,
-      },
-    );
+    state = AsyncData(<String, DeviceInfo>{
+      for (final MapEntry<String, DeviceInfo> entry in current.entries)
+        if (entry.key != deviceId) entry.key: entry.value,
+    });
   }
 }
 

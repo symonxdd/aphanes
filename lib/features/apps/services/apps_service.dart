@@ -147,9 +147,7 @@ class AppsService {
   Stream<LunaOperationProgress> installFromFile(Device device, File file) {
     final StreamController<LunaOperationProgress> controller =
         StreamController<LunaOperationProgress>();
-    unawaited(
-      _runInstall(controller, device, () => file.readAsBytes()),
-    );
+    unawaited(_runInstall(controller, device, () => file.readAsBytes()));
     return controller.stream;
   }
 
@@ -183,7 +181,8 @@ class AppsService {
       final String checksum = sha256.convert(bytes).toString();
 
       client = await _connect(device);
-      remotePath = '$_remoteTempDir/ares_install_${checksum.substring(0, 10)}.ipk';
+      remotePath =
+          '$_remoteTempDir/ares_install_${checksum.substring(0, 10)}.ipk';
 
       final SftpClient sftp = await client.sftp();
       try {
@@ -217,11 +216,7 @@ class AppsService {
       await for (final Map<String, dynamic> message in _luna.subscribe(
         client,
         'luna://com.webos.appInstallService/dev/install',
-        {
-          'id': 'com.ares.defaultName',
-          'ipkUrl': remotePath,
-          'subscribe': true,
-        },
+        {'id': 'com.ares.defaultName', 'ipkUrl': remotePath, 'subscribe': true},
       )) {
         final LunaOperationProgress? progress = _parseInstallerMessage(
           message,

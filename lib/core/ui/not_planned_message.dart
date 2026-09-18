@@ -104,7 +104,8 @@ class _NotPlannedMessageState extends State<NotPlannedMessage> {
                     ),
                   ),
                   const TextSpan(
-                    text: "in the project's GitHub repository, and I'd be "
+                    text:
+                        "in the project's GitHub repository, and I'd be "
                         'happy to consider adding it.',
                   ),
                 ],
