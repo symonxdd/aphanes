@@ -15,9 +15,13 @@ class PairingConnecting extends PairingState {
 }
 
 class PairingSucceeded extends PairingState {
-  const PairingSucceeded(this.host, this.credentials);
+  const PairingSucceeded(this.host, this.passphrase, this.credentials);
 
   final String host;
+
+  /// Carried through so the saved device can keep it for the detail
+  /// page's reveal; pairing itself is done with it by now.
+  final String passphrase;
   final PairedDevmodeCredentials credentials;
 }
 
@@ -48,7 +52,7 @@ class PairingController extends Notifier<PairingState> {
             passphrase: passphrase,
             cachedEncryptedPem: cachedEncryptedPem,
           );
-      state = PairingSucceeded(host, credentials);
+      state = PairingSucceeded(host, passphrase, credentials);
     } on DevmodePairingException catch (e) {
       state = PairingFailed(e.message);
     } catch (e) {

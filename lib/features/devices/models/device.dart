@@ -10,6 +10,7 @@ class Device {
     required this.username,
     required this.privateKeyPem,
     required this.pairedAt,
+    this.passphrase,
   });
 
   factory Device.fromJson(Map<String, dynamic> json) {
@@ -22,6 +23,7 @@ class Device {
       username: json['username'] as String,
       privateKeyPem: json['privateKeyPem'] as String,
       pairedAt: DateTime.parse(json['pairedAt'] as String),
+      passphrase: json['passphrase'] as String?,
     );
   }
 
@@ -34,6 +36,12 @@ class Device {
   final String privateKeyPem;
   final DateTime pairedAt;
 
+  /// The passphrase typed at pairing time. The app has no use for it
+  /// after pairing (it only unlocked the key once) and keeps it solely so
+  /// the device detail page can show it. Null for a TV paired before the
+  /// app started keeping it.
+  final String? passphrase;
+
   Device copyWith({String? name, String? host}) {
     return Device(
       id: id,
@@ -44,6 +52,7 @@ class Device {
       username: username,
       privateKeyPem: privateKeyPem,
       pairedAt: pairedAt,
+      passphrase: passphrase,
     );
   }
 
@@ -56,5 +65,6 @@ class Device {
     'username': username,
     'privateKeyPem': privateKeyPem,
     'pairedAt': pairedAt.toIso8601String(),
+    'passphrase': passphrase,
   };
 }

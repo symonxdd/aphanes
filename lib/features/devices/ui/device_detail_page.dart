@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -268,6 +269,8 @@ class DeviceDetailPage extends ConsumerWidget {
                   onInfoTap: () =>
                       showUsernameInfoSheet(context, device.username),
                 ),
+                _PassphraseRow(passphrase: device.passphrase),
+                _PairingKeyRow(privateKeyPem: device.privateKeyPem),
                 const SizedBox(height: 32),
                 // A section label, unlike anything above it on this page:
                 // everything above is instant, locally-stored data:
@@ -930,6 +933,236 @@ class _EditHostSheetState extends State<_EditHostSheet>
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// How long a revealed secret stays on screen before it is hidden again,
+/// as on the desktop app's details page.
+const Duration _revealFor = Duration(seconds: 30);
+
+/// The passphrase row: hidden until its eye is tapped, shown in the value
+/// column for [_revealFor], then hidden again. A TV paired before the app
+/// kept the passphrase has nothing to reveal and says so in place of a
+/// value; the explainer covers why.
+class _PassphraseRow extends StatefulWidget {
+  const _PassphraseRow({required this.passphrase});
+
+  final String? passphrase;
+
+  @override
+  State<_PassphraseRow> createState() => _PassphraseRowState();
+}
+
+class _PassphraseRowState extends State<_PassphraseRow> {
+  bool _revealed = false;
+  Timer? _hideTimer;
+
+  @override
+  void didUpdateWidget(_PassphraseRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A different TV's row must never open already revealed.
+    if (oldWidget.passphrase != widget.passphrase) {
+      _hide();
+    }
+  }
+
+  @override
+  void dispose() {
+    _hideTimer?.cancel();
+    super.dispose();
+  }
+
+  void _hide() {
+    _hideTimer?.cancel();
+    _hideTimer = null;
+    if (_revealed) {
+      setState(() => _revealed = false);
+    }
+  }
+
+  void _toggle() {
+    if (_revealed) {
+      _hide();
+      return;
+    }
+    setState(() => _revealed = true);
+    _hideTimer = Timer(_revealFor, _hide);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final String? passphrase = widget.passphrase;
+    return _DetailRow(
+      icon: LucideIcons.lockKeyhole,
+      label: 'Passphrase',
+      value: passphrase == null
+          ? 'Not saved'
+          : _revealed
+          ? passphrase
+          : 'Hidden',
+      monospaceValue: _revealed,
+      onInfoTap: () => DeviceFieldExplainers.passphrase(context),
+      labelAction: passphrase == null
+          ? null
+          : IconButton(
+              style: _rowActionStyle,
+              padding: EdgeInsets.zero,
+              constraints: _rowActionConstraints,
+              icon: Icon(
+                _revealed ? LucideIcons.eyeOff : LucideIcons.eye,
+                size: _rowActionIconSize,
+              ),
+              tooltip: _revealed ? 'Hide passphrase' : 'Show passphrase',
+              onPressed: _toggle,
+            ),
+    );
+  }
+}
+
+/// The pairing key row. The key is far too long for the value column, so
+/// its eye opens [_PairingKeySheet] instead, and the row itself only ever
+/// reads "Hidden".
+class _PairingKeyRow extends StatelessWidget {
+  const _PairingKeyRow({required this.privateKeyPem});
+
+  final String privateKeyPem;
+
+  @override
+  Widget build(BuildContext context) {
+    return _DetailRow(
+      icon: LucideIcons.keyRound,
+      label: 'Pairing key',
+      value: 'Hidden',
+      onInfoTap: () => DeviceFieldExplainers.pairingKey(context),
+      labelAction: IconButton(
+        style: _rowActionStyle,
+        padding: EdgeInsets.zero,
+        constraints: _rowActionConstraints,
+        icon: const Icon(LucideIcons.eye, size: _rowActionIconSize),
+        tooltip: 'Show pairing key',
+        onPressed: () => _PairingKeySheet.show(context, privateKeyPem),
+      ),
+    );
+  }
+}
+
+/// The pairing key in a sheet of its own, with a copy button and a
+/// countdown: the sheet closes itself once [_revealFor] is up, so the key
+/// is never left on screen by accident.
+class _PairingKeySheet extends StatefulWidget {
+  const _PairingKeySheet({required this.privateKeyPem});
+
+  final String privateKeyPem;
+
+  static Future<void> show(BuildContext context, String privateKeyPem) {
+    return showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (BuildContext _) =>
+          _PairingKeySheet(privateKeyPem: privateKeyPem),
+    );
+  }
+
+  @override
+  State<_PairingKeySheet> createState() => _PairingKeySheetState();
+}
+
+class _PairingKeySheetState extends State<_PairingKeySheet> {
+  late int _secondsLeft = _revealFor.inSeconds;
+  Timer? _tick;
+  Timer? _copiedReset;
+  bool _copied = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tick = Timer.periodic(const Duration(seconds: 1), (Timer _) {
+      if (_secondsLeft <= 1) {
+        Navigator.of(context).pop();
+        return;
+      }
+      setState(() => _secondsLeft -= 1);
+    });
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    _copiedReset?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _copy() async {
+    await Clipboard.setData(ClipboardData(text: widget.privateKeyPem));
+    if (!mounted) {
+      return;
+    }
+    setState(() => _copied = true);
+    _copiedReset?.cancel();
+    _copiedReset = Timer(const Duration(milliseconds: 1500), () {
+      if (mounted) {
+        setState(() => _copied = false);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final TextStyle? mutedStyle = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  LucideIcons.keyRound,
+                  size: 22,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Pairing key',
+                    style: theme.textTheme.headlineSmall,
+                  ),
+                ),
+                Text('Hides in $_secondsLeft s', style: mutedStyle),
+                const SizedBox(width: 4),
+                IconButton(
+                  tooltip: _copied ? 'Copied' : 'Copy pairing key',
+                  icon: Icon(_copied ? LucideIcons.check : LucideIcons.copy),
+                  onPressed: _copy,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Capped so a key on a short screen scrolls inside the sheet
+            // rather than pushing the header off the top of it.
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.sizeOf(context).height * 0.5,
+              ),
+              child: SingleChildScrollView(
+                child: SelectableText(
+                  widget.privateKeyPem.trim(),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

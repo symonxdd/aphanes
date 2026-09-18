@@ -177,6 +177,7 @@ class _PairDevicePageState extends ConsumerState<PairDevicePage> {
       username: DevmodePairingService.devModeUsername,
       privateKeyPem: succeeded.credentials.privateKeyPem,
       pairedAt: DateTime.now(),
+      passphrase: succeeded.passphrase,
     );
     _savedDeviceId = device.id;
     return ref.read(deviceListProvider.notifier).add(device);

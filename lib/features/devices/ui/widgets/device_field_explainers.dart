@@ -141,6 +141,96 @@ abstract final class DeviceFieldExplainers {
     );
   }
 
+  static Future<void> passphrase(BuildContext context) {
+    return InfoSheet.show(
+      context,
+      icon: LucideIcons.lockKeyhole,
+      title: 'Passphrase',
+      body:
+          'The six characters the Developer Mode app shows in its '
+          'bottom-left corner, typed in once at pairing time. It unlocked '
+          "the encrypted key the TV's key server handed over; the app "
+          'then kept the unlocked key and has had no use for the '
+          "passphrase since. It is kept in this phone's secure storage "
+          'only so it can be shown here.\n\n'
+          'It is not a fresh code each time. The Developer Mode app '
+          "builds it from the TV's own device ID (the first six "
+          'characters of the NDUID, in capitals), so it reads the same '
+          'every time that app is opened, survives reboots and turning '
+          'Developer Mode off and on, and only changes with a factory '
+          'reset.\n\n'
+          'A TV paired before the app started keeping it shows "Not '
+          'saved" here; pairing it again would fill it in.',
+      details:
+          'On its own it is nearly harmless: it only unlocks the encrypted '
+          'key, and getting that key means being on the same network as '
+          'the TV with the key server switched on in the Developer Mode '
+          'app. Anyone in that position can read the passphrase off the '
+          'TV screen anyway. Where it does matter is next to a copy of '
+          'the encrypted key, or with the command-line tools '
+          '(ares-setup-device asks for both), and because it doubles as '
+          "the start of the TV's device ID.\n\n"
+          "Where this comes from: LG's webOS Open Source Edition "
+          'publishes the Developer Mode service, and its getPassphrase '
+          'call returns the first six characters of the NDUID. The script '
+          "the TV's own Developer Mode app runs at startup does the same "
+          'when it creates the key.',
+    );
+  }
+
+  static Future<void> pairingKey(BuildContext context) {
+    return InfoSheet.show(
+      context,
+      icon: LucideIcons.keyRound,
+      title: 'Pairing key',
+      body:
+          'The credential this app presents to the TV every time it '
+          "connects. Pairing fetched it once from the TV's key server, "
+          'unlocked it locally with the passphrase shown on the TV '
+          "screen, and saved the unlocked key in this phone's secure "
+          'storage.\n\n'
+          'From then on, every action on this TV (listing apps, '
+          'installing, uninstalling, reading device details) starts by '
+          "logging in to the TV's SSH server on port 9922 as the "
+          'built-in "prisoner" account, using this key as proof of '
+          'identity. It plays the role a password would, which is also '
+          'the reason to treat it like one.\n\n'
+          'Revealing it here shows it on screen for a short while. '
+          'Nothing about it is written to a file or sent anywhere.',
+      details:
+          'What someone with a copy could do: log in to this TV the same '
+          'way this app does, from any device on the same network, and do '
+          'everything this app can, plus anything else that account is '
+          'allowed to run on the TV. "prisoner" is a sandboxed account '
+          'rather than full control of the TV, so that means installing '
+          'and removing homebrew apps and running commands with that '
+          "account's permissions, not the TV's own settings or any LG "
+          'account.\n\n'
+          'What they would need besides the key: a network path to the '
+          'TV, so a device on the same home network (or a router '
+          'deliberately set up to forward port 9922, which no router does '
+          'by default), and Developer Mode still enabled on the TV with '
+          'its session not lapsed. No physical access to the TV is needed '
+          'once someone has the key. Without the key, they would need to '
+          'read the passphrase off the TV screen and have the key server '
+          'on, which does take being in front of it.\n\n'
+          'Revoking it: the TV has no button for that. It generates the '
+          'key once, the first time Developer Mode is enabled, and '
+          'derives the passphrase from its own device ID, so both stay '
+          'the same across reboots and across turning Developer Mode off '
+          'and on again. Only a factory reset produces a new key. Turning '
+          "Developer Mode off does stop the TV's SSH server, which makes "
+          'any copy of the key useless until it is on again. Removing the '
+          'device here deletes the copy on this phone but changes nothing '
+          'on the TV.\n\n'
+          'In practice: a copy is fine to keep as a backup or to use with '
+          'a regular SSH client (ssh -i <file> -p 9922 prisoner@<ip>), as '
+          'long as it is kept the way a password would be. The clipboard '
+          'can be read by other apps, so paste it where it is going and '
+          'move on.',
+    );
+  }
+
   static Future<void> developerMode(BuildContext context) {
     return InfoSheet.show(
       context,
