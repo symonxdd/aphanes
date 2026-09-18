@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/persistence/shared_preferences_provider.dart';
 import 'core/theme/app_theme.dart';
+import 'features/devices/ui/widgets/foreground_recheck.dart';
 import 'features/home/ui/home_page.dart';
 import 'features/onboarding/state/onboarding_controller.dart';
 import 'features/onboarding/ui/onboarding_page.dart';
@@ -55,7 +56,10 @@ class AphanesApp extends ConsumerWidget {
           switchInCurve: Curves.easeIn,
           switchOutCurve: Curves.easeOut,
           child: hasSeenOnboarding
-              ? const HomePage(key: ValueKey('home'))
+              ? const ForegroundRecheck(
+                  key: ValueKey('home'),
+                  child: HomePage(),
+                )
               : const OnboardingPage(key: ValueKey('onboarding')),
         ),
       ),
