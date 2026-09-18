@@ -80,7 +80,7 @@ Two sources are supported:
 
 ### Why the checksum matters
 
-The catalog does not host most packages itself; entries point at wherever the developer publishes them, usually GitHub release assets. That means the bytes come from a third party. Every catalog download is hashed and compared against the checksum the catalog published, and refused on a mismatch, so a compromised download host cannot quietly swap a package for something else. A catalog entry that publishes no checksum cannot be installed from here at all.
+The catalog does not host most packages itself; entries point at wherever the developer publishes them, usually GitHub release assets. That means the bytes come from a third party. Every catalog download is hashed and compared against the checksum the catalog published, and refused on a mismatch, so a compromised download host cannot quietly swap a package for something else. A catalog entry that publishes no checksum is the one case the check cannot cover; installing one of those starts only after a confirmation that says so and names the host the package comes from.
 
 ## What the TV reports about itself
 
