@@ -85,6 +85,14 @@ button.row:hover {
   color: var(--on-surface-variant);
 }
 
+/* The chosen accent, shown beside its row as mobile shows it. */
+.seedDot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
 .footer {
   padding-top: 8px;
   font-size: 12px;
@@ -92,10 +100,10 @@ button.row:hover {
   text-align: center;
 }
 
-/* The OLED section unfolds and fades in when dark mode arrives and folds
+/* The OLED row unfolds and fades in when dark mode arrives and folds
    away when it leaves, as on mobile, instead of popping. The grid-row
    trick animates height without knowing it; the negative margin swallows
-   the dialog's gap while collapsed so nothing is left behind. */
+   the gap around it while collapsed so nothing is left behind. */
 .reveal {
   display: grid;
   grid-template-rows: 0fr;
@@ -105,6 +113,11 @@ button.row:hover {
     grid-template-rows 280ms ease,
     opacity 280ms ease,
     margin-bottom 280ms ease;
+}
+
+/* Inside a section the gap to swallow is the section's own 2px. */
+.revealTight {
+  margin-bottom: -2px;
 }
 
 .revealOpen {

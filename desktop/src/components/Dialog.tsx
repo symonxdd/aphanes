@@ -58,7 +58,9 @@ export function Dialog({
       // element stays mounted while closed, so the native focusing steps
       // land on the header's first button. A dialog that opens with a
       // text field opens on that field instead.
-      element.querySelector<HTMLElement>("input:not([disabled]), textarea:not([disabled])")?.focus();
+      element
+        .querySelector<HTMLElement>('input:not([disabled]):not([tabindex="-1"]), textarea:not([disabled])')
+        ?.focus();
     } else if (!open && element.open) {
       closingFromProps.current = true;
       element.close();

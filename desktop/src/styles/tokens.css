@@ -1,11 +1,17 @@
 /*
- * Colour tokens, mirroring the mobile app's AppTheme (lib/core/theme/
+ * Color tokens, mirroring the mobile app's AppTheme (lib/core/theme/
  * app_theme.dart): Material 3 roles derived from the #9333EA seed, with the
  * surface ladder pinned to plain neutral greys rather than the seed-tinted
  * ones M3 would generate. Light is the default; [data-theme="dark"] on the
  * root swaps the set. The theme provider sets that attribute, so there is
  * no prefers-color-scheme block here: "follow the system" is decided in
  * one place, in code, and written to the attribute.
+ *
+ * The accent roles and the text and outline neutrals are what the seed
+ * decides, and the theme provider rewrites them on the root element for
+ * whatever seed is chosen (see theme/seed.ts). The values here are the
+ * default seed's, exactly as Flutter's ColorScheme.fromSeed produces
+ * them, so the first paint matches what the provider then applies.
  */
 :root {
   --surface: #ffffff;
@@ -16,15 +22,15 @@
   /* The rail sits a step below the content in both themes. */
   --sidebar: #f5f5f5;
 
-  --on-surface: #1c1b1f;
-  --on-surface-variant: #49454f;
-  --outline: #7a757f;
-  --outline-variant: #cac4d0;
+  --on-surface: #1e1a20;
+  --on-surface-variant: #4a454e;
+  --outline: #7c757e;
+  --outline-variant: #ccc4ce;
 
-  --primary: #6e42a3;
-  --primary-container: #eaddff;
+  --primary: #6f528a;
+  --primary-container: #f0dbff;
   --on-primary: #ffffff;
-  --on-primary-container: #22005d;
+  --on-primary-container: #563b71;
 
   --error: #b3261e;
   --on-error: #ffffff;
@@ -51,15 +57,15 @@
   --surface-highest: #333333;
   --sidebar: #0e0e0e;
 
-  --on-surface: #e6e1e5;
-  --on-surface-variant: #cac4d0;
-  --outline: #938f99;
-  --outline-variant: #49454f;
+  --on-surface: #e8e0e8;
+  --on-surface-variant: #ccc4ce;
+  --outline: #968e98;
+  --outline-variant: #4a454e;
 
-  --primary: #d0bcff;
-  --primary-container: #4f378b;
-  --on-primary: #381e72;
-  --on-primary-container: #eaddff;
+  --primary: #dbb9f9;
+  --primary-container: #563b71;
+  --on-primary: #3e2458;
+  --on-primary-container: #f0dbff;
 
   --error: #f2b8b5;
   --on-error: #601410;

@@ -23,6 +23,7 @@ import { Onboarding } from "./features/onboarding/Onboarding";
 import { readOnboardingDone, writeOnboardingDone } from "./features/onboarding/onboardingState";
 import { installFromCatalog, installFromFile, pickIpkFile, removeApp } from "./ipc/commands";
 import { AboutDialog } from "./features/settings/AboutDialog";
+import { AccentColorDialog } from "./features/settings/AccentColorDialog";
 import { SettingsDialog } from "./features/settings/SettingsDialog";
 import { VersionExplainerDialog } from "./features/settings/VersionExplainerDialog";
 import styles from "./App.module.css";
@@ -36,6 +37,7 @@ type Overlay =
   | "catalog"
   | "catalogExplainer"
   | "settings"
+  | "accent"
   | "about"
   | "version"
   | null;
@@ -314,9 +316,11 @@ export default function App() {
       <SettingsDialog
         open={overlay === "settings"}
         onClose={() => setOverlay(null)}
+        onAccentColor={() => setOverlay("accent")}
         onAbout={() => setOverlay("about")}
         onShowIntro={() => setIntroReplay(true)}
       />
+      <AccentColorDialog open={overlay === "accent"} onClose={() => setOverlay("settings")} />
       <FullscreenLayer open={introReplay} onCancel={() => setIntroReplay(false)}>
         <Onboarding onDone={() => setIntroReplay(false)} />
       </FullscreenLayer>
