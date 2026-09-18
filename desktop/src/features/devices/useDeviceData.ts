@@ -108,11 +108,34 @@ export function useDeviceData(device: Device | null, reachable: boolean | undefi
     );
   }, [device]);
 
+  /**
+   * Re-marks the app list from a running list the TV just reported, as
+   * a launch or a page's own check does, without fetching the list again.
+   */
+  const setRunning = useCallback(
+    (running: readonly string[]) => {
+      if (!device) {
+        return;
+      }
+      const id = device.id;
+      setEntries((current) => {
+        const entry = current[id];
+        if (!entry?.apps.data) {
+          return current;
+        }
+        const data = entry.apps.data.map((app) => ({ ...app, running: running.includes(app.id) }));
+        return { ...current, [id]: { ...entry, apps: { ...entry.apps, data } } };
+      });
+    },
+    [device],
+  );
+
   const entry = device ? entries[device.id] : undefined;
   return {
     detail: entry?.detail ?? (idle as Remote<DeviceDetail>),
     apps: entry?.apps ?? (idle as Remote<InstalledApp[]>),
     refresh,
     refreshApps,
+    setRunning,
   };
 }

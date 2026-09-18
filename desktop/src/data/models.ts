@@ -45,6 +45,8 @@ export interface InstalledApp {
   title: string;
   version: string;
   vendor: string | null;
+  /** Whether the TV listed the app as running when the list was fetched. */
+  running: boolean;
 }
 
 /** Mirrors CatalogPackage in the protocol crate's catalog.rs. */

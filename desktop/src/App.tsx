@@ -17,6 +17,7 @@ import { PairingWalkthroughDialog } from "./features/devices/PairingWalkthroughD
 import { Sidebar } from "./features/devices/Sidebar";
 import { useDeviceData } from "./features/devices/useDeviceData";
 import { useDevices } from "./features/devices/useDevices";
+import { useFocusRecheck } from "./features/devices/useFocusRecheck";
 import { Onboarding } from "./features/onboarding/Onboarding";
 import { readOnboardingDone, writeOnboardingDone } from "./features/onboarding/onboardingState";
 import { installFromCatalog, installFromFile, pickIpkFile, removeApp } from "./ipc/commands";
@@ -70,20 +71,39 @@ export default function App() {
     }
   }, [selected, selectedId]);
 
+  // What the TV reports, fetched once it is known to answer.
+  const data = useDeviceData(selected, selectedReachable);
+  // Coming back to the window after a while asks the TV again: the
+  // reachability probe for the dot, then the app list with its running
+  // flags if the TV answers. The TV only; the details, whose session
+  // check goes out to developer.lge.com, wait for a Refresh.
+  // Coming back to the window asks the TV again over the held connection:
+  // the reachability probe for the dot, then the app list with its
+  // running flags if the TV answers. The details, whose session check
+  // reaches developer.lge.com, wait for a Refresh.
+  useFocusRecheck(() => {
+    if (!selected) {
+      return;
+    }
+    void check(selected).then((reachable) => {
+      if (reachable) {
+        data.refreshApps();
+      }
+    });
+  });
+
+  const refreshSelected = async () => {
+    if (selected && (await check(selected))) {
+      data.refresh();
+    }
+  };
+
   // Reachability is checked when a TV comes into view, never on a timer.
   useEffect(() => {
     if (selected && selectedReachable === undefined) {
       void check(selected);
     }
   }, [selected, selectedReachable, check]);
-
-  // What the TV reports, fetched once it is known to answer.
-  const data = useDeviceData(selected, selectedReachable);
-  const refreshSelected = async () => {
-    if (selected && (await check(selected))) {
-      data.refresh();
-    }
-  };
 
   // One install or uninstall at a time, shown in its own dialog over
   // whatever is open; the app list is refetched once it succeeds.
@@ -116,14 +136,18 @@ export default function App() {
     setOverlay("app");
   };
 
-  // The page's two halves follow what is known now: the catalog entry is
-  // filled in once the catalog has loaded, and the installed half is
-  // dropped once the TV's list no longer has the app (after an uninstall
-  // from the page itself), which turns the page into its catalog view.
-  const pageApp =
-    page?.subject.app && (data.apps.data?.some((app) => app.id === page.subject.app?.id) ?? true)
-      ? page.subject.app
-      : null;
+  // The page's two halves follow what is known now: the installed half
+  // is the list's current entry, so a running flag the list learns
+  // reaches the page, and it is dropped once the list no longer has the
+  // app (after an uninstall from the page itself), which turns the page
+  // into its catalog view; the catalog entry is filled in once the
+  // catalog has loaded.
+  const openedApp = page?.subject.app ?? null;
+  const pageApp = openedApp
+    ? data.apps.data
+      ? (data.apps.data.find((app) => app.id === openedApp.id) ?? null)
+      : openedApp
+    : null;
   const pageSubject: AppSubject | null = page && {
     app: pageApp,
     pkg: page.subject.pkg ?? catalog.data?.find((entry) => entry.id === page.subject.app?.id) ?? null,
@@ -235,6 +259,7 @@ export default function App() {
         onClose={() => setOverlay(page?.from === "catalog" ? "catalog" : null)}
         onUninstall={askUninstall}
         onInstall={install}
+        onRunning={data.setRunning}
       />
       <EditHostDialog
         open={overlay === "editHost"}

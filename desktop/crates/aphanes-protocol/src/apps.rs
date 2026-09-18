@@ -32,6 +32,9 @@ pub struct InstalledApp {
     pub title: String,
     pub version: String,
     pub vendor: Option<String>,
+    /// Whether the TV listed the app as running when this list was
+    /// fetched. See [`list_running`] for what running means.
+    pub running: bool,
 }
 
 /// A step in an install or remove, reported as it happens so the UI can
@@ -51,6 +54,9 @@ pub enum OperationProgress {
     Succeeded { package_id: String },
 }
 
+/// The installed apps, each marked running or not, from two calls on the
+/// one session: asking for the running list here costs no connection,
+/// so an app's page can open already knowing.
 pub async fn list_installed(session: &Session) -> Result<Vec<InstalledApp>> {
     let response = luna::call(
         session,
@@ -58,7 +64,14 @@ pub async fn list_installed(session: &Session) -> Result<Vec<InstalledApp>> {
         &json!({}),
     )
     .await?;
-    Ok(parse_list(&response))
+    let mut apps = parse_list(&response);
+    // A running list that fails leaves every app marked not running,
+    // which the page's own check corrects; the list itself still shows.
+    let running = list_running(session).await.unwrap_or_default();
+    for app in &mut apps {
+        app.running = running.contains(&app.id);
+    }
+    Ok(apps)
 }
 
 /// Removes an app by id, reporting each step to `on_progress`.
@@ -102,9 +115,13 @@ pub async fn list_running(session: &Session) -> Result<Vec<String>> {
         .unwrap_or_default())
 }
 
-/// Opens an app on the TV's screen, as pressing it on the TV would. Only
+/// Opens an app on the TV's screen, as pressing it on the TV would, and
+/// reports which apps are running afterwards, on the same session. The
+/// TV accepts a launch a moment before it lists the app as running, so
+/// the list is read a few times until the app shows up in it; a launch
+/// the TV accepted is reported as running even if it never did. Only
 /// ever runs from the Launch button on the app's page.
-pub async fn launch(session: &Session, app_id: &str) -> Result<()> {
+pub async fn launch(session: &Session, app_id: &str) -> Result<Vec<String>> {
     let response = luna::call(
         session,
         "luna://com.webos.applicationManager/launch",
@@ -118,8 +135,23 @@ pub async fn launch(session: &Session, app_id: &str) -> Result<()> {
             .unwrap_or("The TV couldn't open that app.");
         return Err(Error::message(reason));
     }
-    Ok(())
+    let mut running = Vec::new();
+    for attempt in 0..LAUNCH_LIST_ATTEMPTS {
+        if attempt > 0 {
+            tokio::time::sleep(LAUNCH_LIST_INTERVAL).await;
+        }
+        running = list_running(session).await.unwrap_or_default();
+        if running.iter().any(|id| id == app_id) {
+            return Ok(running);
+        }
+    }
+    running.push(app_id.to_string());
+    Ok(running)
 }
+
+/// How often, and how far apart, the running list is read after a launch.
+const LAUNCH_LIST_ATTEMPTS: u32 = 4;
+const LAUNCH_LIST_INTERVAL: std::time::Duration = std::time::Duration::from_millis(500);
 
 /// Installs a package already in memory: uploaded to the TV's temp
 /// directory, checked, handed to the installer, and removed again after.
@@ -273,6 +305,7 @@ fn parse_list(response: &Value) -> Vec<InstalledApp> {
                     .get("vendor")
                     .and_then(Value::as_str)
                     .map(str::to_string),
+                running: false,
             })
         })
         .collect()

@@ -43,6 +43,8 @@ interface AppDialogProps {
   onClose: () => void;
   onUninstall: (app: InstalledApp) => void;
   onInstall: (pkg: CatalogPackage) => void;
+  /** Called with every running list the TV reports here, for the app list. */
+  onRunning: (ids: string[]) => void;
 }
 
 /**
@@ -53,7 +55,16 @@ interface AppDialogProps {
  * only from their button; the description is fetched when the page
  * opens and kept for the session.
  */
-export function AppDialog({ open, deviceId, subject, catalog, onClose, onUninstall, onInstall }: AppDialogProps) {
+export function AppDialog({
+  open,
+  deviceId,
+  subject,
+  catalog,
+  onClose,
+  onUninstall,
+  onInstall,
+  onRunning,
+}: AppDialogProps) {
   // Held through the close animation so the page does not empty out
   // while it fades, as the confirmation dialog does.
   const last = useRef<AppSubject | null>(null);
@@ -67,7 +78,7 @@ export function AppDialog({ open, deviceId, subject, catalog, onClose, onUninsta
   const title = app?.title ?? pkg?.title ?? "";
 
   const description = useDescription(pkg?.fullDescriptionUrl ?? null);
-  const launch = useLaunch(deviceId, app?.id ?? null, open);
+  const launch = useLaunch(deviceId, app?.id ?? null, app?.running ?? false, open, onRunning);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [iconOpen, setIconOpen] = useState(false);
   useEffect(() => {
@@ -170,12 +181,7 @@ export function AppDialog({ open, deviceId, subject, catalog, onClose, onUninsta
                 <InfoPopover explainer={explain.running} label="About running" />
               </span>
             ) : (
-              <Button
-                variant="filled"
-                icon={<Play size={18} />}
-                disabled={launch.busy || launch.running === null}
-                onClick={launch.start}
-              >
+              <Button variant="filled" icon={<Play size={18} />} disabled={launch.busy} onClick={launch.start}>
                 {launch.busy ? "Opening..." : "Launch"}
               </Button>
             )
@@ -410,30 +416,37 @@ function useDescription(url: string | null): Description {
 }
 
 interface LaunchState {
-  /** Whether the app is running on the TV; null until the TV has said. */
-  running: boolean | null;
+  running: boolean;
   busy: boolean;
   message: string | null;
   start: () => void;
 }
 
 /**
- * Whether the app is running on the TV, asked once when its page opens,
- * and the Launch button, whose outcome shows beside it until the page
- * shows another app. A launch that the TV accepted counts as running
- * from then on, without asking again.
+ * The Launch button and the running state it shows. The state is the
+ * app list's own flag: the page opens with what the list already knew,
+ * asks the TV again at every open, and both that answer and a launch's
+ * report go back to the list through `onRunning`, so the row and the
+ * page always agree and neither needs a connection of its own.
  */
-function useLaunch(deviceId: string | null, appId: string | null, open: boolean): LaunchState {
-  const [running, setRunning] = useState<boolean | null>(null);
+function useLaunch(
+  deviceId: string | null,
+  appId: string | null,
+  running: boolean,
+  open: boolean,
+  onRunning: (ids: string[]) => void,
+): LaunchState {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   // Reset for another app, never for closing: the page keeps its state
-  // through the close fade, and asks again when it opens next.
-  useEffect(() => {
-    setMessage(null);
-    setRunning(null);
-  }, [deviceId, appId]);
+  // through the close fade.
+  useEffect(() => setMessage(null), [deviceId, appId]);
+
+  // The callback is read through a ref so the check runs once per open,
+  // not once per render of the parent.
+  const report = useRef(onRunning);
+  report.current = onRunning;
 
   useEffect(() => {
     if (!open || !deviceId || !appId) {
@@ -443,14 +456,11 @@ function useLaunch(deviceId: string | null, appId: string | null, open: boolean)
     listRunningApps(deviceId).then(
       (ids) => {
         if (!stale) {
-          setRunning(ids.includes(appId));
+          report.current(ids);
         }
       },
       () => {
-        // Unknown stays unknown; the button is still offered.
-        if (!stale) {
-          setRunning(false);
-        }
+        // The TV did not say; what was known stands.
       },
     );
     return () => {
@@ -465,8 +475,7 @@ function useLaunch(deviceId: string | null, appId: string | null, open: boolean)
     setBusy(true);
     setMessage(null);
     try {
-      await launchApp(deviceId, appId);
-      setRunning(true);
+      report.current(await launchApp(deviceId, appId));
       setMessage("Opened on the TV.");
     } catch (e) {
       setMessage(`Couldn't open it: ${String(e)}`);

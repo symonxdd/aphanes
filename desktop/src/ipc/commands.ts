@@ -98,9 +98,9 @@ export function listRunningApps(id: string): Promise<string[]> {
   return invoke<string[]>("list_running_apps", { id });
 }
 
-/** Opens an app on the TV's screen. Only from the Launch button. */
-export function launchApp(id: string, appId: string): Promise<void> {
-  return invoke<void>("launch_app", { id, appId });
+/** Opens an app on the TV's screen and returns the ids running afterwards. Only from the Launch button. */
+export function launchApp(id: string, appId: string): Promise<string[]> {
+  return invoke<string[]>("launch_app", { id, appId });
 }
 
 /** Called once per step while an install or uninstall runs. */

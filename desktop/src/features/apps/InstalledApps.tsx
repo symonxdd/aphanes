@@ -52,6 +52,7 @@ export function InstalledApps({ device, apps, reachable, onOpen, onUninstall }: 
                 <div className={styles.meta}>
                   {app.version}
                   {app.vendor ? ` · ${app.vendor}` : ""}
+                  {app.running && <span className={styles.running}> · Running</span>}
                 </div>
               </div>
             </button>

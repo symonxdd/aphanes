@@ -188,9 +188,15 @@
   white-space: nowrap;
 }
 
-/* The pill's (i) sits inside its right end. */
+/* The pill's (i) sits inside its right end, in the pill's own green
+   rather than the grey every other (i) wears. */
 .running > button {
   margin: 0 -8px 0 -4px;
+  color: inherit;
+}
+
+.running > button:not(:disabled):hover {
+  background: color-mix(in srgb, var(--success) 14%, transparent);
 }
 
 .notice {

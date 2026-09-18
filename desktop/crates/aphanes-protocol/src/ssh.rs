@@ -1,7 +1,11 @@
-//! One authenticated SSH connection to a paired TV, as the mobile app's
-//! `ssh_connection_service.dart` opens it: for the length of one
-//! user-triggered action, closed by the caller when done. No cached or
-//! shared session, no reconnecting on its own.
+//! One authenticated SSH connection to a paired TV. This type is a dumb
+//! single connection: it connects, runs calls, and closes, and knows
+//! nothing about caching or reconnecting. Whether a connection is opened
+//! per action or held and reused across actions is the caller's choice;
+//! the desktop shell holds one per TV, the mobile app opens one per
+//! action. It reports [`Session::is_closed`] so a holder can tell when
+//! to reconnect, and asks for keepalives so a held one is noticed going
+//! dead rather than hanging on the next call.
 //!
 //! The TV's sshd is old (OpenSSH 6.1 on the TV this was built against).
 //! It has no curve25519, negotiates `ecdh-sha2-nistp256` or the SHA-1
@@ -34,6 +38,12 @@ const CONNECT_TIMEOUT: Duration = Duration::from_secs(10);
 /// How long one command may run before the TV is considered hung.
 const COMMAND_TIMEOUT: Duration = Duration::from_secs(10);
 
+/// A held connection pings this often; after this many unanswered pings
+/// the client loop ends and [`Session::is_closed`] turns true. Together
+/// they notice a TV that went away in about a minute.
+const KEEPALIVE_INTERVAL: Duration = Duration::from_secs(20);
+const KEEPALIVE_MAX: usize = 3;
+
 /// What a finished command left behind. Both streams are decoded leniently:
 /// the TV's tools write UTF-8, but a stray byte should not turn a result
 /// into an error.
@@ -50,6 +60,12 @@ pub struct Session {
 }
 
 impl Session {
+    /// Whether the connection has ended, by a close, a drop, or enough
+    /// unanswered keepalives. A holder reconnects when this is true.
+    pub fn is_closed(&self) -> bool {
+        self.handle.is_closed()
+    }
+
     /// Connects and authenticates with the PKCS#1 key pairing produced.
     pub async fn connect(
         host: &str,
@@ -64,9 +80,15 @@ impl Session {
         })?;
         let key = Arc::new(key);
 
+        // No inactivity timeout: a held connection may idle between
+        // actions and must not be dropped for it. Keepalives instead keep
+        // it live and, after KEEPALIVE_MAX unanswered, let the client
+        // loop end so [`is_closed`] turns true and the holder reconnects.
         let config = Arc::new(client::Config {
             preferred: preferred_for_tv(),
-            inactivity_timeout: Some(Duration::from_secs(60)),
+            inactivity_timeout: None,
+            keepalive_interval: Some(KEEPALIVE_INTERVAL),
+            keepalive_max: KEEPALIVE_MAX,
             ..client::Config::default()
         });
 

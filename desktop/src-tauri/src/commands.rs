@@ -11,11 +11,24 @@ use aphanes_protocol::{apps, catalog, devmode, pairing, reachability};
 use tauri::ipc::Channel;
 use tauri::State;
 
-use crate::store::{Connection, DeviceRecord, DeviceStore};
+use std::sync::Arc;
 
-/// Shared with every command: where devices are stored on this computer.
+use crate::pool::SessionPool;
+use crate::store::{DeviceRecord, DeviceStore};
+
+/// Shared with every command: where devices are stored on this computer,
+/// and the connections held open to them.
 pub struct AppState {
     pub store: DeviceStore,
+    pub pool: SessionPool,
+}
+
+impl AppState {
+    /// The held connection for a device, reconnecting if the last one
+    /// died. Every command that reaches a TV goes through here.
+    async fn session(&self, id: &str) -> CommandResult<Arc<Session>> {
+        self.pool.get(&self.store, id).await
+    }
 }
 
 type CommandResult<T> = Result<T, String>;
@@ -105,12 +118,16 @@ pub fn rename_device(
 /// device details page. Nothing is sent to the TV; the next connection
 /// simply goes to the new address with the same key.
 #[tauri::command]
-pub fn update_device_host(
+pub async fn update_device_host(
     state: State<'_, AppState>,
     id: String,
     host: String,
 ) -> CommandResult<DeviceRecord> {
-    state.store.update_host(&id, &host).map_err(shown)
+    let record = state.store.update_host(&id, &host).map_err(shown)?;
+    // The held connection points at the old address; drop it so the next
+    // request connects to the new one.
+    state.pool.invalidate(&id).await;
+    Ok(record)
 }
 
 /// The pairing key, for the reveal on the device details page. Read from
@@ -135,10 +152,8 @@ pub async fn fetch_device_detail(
     state: State<'_, AppState>,
     id: String,
 ) -> CommandResult<DeviceDetail> {
-    let session = open_session(&state.store, &id).await?;
-    let detail = devmode::fetch_detail(&session).await;
-    session.close().await;
-    let detail = detail.map_err(shown)?;
+    let session = state.session(&id).await?;
+    let detail = devmode::fetch_detail(&session).await.map_err(shown)?;
     state.store.save_info(&id, &detail.info).map_err(shown)?;
     Ok(detail)
 }
@@ -149,20 +164,16 @@ pub async fn list_installed_apps(
     state: State<'_, AppState>,
     id: String,
 ) -> CommandResult<Vec<InstalledApp>> {
-    let session = open_session(&state.store, &id).await?;
-    let apps = apps::list_installed(&session).await;
-    session.close().await;
-    apps.map_err(shown)
+    let session = state.session(&id).await?;
+    apps::list_installed(&session).await.map_err(shown)
 }
 
 /// Asks the TV to extend its Developer Mode session. Opens the Developer
 /// Mode app on the TV's screen; only ever runs from the Renew button.
 #[tauri::command]
 pub async fn renew_dev_mode(state: State<'_, AppState>, id: String) -> CommandResult<()> {
-    let session = open_session(&state.store, &id).await?;
-    let result = devmode::renew(&session).await;
-    session.close().await;
-    result.map_err(shown)
+    let session = state.session(&id).await?;
+    devmode::renew(&session).await.map_err(shown)
 }
 
 /// The public Homebrew catalog listing. Fetched when the catalog dialog
@@ -185,23 +196,20 @@ pub async fn list_running_apps(
     state: State<'_, AppState>,
     id: String,
 ) -> CommandResult<Vec<String>> {
-    let session = open_session(&state.store, &id).await?;
-    let result = apps::list_running(&session).await;
-    session.close().await;
-    result.map_err(shown)
+    let session = state.session(&id).await?;
+    apps::list_running(&session).await.map_err(shown)
 }
 
-/// Opens an app on the TV's screen. Only ever runs from the Launch button.
+/// Opens an app on the TV's screen and reports what is running after.
+/// Only ever runs from the Launch button.
 #[tauri::command]
 pub async fn launch_app(
     state: State<'_, AppState>,
     id: String,
     app_id: String,
-) -> CommandResult<()> {
-    let session = open_session(&state.store, &id).await?;
-    let result = apps::launch(&session, &app_id).await;
-    session.close().await;
-    result.map_err(shown)
+) -> CommandResult<Vec<String>> {
+    let session = state.session(&id).await?;
+    apps::launch(&session, &app_id).await.map_err(shown)
 }
 
 /// Uninstalls an app. Only ever called after the confirmation dialog;
@@ -213,15 +221,15 @@ pub async fn remove_app(
     package_id: String,
     on_progress: Channel<OperationProgress>,
 ) -> CommandResult<()> {
-    let session = open_session(&state.store, &id).await?;
-    let result = apps::remove(&session, &package_id, &mut forward_to(&on_progress)).await;
-    session.close().await;
-    result.map_err(shown)
+    let session = state.session(&id).await?;
+    apps::remove(&session, &package_id, &mut forward_to(&on_progress))
+        .await
+        .map_err(shown)
 }
 
 /// Installs a catalog package: downloaded, checked against the published
-/// SHA-256 (refused on a mismatch or when there is none), then uploaded
-/// and installed. Runs only from the Install button on a catalog entry.
+/// SHA-256 when there is one (refused on a mismatch), then uploaded and
+/// installed. Runs only from the Install button on a catalog entry.
 #[tauri::command]
 pub async fn install_from_catalog(
     state: State<'_, AppState>,
@@ -236,7 +244,7 @@ pub async fn install_from_catalog(
     let bytes = catalog::download_and_verify(&ipk_url, ipk_sha256.as_deref())
         .await
         .map_err(shown)?;
-    install_bytes(&state.store, &id, &bytes, &on_progress).await
+    install_bytes(&state, &id, &bytes, &on_progress).await
 }
 
 /// Installs a .ipk the person picked from this computer's disk.
@@ -250,19 +258,19 @@ pub async fn install_from_file(
     let bytes = tokio::fs::read(&path)
         .await
         .map_err(|_| "Couldn't read that file.".to_string())?;
-    install_bytes(&state.store, &id, &bytes, &on_progress).await
+    install_bytes(&state, &id, &bytes, &on_progress).await
 }
 
 async fn install_bytes(
-    store: &DeviceStore,
+    state: &AppState,
     id: &str,
     bytes: &[u8],
     on_progress: &Channel<OperationProgress>,
 ) -> CommandResult<()> {
-    let session = open_session(store, id).await?;
-    let result = apps::install(&session, bytes, &mut forward_to(on_progress)).await;
-    session.close().await;
-    result.map_err(shown)
+    let session = state.session(id).await?;
+    apps::install(&session, bytes, &mut forward_to(on_progress))
+        .await
+        .map_err(shown)
 }
 
 /// Relays protocol progress to the frontend. A send failure means the
@@ -273,23 +281,11 @@ fn forward_to(channel: &Channel<OperationProgress>) -> impl FnMut(OperationProgr
     }
 }
 
-/// One connection for one command. The key is read from the keychain
-/// here and handed straight to the protocol crate.
-async fn open_session(store: &DeviceStore, id: &str) -> CommandResult<Session> {
-    let Connection {
-        host,
-        port,
-        username,
-        private_key_pem,
-    } = store.connection(id).map_err(shown)?;
-    Session::connect(&host, port, &username, &private_key_pem)
-        .await
-        .map_err(shown)
-}
-
 /// Forgets a TV: its record and its secrets. Only ever called after the
 /// confirmation dialog; the TV itself is not touched.
 #[tauri::command]
-pub fn remove_device(state: State<'_, AppState>, id: String) -> CommandResult<()> {
-    state.store.remove(&id).map_err(shown)
+pub async fn remove_device(state: State<'_, AppState>, id: String) -> CommandResult<()> {
+    state.store.remove(&id).map_err(shown)?;
+    state.pool.invalidate(&id).await;
+    Ok(())
 }

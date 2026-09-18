@@ -3,6 +3,7 @@
 //! lives in this crate.
 
 mod commands;
+mod pool;
 mod store;
 
 use tauri::Manager;
@@ -19,6 +20,7 @@ pub fn run() {
             let dir = app.path().app_data_dir()?;
             app.manage(AppState {
                 store: DeviceStore::new(dir),
+                pool: pool::SessionPool::default(),
             });
             Ok(())
         })
