@@ -16,6 +16,7 @@ import '../../devices/ui/pair_device_page.dart';
 import '../../devices/ui/widgets/unreachable_message.dart';
 import '../../home/state/home_tab_controller.dart';
 import '../models/installed_app.dart';
+import '../state/app_launch_controller.dart';
 import '../state/app_operation_controller.dart';
 import '../state/installed_apps_controller.dart';
 import 'catalog_page.dart';
@@ -172,10 +173,27 @@ class _AppsList extends ConsumerWidget {
     );
   }
 
+  /// Opens the app on the TV. Success shows on the row itself (it flips
+  /// to "Running"), so only a failure needs saying.
+  Future<void> _launch(
+    BuildContext context,
+    WidgetRef ref,
+    InstalledApp app,
+  ) async {
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    final String? failure = await ref
+        .read(appLaunchProvider.notifier)
+        .launch(device, app.id);
+    if (failure != null) {
+      messenger.showSnackBar(SnackBar(content: Text(failure)));
+    }
+  }
+
   Widget _installedAppsBody(BuildContext context, WidgetRef ref) {
     final AsyncValue<List<InstalledApp>> apps = ref.watch(
       installedAppsProvider,
     );
+    final Set<String> launching = ref.watch(appLaunchProvider);
     return RefreshIndicator(
       onRefresh: () => ref.read(installedAppsProvider.notifier).refresh(),
       child: apps.when(
@@ -194,6 +212,8 @@ class _AppsList extends ConsumerWidget {
                 itemBuilder: (BuildContext context, int index) =>
                     InstalledAppTile(
                       app: list[index],
+                      launching: launching.contains(list[index].id),
+                      onLaunch: () => _launch(context, ref, list[index]),
                       onUninstall: () =>
                           _confirmUninstall(context, ref, list[index]),
                     ),

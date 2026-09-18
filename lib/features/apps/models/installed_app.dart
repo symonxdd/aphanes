@@ -8,6 +8,7 @@ class InstalledApp {
     required this.title,
     required this.version,
     this.vendor,
+    this.running = false,
   });
 
   factory InstalledApp.fromJson(Map<String, dynamic> json) {
@@ -23,4 +24,19 @@ class InstalledApp {
   final String title;
   final String version;
   final String? vendor;
+
+  /// Whether the TV listed the app as running when the list was fetched.
+  /// Running is not the same as on screen: the TV reports active apps
+  /// without saying which one is in the foreground.
+  final bool running;
+
+  InstalledApp copyWith({bool? running}) {
+    return InstalledApp(
+      id: id,
+      title: title,
+      version: version,
+      vendor: vendor,
+      running: running ?? this.running,
+    );
+  }
 }

@@ -50,6 +50,20 @@ class InstalledAppsController extends AsyncNotifier<List<InstalledApp>> {
     await future;
   }
 
+  /// Re-marks which apps are running from a list the TV just reported
+  /// (after a launch), without fetching the whole list again.
+  void setRunning(List<String> runningIds) {
+    final List<InstalledApp>? apps = state.value;
+    if (apps == null) {
+      return;
+    }
+    final Set<String> running = runningIds.toSet();
+    state = AsyncData([
+      for (final InstalledApp app in apps)
+        app.copyWith(running: running.contains(app.id)),
+    ]);
+  }
+
   Device? _findDevice(List<Device> devices, String id) {
     for (final Device device in devices) {
       if (device.id == id) {

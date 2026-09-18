@@ -24,7 +24,7 @@ class AppInstallException implements Exception {
   String toString() => message;
 }
 
-/// Lists, installs, and uninstalls apps on a paired TV over the same
+/// Lists, launches, installs, and uninstalls apps on a paired TV over the same
 /// luna-bus protocol webosbrew/ares-cli-rs (Apache-2.0) uses, verified
 /// directly against its `ares-install/src/{list,install,remove}.rs`.
 ///
@@ -43,6 +43,9 @@ class AppsService {
 
   static const String _remoteTempDir = '/media/developer/temp';
 
+  /// The installed apps, each marked running or not, from two calls on
+  /// the one connection: asking for the running list here costs nothing
+  /// extra, so the list opens already knowing.
   Future<List<InstalledApp>> listInstalled(Device device) async {
     final SSHClient client = await _connect(device);
     try {
@@ -52,14 +55,89 @@ class AppsService {
         const {},
       );
       final List<dynamic> apps = (response['apps'] as List<dynamic>?) ?? [];
+      // A running list that fails leaves every app marked not running;
+      // the list itself still shows.
+      Set<String> running = const {};
+      try {
+        running = (await _listRunning(client)).toSet();
+      } on LunaCallException {
+        // Not worth failing the whole list over.
+      }
       return apps
           .cast<Map<String, dynamic>>()
           .where((Map<String, dynamic> app) => app['visible'] == true)
           .map(InstalledApp.fromJson)
+          .map(
+            (InstalledApp app) =>
+                app.copyWith(running: running.contains(app.id)),
+          )
           .toList();
     } finally {
       await client.close();
     }
+  }
+
+  /// Opens an app on the TV's screen, as pressing it on the TV would, and
+  /// returns the ids of the apps running afterwards. The TV accepts a
+  /// launch a moment before it lists the app as running, so the list is
+  /// read a few times until the app shows up in it; a launch the TV
+  /// accepted is reported as running even if it never did. Only ever runs
+  /// from the Launch button.
+  Future<List<String>> launch(Device device, String appId) async {
+    final SSHClient client = await _connect(device);
+    try {
+      final Map<String, dynamic> response = await _luna.call(
+        client,
+        'luna://com.webos.applicationManager/launch',
+        {'id': appId},
+      );
+      if (response['returnValue'] == false) {
+        throw LunaCallException(
+          response['errorText'] as String? ?? "The TV couldn't open that app.",
+        );
+      }
+      List<String> running = const [];
+      for (int attempt = 0; attempt < _launchListAttempts; attempt++) {
+        if (attempt > 0) {
+          await Future<void>.delayed(_launchListInterval);
+        }
+        try {
+          running = await _listRunning(client);
+        } on LunaCallException {
+          running = const [];
+        }
+        if (running.contains(appId)) {
+          return running;
+        }
+      }
+      return [...running, appId];
+    } finally {
+      await client.close();
+    }
+  }
+
+  /// How often, and how far apart, the running list is read after a launch.
+  static const int _launchListAttempts = 4;
+  static const Duration _launchListInterval = Duration(milliseconds: 500);
+
+  /// The ids of the apps running on the TV right now, as
+  /// `applicationManager/dev/running` reports them: the one form of that
+  /// call the Developer Mode account is allowed to make.
+  Future<List<String>> _listRunning(SSHClient client) async {
+    final Map<String, dynamic> response = await _luna.call(
+      client,
+      'luna://com.webos.applicationManager/dev/running',
+      const {},
+    );
+    if (response['returnValue'] == false) {
+      throw const LunaCallException("The TV couldn't list its running apps.");
+    }
+    final List<dynamic> running = (response['running'] as List<dynamic>?) ?? [];
+    return running
+        .whereType<Map<String, dynamic>>()
+        .map((Map<String, dynamic> app) => app['id'])
+        .whereType<String>()
+        .toList();
   }
 
   /// Installs a local .ipk file (from the file picker). Read fully into
