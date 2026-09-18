@@ -60,7 +60,7 @@ export function writeStoredSeed(seed: string): void {
 /**
  * The tokens the seed decides, as tokens.css names them, for one mode.
  * The surface ladder is not among them: as on mobile, surfaces stay
- * plain neutral greys whatever the seed, and only the accent roles and
+ * plain neutral grays whatever the seed, and only the accent roles and
  * the text and outline neutrals (which Material tints faintly toward the
  * seed) follow it.
  */

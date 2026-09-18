@@ -216,7 +216,7 @@ export const oledTheme: Explainer = {
   icon: <Contrast size={22} />,
   title: "OLED theme",
   body:
-    "Replaces dark mode's usual dark grey with pure black across every surface. On OLED and AMOLED screens, " +
+    "Replaces dark mode's usual dark gray with pure black across every surface. On OLED and AMOLED screens, " +
     "black pixels are turned off entirely, so this can noticeably extend battery life alongside a cleaner, " +
     "higher-contrast look.\n\n" +
     "Has no effect while the app is in light mode.",

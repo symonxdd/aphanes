@@ -27,7 +27,7 @@ interface ConfirmDialogProps {
 /**
  * The visible, easy-to-reach confirmation every destructive action gets.
  * As on mobile: a plain Cancel, then the destructive verb on a filled
- * error-coloured button, last, so it is never the one focus lands on.
+ * error-colored button, last, so it is never the one focus lands on.
  */
 export function ConfirmDialog({ request, onClose }: ConfirmDialogProps) {
   // The request goes null the instant the dialog closes, but the dialog

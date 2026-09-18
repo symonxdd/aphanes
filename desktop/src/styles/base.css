@@ -74,7 +74,7 @@ dialog {
 
 /*
  * Scrollbars: thin and quiet, no buttons, no track, the thumb a faint wash
- * of the text colour, inset from the ends so it never meets a rounded
+ * of the text color, inset from the ends so it never meets a rounded
  * corner. Only the WebKit pseudo-elements are used: Chromium ignores them
  * the moment the standard scrollbar-width or scrollbar-color is set, and
  * both WebView2 and WKWebView honour these. Each scroller reserves its

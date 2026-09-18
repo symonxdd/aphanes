@@ -1,7 +1,7 @@
 /*
  * Color tokens, mirroring the mobile app's AppTheme (lib/core/theme/
  * app_theme.dart): Material 3 roles derived from the #9333EA seed, with the
- * surface ladder pinned to plain neutral greys rather than the seed-tinted
+ * surface ladder pinned to plain neutral grays rather than the seed-tinted
  * ones M3 would generate. Light is the default; [data-theme="dark"] on the
  * root swaps the set. The theme provider sets that attribute, so there is
  * no prefers-color-scheme block here: "follow the system" is decided in
