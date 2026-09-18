@@ -5,7 +5,7 @@ import '../../../core/persistence/shared_preferences_provider.dart';
 const String _oledPrefsKey = 'oled_enabled';
 
 /// Whether dark mode should use true-black ([AppTheme.oled]) surfaces
-/// instead of the usual dark grey.
+/// instead of the usual dark gray.
 ///
 /// On by default, which costs nothing to anyone who does not want dark
 /// mode: this is read only once the resolved theme is already dark, so a

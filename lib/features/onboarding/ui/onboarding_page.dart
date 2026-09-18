@@ -195,7 +195,7 @@ class OnboardingPage extends ConsumerWidget {
 }
 
 /// One line of the intro's feature list: a small icon and a short phrase,
-/// both in the muted colour so the tagline above keeps the emphasis.
+/// both in the muted color so the tagline above keeps the emphasis.
 class _FeatureRow extends StatelessWidget {
   const _FeatureRow({
     required this.icon,

@@ -58,7 +58,7 @@ class AboutSheet extends ConsumerWidget {
             const SizedBox(height: 12),
             // The longer form of the first-run screen's one-liner, worded
             // to match the README. "Only from GitHub" is what lets a person
-            // recognise an unofficial copy when they meet one.
+            // recognize an unofficial copy when they meet one.
             Text(
               'This app will always be free, and free from every kind of '
               'ad and tracking. Official releases come only from the '
@@ -158,7 +158,7 @@ class _PrivacyPolicyLink extends StatelessWidget {
 /// gives someone a reason to tap it. Saying what happens next removes it.
 ///
 /// The version line below is in the list for a different reason: it does
-/// not look tappable at all, being the sort of small grey text that reads
+/// not look tappable at all, being the sort of small gray text that reads
 /// as a footer, so it would otherwise never be tried.
 class _ThingsToTry extends StatelessWidget {
   const _ThingsToTry();

@@ -152,7 +152,7 @@ class SettingsSheet extends ConsumerWidget {
                                     title: 'OLED theme',
                                     body:
                                         'Replaces dark mode\'s usual dark '
-                                        'grey with pure black across every '
+                                        'gray with pure black across every '
                                         'surface. On OLED and AMOLED '
                                         'screens, black pixels are turned '
                                         'off entirely, so this can '

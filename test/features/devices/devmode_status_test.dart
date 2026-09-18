@@ -32,7 +32,7 @@ void main() {
       );
     });
 
-    test('gives up on anything it does not recognise', () {
+    test('gives up on anything it does not recognize', () {
       // The caller falls back to showing LG's string verbatim, so
       // returning null here is the safe outcome, not a failure.
       expect(parse(null), isNull);

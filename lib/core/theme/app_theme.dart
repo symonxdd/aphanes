@@ -66,8 +66,8 @@ abstract final class AppTheme {
     );
   }
 
-  // A plain, neutral dark grey ladder (Material's own canonical #121212
-  // base), not the faint seed-tinted grey ColorScheme.fromSeed generates
+  // A plain, neutral dark gray ladder (Material's own canonical #121212
+  // base), not the faint seed-tinted gray ColorScheme.fromSeed generates
   // by default. Only the surface family changes - primary/secondary/
   // tertiary/error (buttons, accents) stay exactly as the seed derives
   // them.
@@ -112,7 +112,7 @@ abstract final class AppTheme {
   /// Same palette as [dark], but every surface - background, cards, sheets,
   /// dialogs, all of it - is forced to true black, with tonal elevation
   /// tinting turned off entirely. What actually saves power and looks
-  /// clean on OLED panels, rather than dark mode's usual dark grey with a
+  /// clean on OLED panels, rather than dark mode's usual dark gray with a
   /// faint primary-colored wash on raised surfaces.
   static ThemeData oled(Color seedColor) {
     final ColorScheme scheme =

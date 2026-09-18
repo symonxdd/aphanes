@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/device_reachability_controller.dart';
 
 /// A small colored dot showing whether a paired device currently answers
-/// on its SSH port - grey while checking, green when reachable, the
+/// on its SSH port - gray while checking, green when reachable, the
 /// theme's error color when not (TV off, wrong network, etc.).
 class ReachabilityDot extends ConsumerWidget {
   const ReachabilityDot({required this.deviceId, super.key});

@@ -13,7 +13,7 @@ class DevModeStatus {
   bool get hasToken => token != null;
 
   /// [remaining] read as a real duration, or null when it is not in a
-  /// shape this recognises.
+  /// shape this recognizes.
   ///
   /// LG does not document the format, and dev-manager-desktop passes the
   /// string straight through without parsing it either. A real TV was
