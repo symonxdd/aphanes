@@ -25,6 +25,7 @@ import { installFromCatalog, installFromFile, pickIpkFile, removeApp } from "./i
 import { AboutDialog } from "./features/settings/AboutDialog";
 import { AccentColorDialog } from "./features/settings/AccentColorDialog";
 import { SettingsDialog } from "./features/settings/SettingsDialog";
+import { useTabVisibility } from "./features/settings/tabVisibility";
 import { VersionExplainerDialog } from "./features/settings/VersionExplainerDialog";
 import styles from "./App.module.css";
 
@@ -73,6 +74,7 @@ export default function App() {
   // closing it returns to.
   const [page, setPage] = useState<{ subject: AppSubject; from: "installed" | "catalog" } | null>(null);
   const [version, setVersion] = useState<string | null>(null);
+  const tabs = useTabVisibility();
 
   // Keep a valid selection: the first TV once loaded, or whatever is left
   // after one is removed.
@@ -254,6 +256,7 @@ export default function App() {
         reachable={selectedReachable}
         detail={data.detail}
         apps={data.apps}
+        tabs={tabs}
         onPair={() => setOverlay("pair")}
         onRefresh={() => void refreshSelected()}
         onBrowseCatalog={() => setOverlay("catalog")}
@@ -315,6 +318,7 @@ export default function App() {
       <CatalogExplainerDialog open={overlay === "catalogExplainer"} onClose={() => setOverlay("catalog")} />
       <SettingsDialog
         open={overlay === "settings"}
+        tabs={tabs}
         onClose={() => setOverlay(null)}
         onAccentColor={() => setOverlay("accent")}
         onAbout={() => setOverlay("about")}

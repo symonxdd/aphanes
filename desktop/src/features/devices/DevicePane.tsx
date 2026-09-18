@@ -1,21 +1,25 @@
 import { useState } from "react";
-import { Info, LayoutGrid, Pencil, Plus, RefreshCw, Search, Tv, Upload } from "lucide-react";
+import { Folder, Info, LayoutGrid, Pencil, Plus, RefreshCw, Search, SquareTerminal, Tv, Upload } from "lucide-react";
 import { Button } from "../../components/Button";
 import { IconButton } from "../../components/IconButton";
+import { NotPlannedMessage } from "../../components/NotPlannedMessage";
 import { Tabs, type TabItem } from "../../components/Tabs";
 import type { Device, DeviceDetail, InstalledApp } from "../../data/models";
 import { InstalledApps } from "../apps/InstalledApps";
+import type { TabVisibility } from "../settings/tabVisibility";
 import { DeviceDetails } from "./DeviceDetails";
 import { reachabilityLabel } from "./Sidebar";
 import type { Remote } from "./useDeviceData";
 import styles from "./DevicePane.module.css";
 
-type TabId = "apps" | "details";
+type TabId = "apps" | "details" | "files" | "terminal";
 
-const tabs: readonly TabItem<TabId>[] = [
-  { id: "apps", label: "Installed apps", icon: <LayoutGrid size={18} /> },
-  { id: "details", label: "Device details", icon: <Info size={18} /> },
-];
+const appsTab: TabItem<TabId> = { id: "apps", label: "Installed apps", icon: <LayoutGrid size={18} /> };
+const detailsTab: TabItem<TabId> = { id: "details", label: "Device details", icon: <Info size={18} /> };
+/* The two optional tabs, shown only when switched on in settings. Like
+   the mobile app's, each holds a placeholder for now. */
+const filesTab: TabItem<TabId> = { id: "files", label: "Files", icon: <Folder size={18} /> };
+const terminalTab: TabItem<TabId> = { id: "terminal", label: "Terminal", icon: <SquareTerminal size={18} /> };
 
 interface DevicePaneProps {
   /** False until the device list has loaded, so no empty state flashes. */
@@ -24,6 +28,8 @@ interface DevicePaneProps {
   reachable: boolean | undefined;
   detail: Remote<DeviceDetail>;
   apps: Remote<InstalledApp[]>;
+  /** Which optional tabs are switched on. */
+  tabs: TabVisibility;
   onPair: () => void;
   /** Probes the TV again and, if it answers, fetches everything afresh. */
   onRefresh: () => void;
@@ -36,13 +42,14 @@ interface DevicePaneProps {
   onRemoveDevice: (device: Device) => void;
 }
 
-/** The main area: the selected TV's name and state, then its two tabs. */
+/** The main area: the selected TV's name and state, then its tabs. */
 export function DevicePane({
   ready,
   device,
   reachable,
   detail,
   apps,
+  tabs: visibleTabs,
   onPair,
   onRefresh,
   onBrowseCatalog,
@@ -53,7 +60,15 @@ export function DevicePane({
   onEditHost,
   onRemoveDevice,
 }: DevicePaneProps) {
-  const [tab, setTab] = useState<TabId>("apps");
+  const [chosenTab, setTab] = useState<TabId>("apps");
+  const tabs: TabItem<TabId>[] = [
+    appsTab,
+    detailsTab,
+    ...(visibleTabs.files ? [filesTab] : []),
+    ...(visibleTabs.terminal ? [terminalTab] : []),
+  ];
+  // An optional tab switched off while open falls back to the first.
+  const tab: TabId = tabs.some((item) => item.id === chosenTab) ? chosenTab : "apps";
 
   if (!ready) {
     return <main className={styles.pane} />;
@@ -113,7 +128,7 @@ export function DevicePane({
 
       <div className={styles.content}>
         <div key={tab} className={styles.tabContent}>
-          {tab === "apps" ? (
+          {tab === "apps" && (
             <InstalledApps
               device={device}
               apps={apps}
@@ -121,7 +136,8 @@ export function DevicePane({
               onOpen={onOpenApp}
               onUninstall={onUninstall}
             />
-          ) : (
+          )}
+          {tab === "details" && (
             <DeviceDetails
               device={device}
               detail={detail}
@@ -130,6 +146,7 @@ export function DevicePane({
               onRemove={() => onRemoveDevice(device)}
             />
           )}
+          {(tab === "files" || tab === "terminal") && <NotPlannedMessage />}
         </div>
       </div>
     </main>

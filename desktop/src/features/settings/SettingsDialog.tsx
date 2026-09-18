@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChevronRight, Contrast, Info, Moon, Palette, RotateCcw, Sun } from "lucide-react";
+import { ChevronRight, Contrast, Folder, Info, Moon, Palette, RotateCcw, SquareTerminal, Sun } from "lucide-react";
 import { AphanesTitle } from "../../components/AphanesTitle";
 import { AppMark } from "../../components/AppMark";
 import { Dialog } from "../../components/Dialog";
@@ -10,10 +10,12 @@ import { Switch } from "../../components/Switch";
 import { appVersion } from "../../ipc/commands";
 import { useTheme } from "../../theme/ThemeProvider";
 import { oledTheme } from "../devices/explainers";
+import type { TabVisibility } from "./tabVisibility";
 import styles from "./SettingsDialog.module.css";
 
 interface SettingsDialogProps {
   open: boolean;
+  tabs: TabVisibility;
   onClose: () => void;
   onAccentColor: () => void;
   onAbout: () => void;
@@ -23,10 +25,10 @@ interface SettingsDialogProps {
 /**
  * The mobile settings sheet, as a dialog. Same header (the codename as a
  * signature, with the shipped name in the footer line), same sections in
- * the same order. The hidden tab switches and the ambient backdrop are
- * not here yet.
+ * the same order: Appearance, Tabs, General. The ambient backdrop is the
+ * one mobile row not here.
  */
-export function SettingsDialog({ open, onClose, onAccentColor, onAbout, onShowIntro }: SettingsDialogProps) {
+export function SettingsDialog({ open, tabs, onClose, onAccentColor, onAbout, onShowIntro }: SettingsDialogProps) {
   const { mode, toggle, oled, setOled, seed } = useTheme();
   const isDark = mode === "dark";
   const [version, setVersion] = useState<string | null>(null);
@@ -87,6 +89,28 @@ export function SettingsDialog({ open, onClose, onAccentColor, onAbout, onShowIn
               </span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className={styles.section}>
+        <div className={styles.sectionTitle}>Tabs</div>
+        <div className={styles.row}>
+          <span className={styles.rowIcon}>
+            <Folder size={22} />
+          </span>
+          <span className={styles.rowLabel}>Files tab</span>
+          <span className={styles.trailing}>
+            <Switch checked={tabs.files} onChange={tabs.setFiles} label="Files tab" />
+          </span>
+        </div>
+        <div className={styles.row}>
+          <span className={styles.rowIcon}>
+            <SquareTerminal size={22} />
+          </span>
+          <span className={styles.rowLabel}>Terminal tab</span>
+          <span className={styles.trailing}>
+            <Switch checked={tabs.terminal} onChange={tabs.setTerminal} label="Terminal tab" />
+          </span>
         </div>
       </div>
 
