@@ -3,11 +3,10 @@ import { CircleCheck, Eye, EyeOff, Info } from "lucide-react";
 import { Button } from "../../components/Button";
 import { Dialog } from "../../components/Dialog";
 import { IconButton } from "../../components/IconButton";
+import { isValidIpv4 } from "../../data/ipv4";
 import type { Device } from "../../data/models";
 import { fetchEncryptedKey, pairDevice, probeKeyServer, renameDevice, validatePassphrase } from "../../ipc/commands";
 import styles from "./PairDialog.module.css";
-
-const ipv4 = /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
 
 type ProbeStatus = "idle" | "checking" | "found" | "notFound";
 type PassphraseStatus = "idle" | "checking" | "correct" | "incorrect";
@@ -67,7 +66,7 @@ export function PairDialog({ open, pairedHosts, onClose, onPaired, onHowItWorks,
   }, [open]);
 
   const trimmedHost = host.trim();
-  const validHost = ipv4.test(trimmedHost);
+  const validHost = isValidIpv4(trimmedHost);
   const alreadyPaired = validHost && pairedHosts.includes(trimmedHost);
 
   useEffect(() => {

@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { Dialog } from "../../components/Dialog";
 import { ReadMore } from "../../components/ReadMore";
+import { isValidIpv4 } from "../../data/ipv4";
 import type { Device } from "../../data/models";
 import styles from "./EditHostDialog.module.css";
-
-const ipv4 = /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
 
 /** Behind "Read more", the same three paragraphs as the mobile sheet. */
 const detailParagraphs = [
@@ -125,7 +124,7 @@ function validate(host: string, otherDevices: Device[]): string | null {
   if (host === "") {
     return "IP address is required";
   }
-  if (!ipv4.test(host)) {
+  if (!isValidIpv4(host)) {
     return "Enter a valid IP address";
   }
   if (otherDevices.some((device) => device.host === host)) {
