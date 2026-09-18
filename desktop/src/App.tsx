@@ -14,6 +14,7 @@ import { DevmodeSetupDialog } from "./features/devices/DevmodeSetupDialog";
 import { EditHostDialog } from "./features/devices/EditHostDialog";
 import { PairDialog } from "./features/devices/PairDialog";
 import { PairingWalkthroughDialog } from "./features/devices/PairingWalkthroughDialog";
+import { RenameDialog } from "./features/devices/RenameDialog";
 import { Sidebar } from "./features/devices/Sidebar";
 import { useDeviceData } from "./features/devices/useDeviceData";
 import { useDevices } from "./features/devices/useDevices";
@@ -27,7 +28,17 @@ import { VersionExplainerDialog } from "./features/settings/VersionExplainerDial
 import styles from "./App.module.css";
 
 type Overlay =
-  "pair" | "pairHelp" | "editHost" | "app" | "catalog" | "catalogExplainer" | "settings" | "about" | "version" | null;
+  | "pair"
+  | "pairHelp"
+  | "rename"
+  | "editHost"
+  | "app"
+  | "catalog"
+  | "catalogExplainer"
+  | "settings"
+  | "about"
+  | "version"
+  | null;
 
 /**
  * Root of the desktop UI: the intro on first run, then the sidebar, the
@@ -49,7 +60,7 @@ export default function App() {
   // A replay from settings shows the intro above the still-open settings
   // dialog, as mobile pushes it over the sheet, and lands back on it.
   const [introReplay, setIntroReplay] = useState(false);
-  const { devices, loaded, reachability, refresh, check, remove, updateHost } = useDevices();
+  const { devices, loaded, reachability, refresh, check, remove, rename, updateHost } = useDevices();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [overlay, setOverlay] = useState<Overlay>(null);
   // Its own flag, not an Overlay value: it stacks on top of the pairing
@@ -247,6 +258,7 @@ export default function App() {
         onInstallIpk={() => void installIpk()}
         onOpenApp={openInstalledApp}
         onUninstall={askUninstall}
+        onRename={() => setOverlay("rename")}
         onEditHost={() => setOverlay("editHost")}
         onRemoveDevice={askRemoveDevice}
       />
@@ -260,6 +272,12 @@ export default function App() {
         onUninstall={askUninstall}
         onInstall={install}
         onRunning={data.setRunning}
+      />
+      <RenameDialog
+        open={overlay === "rename"}
+        device={selected}
+        onClose={() => setOverlay(null)}
+        onSave={(name) => (selected ? rename(selected.id, name) : Promise.resolve())}
       />
       <EditHostDialog
         open={overlay === "editHost"}

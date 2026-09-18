@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Info, LayoutGrid, Plus, RefreshCw, Search, Tv, Upload } from "lucide-react";
+import { Info, LayoutGrid, Pencil, Plus, RefreshCw, Search, Tv, Upload } from "lucide-react";
 import { Button } from "../../components/Button";
 import { IconButton } from "../../components/IconButton";
 import { Tabs, type TabItem } from "../../components/Tabs";
@@ -31,6 +31,7 @@ interface DevicePaneProps {
   onInstallIpk: () => void;
   onOpenApp: (app: InstalledApp) => void;
   onUninstall: (app: InstalledApp) => void;
+  onRename: (device: Device) => void;
   onEditHost: (device: Device) => void;
   onRemoveDevice: (device: Device) => void;
 }
@@ -48,6 +49,7 @@ export function DevicePane({
   onInstallIpk,
   onOpenApp,
   onUninstall,
+  onRename,
   onEditHost,
   onRemoveDevice,
 }: DevicePaneProps) {
@@ -78,7 +80,12 @@ export function DevicePane({
     <main className={styles.pane}>
       <div className={styles.header}>
         <div className={styles.heading}>
-          <h1 className={styles.name}>{device.name}</h1>
+          <div className={styles.nameRow}>
+            <h1 className={styles.name}>{device.name}</h1>
+            <IconButton size="small" label="Rename device" tooltip onClick={() => onRename(device)}>
+              <Pencil size={16} />
+            </IconButton>
+          </div>
           <div className={[styles.status, reachable === true && styles.statusReachable].filter(Boolean).join(" ")}>
             <span className={styles.dot} />
             <span>{reachabilityLabel(reachable)}</span>

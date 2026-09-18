@@ -23,7 +23,21 @@
   min-width: 0;
 }
 
+/* The name and its rename button on one line: the name gives way first,
+   so the button never leaves the row however long the name gets. */
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.nameRow > button {
+  flex-shrink: 0;
+}
+
 .name {
+  min-width: 0;
   font-size: 26px;
   font-weight: 500;
   line-height: 30px;

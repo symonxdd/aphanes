@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Device } from "../../data/models";
-import { checkReachable, listDevices, removeDevice, updateDeviceHost } from "../../ipc/commands";
+import { checkReachable, listDevices, removeDevice, renameDevice, updateDeviceHost } from "../../ipc/commands";
 
 /** Reachability per device id: unknown until checked, then a boolean. */
 export type Reachability = Record<string, boolean | undefined>;
@@ -46,6 +46,15 @@ export function useDevices() {
     [refresh],
   );
 
+  /** Saves a new display name; nothing about reaching the TV changes. */
+  const rename = useCallback(
+    async (id: string, name: string) => {
+      await renameDevice(id, name);
+      await refresh();
+    },
+    [refresh],
+  );
+
   /**
    * Saves a new address and forgets what was known about reaching the
    * old one, so the TV is probed again at the new address. The list is
@@ -60,5 +69,5 @@ export function useDevices() {
     [refresh],
   );
 
-  return { devices, loaded, error, reachability, refresh, check, remove, updateHost };
+  return { devices, loaded, error, reachability, refresh, check, remove, rename, updateHost };
 }
