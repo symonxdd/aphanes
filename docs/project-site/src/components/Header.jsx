@@ -9,6 +9,7 @@ import { useLatestRelease } from '@/hooks/useLatestRelease';
 const NAV = [
   { label: 'Screens', href: '#screens' },
   { label: 'What it does', href: '#what' },
+  { label: 'Why it exists', href: '#why' },
   { label: 'Pairing', href: '#pairing' },
   { label: 'Privacy', href: '#privacy' },
 ];

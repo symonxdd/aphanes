@@ -12,6 +12,7 @@ const PROBLEMS = [
 export function WhyItExists() {
   return (
     <Section
+      id="why"
       eyebrow="Why it exists"
       title="A tool already existed. It just was not built for a phone."
       lead="dev-manager-desktop is excellent, and this project reads its protocol work with gratitude. It is desktop-first, though, and in the first half of 2026 a phone showed it."
