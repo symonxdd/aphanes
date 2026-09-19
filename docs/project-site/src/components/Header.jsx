@@ -108,7 +108,7 @@ export function Header() {
     document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Over the dark hero the header borrows light colours; past it, the
+  // Over the dark hero the header borrows light colors; past it, the
   // theme's own.
   // Whole class strings, not interpolated fragments: Tailwind reads the
   // source for literal class names, so `hover:${something}` compiles to

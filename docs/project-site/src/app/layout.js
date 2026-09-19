@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
           attribute="class"
           defaultTheme="dark"
           enableSystem
-          // The instant swap. Without it every themed colour animates at
+          // The instant swap. Without it every themed color animates at
           // its own pace and the page appears to melt between states
           // rather than change.
           disableTransitionOnChange

@@ -13,7 +13,7 @@
   --muted-foreground: #6b7280;
   --accent: #7c5cbf;
   /* The app icon's own gradient, reused wherever the site needs the
-     project's colour rather than a neutral. */
+     project's color rather than a neutral. */
   --rose: #fb7185;
   --pink: #ec4899;
   /* The hero and every "unseen" band stay this dark in both themes.
@@ -120,7 +120,7 @@ a, button, [role="button"] {
      than the word it crosses.
    - Brightness alone was too weak to carry it at a calm speed, and
      dimming the resting text far enough to fix that left the wordmark
-     looking grey. Removing letters reads instantly at any speed, and
+     looking gray. Removing letters reads instantly at any speed, and
      costs the resting state nothing: it stays full white.
 
    The loop is seamless rather than reset: the gradient is a repeating
@@ -141,7 +141,7 @@ a, button, [role="button"] {
 
    Only background-position animates. The entrance animation on the same
    element owns opacity and transform, so the two never fight, and the
-   hero is pinned dark in both themes, which is why the colours here are
+   hero is pinned dark in both themes, which is why the colors here are
    fixed rather than themed. */
 @keyframes title-veil {
   from {

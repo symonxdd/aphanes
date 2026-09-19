@@ -170,7 +170,7 @@ export default function PrivacyPolicy() {
               'The Developer Mode pairing key and passphrase for each paired TV, held in the Android keystore through encrypted platform storage.',
               'The Developer Mode session token read from a paired TV.',
               'Cached hardware and firmware details of a paired TV, so a detail page can be shown before the TV answers.',
-              'App settings such as the chosen theme and accent colour.',
+              'App settings such as the chosen theme and accent color.',
             ]}
           />
           <Body>

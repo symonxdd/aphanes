@@ -21,7 +21,7 @@ export function Hero() {
       id="hero"
       className="relative isolate overflow-hidden bg-void text-white"
     >
-      {/* The one spot of colour in the dark, bled out of the icon itself
+      {/* The one spot of color in the dark, bled out of the icon itself
           rather than laid on top of it as a separate decoration. */}
       <div
         aria-hidden

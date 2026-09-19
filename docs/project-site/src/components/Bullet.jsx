@@ -1,4 +1,4 @@
-/// One list bullet, sitting on the optical centre of the first line of
+/// One list bullet, sitting on the optical center of the first line of
 /// its own text.
 ///
 /// The dot lives inside a box exactly one line tall and is centred in
