@@ -181,8 +181,14 @@ export function AppDialog({
                 <InfoPopover explainer={explain.running} label="About running" />
               </span>
             ) : (
-              <Button variant="filled" icon={<Play size={18} />} disabled={launch.busy} onClick={launch.start}>
-                {launch.busy ? "Opening..." : "Launch"}
+              <Button
+                variant="filled"
+                icon={<Play size={18} />}
+                disabled={launch.busy}
+                onClick={launch.start}
+                busy={launch.busy}
+              >
+                Launch
               </Button>
             )
           ) : (

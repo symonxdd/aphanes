@@ -246,8 +246,8 @@ export function PairDialog({ open, pairedHosts, onClose, onPaired, onHowItWorks,
             <Button variant="outlined" onClick={onClose} disabled={pairing}>
               Cancel
             </Button>
-            <Button variant="filled" onClick={() => void pair()} disabled={!canPair}>
-              {pairing ? "Pairing..." : "Pair"}
+            <Button variant="filled" onClick={() => void pair()} disabled={!canPair} busy={pairing}>
+              Pair
             </Button>
           </div>
 
