@@ -130,6 +130,21 @@ export function useDeviceData(device: Device | null, reachable: boolean | undefi
     [device],
   );
 
+  /**
+   * Drops everything held for a TV, so it is fetched afresh the next
+   * time it is known to answer. For an address change: what the old
+   * address said may not be this TV at all.
+   */
+  const forget = useCallback((id: string) => {
+    setEntries((current) => {
+      if (!(id in current)) {
+        return current;
+      }
+      const { [id]: _dropped, ...rest } = current;
+      return rest;
+    });
+  }, []);
+
   const entry = device ? entries[device.id] : undefined;
   return {
     detail: entry?.detail ?? (idle as Remote<DeviceDetail>),
@@ -137,5 +152,6 @@ export function useDeviceData(device: Device | null, reachable: boolean | undefi
     refresh,
     refreshApps,
     setRunning,
+    forget,
   };
 }

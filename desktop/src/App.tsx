@@ -292,7 +292,16 @@ export default function App() {
         device={selected}
         otherDevices={devices.filter((device) => device.id !== selected?.id)}
         onClose={() => setOverlay(null)}
-        onSave={(host) => (selected ? updateHost(selected.id, host) : Promise.resolve())}
+        onSave={async (host) => {
+          if (!selected) {
+            return;
+          }
+          // The new address is probed by the effect above once the old
+          // result is forgotten; dropping the fetched data too means the
+          // list and details are refetched from it as soon as it answers.
+          await updateHost(selected.id, host);
+          data.forget(selected.id);
+        }}
       />
 
       <PairDialog
