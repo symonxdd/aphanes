@@ -19,8 +19,8 @@
   --surface-container: #efefef;
   --surface-high: #e8e8e8;
   --surface-highest: #e0e0e0;
-  /* The rail sits a step below the content in both themes. */
-  --sidebar: #f5f5f5;
+  /* The rail matches the content in light; dark keeps it a step below. */
+  --sidebar: #ffffff;
 
   --on-surface: #1e1a20;
   --on-surface-variant: #4a454e;
