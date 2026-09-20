@@ -26,9 +26,10 @@ use std::borrow::Cow;
 use std::sync::Arc;
 use std::time::Duration;
 
-use russh::client::{self, AuthResult, Handle};
+use russh::client::{self, AuthResult, DisconnectReason, Handle};
 use russh::keys::{self, PrivateKeyWithHashAlg};
 use russh::{kex, mac, ChannelMsg, Disconnect, Preferred};
+use tokio::sync::watch;
 
 use crate::{Error, Result};
 
@@ -38,11 +39,13 @@ const CONNECT_TIMEOUT: Duration = Duration::from_secs(10);
 /// How long one command may run before the TV is considered hung.
 const COMMAND_TIMEOUT: Duration = Duration::from_secs(10);
 
-/// A held connection pings this often; after this many unanswered pings
-/// the client loop ends and [`Session::is_closed`] turns true. Together
-/// they notice a TV that went away in about a minute.
-const KEEPALIVE_INTERVAL: Duration = Duration::from_secs(20);
-const KEEPALIVE_MAX: usize = 3;
+/// A held connection pings this often. russh gives up once more than
+/// KEEPALIVE_MAX pings in a row went unanswered, so a TV that went away
+/// is noticed at (KEEPALIVE_MAX + 1) intervals: 20 seconds. Then the
+/// client loop ends, [`Session::is_closed`] turns true and
+/// [`Session::closed`] resolves.
+const KEEPALIVE_INTERVAL: Duration = Duration::from_secs(10);
+const KEEPALIVE_MAX: usize = 1;
 
 /// What a finished command left behind. Both streams are decoded leniently:
 /// the TV's tools write UTF-8, but a stray byte should not turn a result
@@ -56,7 +59,9 @@ pub struct CommandOutput {
 
 /// An open, authenticated connection.
 pub struct Session {
-    handle: Handle<AcceptAnyHostKey>,
+    handle: Handle<TvHandler>,
+    /// Flips to true once, when the connection ends for any reason.
+    closed: watch::Receiver<bool>,
 }
 
 impl Session {
@@ -64,6 +69,20 @@ impl Session {
     /// unanswered keepalives. A holder reconnects when this is true.
     pub fn is_closed(&self) -> bool {
         self.handle.is_closed()
+    }
+
+    /// Resolves once the connection has ended, for any reason: the TV
+    /// closed it, it went away and the keepalives ran out, or the link
+    /// broke. A holder can wait on this to learn about it as it happens
+    /// rather than on the next call.
+    pub async fn closed(&self) {
+        let mut closed = self.closed.clone();
+        while !*closed.borrow_and_update() {
+            if closed.changed().await.is_err() {
+                // The handler is gone, so the client loop is over.
+                return;
+            }
+        }
     }
 
     /// Connects and authenticates with the PKCS#1 key pairing produced.
@@ -92,7 +111,8 @@ impl Session {
             ..client::Config::default()
         });
 
-        let connecting = client::connect(config, (host, port), AcceptAnyHostKey);
+        let (closed_tx, closed) = watch::channel(false);
+        let connecting = client::connect(config, (host, port), TvHandler { closed: closed_tx });
         let mut handle = match tokio::time::timeout(CONNECT_TIMEOUT, connecting).await {
             Ok(Ok(handle)) => handle,
             Ok(Err(russh::Error::IO(_))) => return Err(Error::Unreachable),
@@ -102,7 +122,7 @@ impl Session {
 
         let authenticating = authenticate(&mut handle, username, key);
         match tokio::time::timeout(CONNECT_TIMEOUT, authenticating).await {
-            Ok(Ok(())) => Ok(Self { handle }),
+            Ok(Ok(())) => Ok(Self { handle, closed }),
             Ok(Err(e)) => {
                 let _ = handle.disconnect(Disconnect::ByApplication, "", "en").await;
                 Err(e)
@@ -240,7 +260,7 @@ impl CommandStream {
 /// `ssh-rsa` if that was refused or the server said nothing. A webOS TV
 /// sends no `server-sig-algs`, so it goes straight to the fallback.
 async fn authenticate(
-    handle: &mut Handle<AcceptAnyHostKey>,
+    handle: &mut Handle<TvHandler>,
     username: &str,
     key: Arc<keys::PrivateKey>,
 ) -> Result<()> {
@@ -321,9 +341,13 @@ fn io_error(e: russh::Error) -> Error {
 }
 
 /// Accepts whichever host key the TV presents. See the module docs.
-struct AcceptAnyHostKey;
+/// Accepts any host key (see the module docs) and reports the end of the
+/// connection through [`Session::closed`].
+struct TvHandler {
+    closed: watch::Sender<bool>,
+}
 
-impl client::Handler for AcceptAnyHostKey {
+impl client::Handler for TvHandler {
     type Error = russh::Error;
 
     async fn check_server_key(
@@ -331,6 +355,18 @@ impl client::Handler for AcceptAnyHostKey {
         _server_public_key: &keys::PublicKeyOrCertificate,
     ) -> std::result::Result<bool, Self::Error> {
         Ok(true)
+    }
+
+    async fn disconnected(
+        &mut self,
+        reason: DisconnectReason<Self::Error>,
+    ) -> std::result::Result<(), Self::Error> {
+        // Nobody may be listening any more; that is fine.
+        let _ = self.closed.send(true);
+        match reason {
+            DisconnectReason::ReceivedDisconnect(_) => Ok(()),
+            DisconnectReason::Error(e) => Err(e),
+        }
     }
 }
 

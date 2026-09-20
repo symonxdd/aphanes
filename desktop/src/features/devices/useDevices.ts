@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Device } from "../../data/models";
-import { checkReachable, listDevices, removeDevice, renameDevice, updateDeviceHost } from "../../ipc/commands";
+import {
+  checkReachable,
+  listDevices,
+  onConnectionClosed,
+  removeDevice,
+  renameDevice,
+  updateDeviceHost,
+} from "../../ipc/commands";
 
 /** Reachability per device id: unknown until checked, then a boolean. */
 export type Reachability = Record<string, boolean | undefined>;
@@ -30,6 +37,18 @@ export function useDevices() {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  // A held connection that dies on its own means the TV went away: its
+  // dot goes grey at once, without a probe, since the keepalives already
+  // asked. The next focus, Refresh or action probes again.
+  useEffect(() => {
+    const unlisten = onConnectionClosed((id) => {
+      setReachability((current) => (id in current ? { ...current, [id]: false } : current));
+    });
+    return () => {
+      void unlisten.then((stop) => stop());
+    };
+  }, []);
 
   // One probe per TV at a time: a second ask while one is running joins
   // it rather than starting another.

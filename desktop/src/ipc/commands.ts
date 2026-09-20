@@ -1,4 +1,5 @@
 import { Channel, invoke } from "@tauri-apps/api/core";
+import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { open as openFileDialog } from "@tauri-apps/plugin-dialog";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import type { CatalogPackage, Device, DeviceDetail, InstalledApp, OperationProgress } from "../data/models";
@@ -20,6 +21,15 @@ export function listDevices(): Promise<Device[]> {
 /** Whether the TV answers on its SSH port right now. */
 export function checkReachable(host: string, port: number): Promise<boolean> {
   return invoke<boolean>("check_reachable", { host, port });
+}
+
+/**
+ * Calls back with the device id whenever the held connection to a TV
+ * ends on its own: the TV went away and the keepalives ran out, or it
+ * closed the connection. Resolves to the function that stops listening.
+ */
+export function onConnectionClosed(callback: (deviceId: string) => void): Promise<UnlistenFn> {
+  return listen<string>("device-connection-closed", (event) => callback(event.payload));
 }
 
 /** Whether a key server answers at the address. Advisory only. */

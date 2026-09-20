@@ -8,25 +8,66 @@
 //! of this; the reuse and the reconnect live here.
 //!
 //! A held connection sends keepalives (see the protocol crate), so a TV
-//! that goes away is noticed within about a minute: the session reports
-//! [`Session::is_closed`], and the next request reconnects. The frontend
-//! never waits on a dead one hanging.
+//! that goes away is noticed within about twenty seconds: the session
+//! reports [`Session::is_closed`], the next request reconnects, and the
+//! frontend is told right away (see [`CONNECTION_CLOSED`]) so the TV's
+//! dot can go grey without waiting for that next request.
 
 use std::collections::HashMap;
 use std::sync::Arc;
 
 use aphanes_protocol::ssh::Session;
+use tauri::{AppHandle, Emitter};
 use tokio::sync::Mutex;
 
 use crate::store::{Connection, DeviceStore};
 
+/// Emitted with the device id when a held connection to that TV ends
+/// while it is still the one the pool holds: the TV went away, or closed
+/// it. Not emitted for a connection the pool dropped itself.
+pub const CONNECTION_CLOSED: &str = "device-connection-closed";
+
+type Sessions = Arc<Mutex<HashMap<String, Arc<Session>>>>;
+
 /// The live connections, one per device id, opened on demand and kept.
-#[derive(Default)]
 pub struct SessionPool {
-    sessions: Mutex<HashMap<String, Arc<Session>>>,
+    app: AppHandle,
+    /// Shared with the watcher task of every held connection.
+    sessions: Sessions,
 }
 
 impl SessionPool {
+    pub fn new(app: AppHandle) -> Self {
+        Self {
+            app,
+            sessions: Arc::default(),
+        }
+    }
+
+    /// Waits for a connection to end and, if the pool still holds that
+    /// very connection then, drops it and tells the frontend. A
+    /// connection the pool replaced or removed meanwhile ends quietly.
+    fn watch(&self, id: String, session: Arc<Session>) {
+        let app = self.app.clone();
+        let sessions = Arc::clone(&self.sessions);
+        tauri::async_runtime::spawn(async move {
+            session.closed().await;
+            let still_held = {
+                let mut held = sessions.lock().await;
+                match held.get(&id) {
+                    Some(current) if Arc::ptr_eq(current, &session) => {
+                        held.remove(&id);
+                        true
+                    }
+                    _ => false,
+                }
+            };
+            if still_held {
+                // The window may be gone; nothing to tell then.
+                let _ = app.emit(CONNECTION_CLOSED, &id);
+            }
+        });
+    }
     /// The connection for a device, reused if one is held and still open,
     /// or freshly connected otherwise. The returned handle is shared: two
     /// commands on the same TV run over the one connection, each on its
@@ -59,6 +100,7 @@ impl SessionPool {
             .lock()
             .await
             .insert(id.to_string(), Arc::clone(&session));
+        self.watch(id.to_string(), Arc::clone(&session));
         Ok(session)
     }
 

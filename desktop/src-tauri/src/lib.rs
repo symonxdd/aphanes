@@ -20,7 +20,7 @@ pub fn run() {
             let dir = app.path().app_data_dir()?;
             app.manage(AppState {
                 store: DeviceStore::new(dir),
-                pool: pool::SessionPool::default(),
+                pool: pool::SessionPool::new(app.handle().clone()),
             });
             mark_dev_window(app);
             Ok(())
