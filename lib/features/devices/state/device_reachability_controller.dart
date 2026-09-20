@@ -17,21 +17,27 @@ import 'device_list_controller.dart';
 /// currently looking at.
 final deviceReachabilityProvider = FutureProvider.autoDispose
     .family<bool, String>((Ref ref, String deviceId) async {
-      final List<Device> devices = await ref.watch(deviceListProvider.future);
-      Device? device;
-      for (final Device d in devices) {
-        if (d.id == deviceId) {
-          device = d;
-          break;
-        }
-      }
-      if (device == null) {
+      // Only the address is watched, not the whole list: a rename or
+      // another TV's change is no reason to ask this one again, and it
+      // used to send every dot to "Checking..." for a purely local edit.
+      final (String, int)? address = await ref.watch(
+        deviceListProvider.selectAsync((List<Device> devices) {
+          for (final Device d in devices) {
+            if (d.id == deviceId) {
+              return (d.host, d.port);
+            }
+          }
+          return null;
+        }),
+      );
+      if (address == null) {
         return false;
       }
+      final (String host, int port) = address;
       try {
         final Socket socket = await Socket.connect(
-          device.host,
-          device.port,
+          host,
+          port,
           timeout: const Duration(seconds: 3),
         );
         unawaited(socket.close());
