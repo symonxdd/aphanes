@@ -22,6 +22,7 @@ pub fn run() {
                 store: DeviceStore::new(dir),
                 pool: pool::SessionPool::default(),
             });
+            mark_dev_window(app);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -50,4 +51,19 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+/// Appends a "(dev)" marker to the window title of a debug build, so a
+/// window opened by `tauri dev` is never mistaken for an installed
+/// release. A release build keeps the title from `tauri.conf.json`.
+fn mark_dev_window(app: &tauri::App) {
+    if !cfg!(debug_assertions) {
+        return;
+    }
+    if let Some(window) = app.get_webview_window("main") {
+        let title = window.title().unwrap_or_default();
+        // A window that cannot be retitled still works; the missing
+        // marker is not worth refusing to start over.
+        let _ = window.set_title(&format!("{title} (dev)"));
+    }
 }
