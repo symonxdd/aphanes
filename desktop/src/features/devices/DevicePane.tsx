@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Folder, Info, LayoutGrid, Pencil, Plus, RefreshCw, Search, SquareTerminal, Tv, Upload } from "lucide-react";
 import { Button } from "../../components/Button";
+import type { ConfirmRequest } from "../../components/ConfirmDialog";
 import { IconButton } from "../../components/IconButton";
 import { NotPlannedMessage } from "../../components/NotPlannedMessage";
 import { Tabs, type TabItem } from "../../components/Tabs";
@@ -40,6 +41,7 @@ interface DevicePaneProps {
   onRename: (device: Device) => void;
   onEditHost: (device: Device) => void;
   onRemoveDevice: (device: Device) => void;
+  onConfirm: (request: ConfirmRequest) => void;
 }
 
 /** The main area: the selected TV's name and state, then its tabs. */
@@ -59,6 +61,7 @@ export function DevicePane({
   onRename,
   onEditHost,
   onRemoveDevice,
+  onConfirm,
 }: DevicePaneProps) {
   const [chosenTab, setTab] = useState<TabId>("apps");
   const tabs: TabItem<TabId>[] = [
@@ -144,6 +147,7 @@ export function DevicePane({
               reachable={reachable}
               onEditHost={() => onEditHost(device)}
               onRemove={() => onRemoveDevice(device)}
+              onConfirm={onConfirm}
             />
           )}
           {(tab === "files" || tab === "terminal") && <NotPlannedMessage />}

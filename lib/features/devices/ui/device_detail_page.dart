@@ -599,9 +599,38 @@ class _DevModeStatusRow extends ConsumerWidget {
               // Nothing to renew until the current session is known.
               onPressed: current == null
                   ? null
-                  : () => ref.read(devModeRenewProvider.notifier).renew(device),
+                  : () => _confirmRenew(context, ref),
             ),
     );
+  }
+
+  /// Renewing visibly opens an app on the TV screen, which is a surprise
+  /// the first time, so it asks first and says what it does.
+  Future<void> _confirmRenew(BuildContext context, WidgetRef ref) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Renew Developer Mode session?'),
+        content: const Text(
+          'This opens the Developer Mode app on the TV screen, which '
+          "extends the session's remaining time. Nothing is installed or "
+          'removed.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Renew'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed ?? false) {
+      await ref.read(devModeRenewProvider.notifier).renew(device);
+    }
   }
 }
 

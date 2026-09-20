@@ -19,6 +19,7 @@ import {
   Tv,
 } from "lucide-react";
 import { Button } from "../../components/Button";
+import type { ConfirmRequest } from "../../components/ConfirmDialog";
 import { IconButton } from "../../components/IconButton";
 import { InfoPopover, placePopover, type Explainer } from "../../components/InfoPopover";
 import popoverStyles from "../../components/InfoPopover.module.css";
@@ -39,6 +40,8 @@ interface DeviceDetailsProps {
   reachable: boolean | undefined;
   onEditHost: () => void;
   onRemove: () => void;
+  /** Puts a question to the person before something happens on the TV. */
+  onConfirm: (request: ConfirmRequest) => void;
 }
 
 /**
@@ -53,7 +56,7 @@ interface DeviceDetailsProps {
  * that way: it is a countdown, so a stored copy would be wrong rather
  * than stale, and the row says what the check is doing instead.
  */
-export function DeviceDetails({ device, detail, reachable, onEditHost, onRemove }: DeviceDetailsProps) {
+export function DeviceDetails({ device, detail, reachable, onEditHost, onRemove, onConfirm }: DeviceDetailsProps) {
   const key = useRevealedSecret(device.id, devicePrivateKey);
   const passphrase = useRevealedSecret(device.id, devicePassphrase);
   const info = detail.data?.info ?? device.info ?? null;
@@ -108,7 +111,7 @@ export function DeviceDetails({ device, detail, reachable, onEditHost, onRemove 
 
       <div className={styles.group}>
         <div className={styles.sectionTitle}>From the TV</div>
-        <FromTheTv device={device} info={info} detail={detail} reachable={reachable} />
+        <FromTheTv device={device} info={info} detail={detail} reachable={reachable} onConfirm={onConfirm} />
       </div>
 
       <div className={styles.actions}>
@@ -125,6 +128,7 @@ interface FromTheTvProps {
   info: DeviceInfo | null;
   detail: Remote<DeviceDetail>;
   reachable: boolean | undefined;
+  onConfirm: (request: ConfirmRequest) => void;
 }
 
 /**
@@ -132,7 +136,7 @@ interface FromTheTvProps {
  * there is not one. Follows the mobile page's _LiveDeviceInfo case by
  * case, with stored facts always taking precedence over a notice.
  */
-function FromTheTv({ device, info, detail, reachable }: FromTheTvProps) {
+function FromTheTv({ device, info, detail, reachable, onConfirm }: FromTheTvProps) {
   const hasRows = info !== null && !isEmptyInfo(info);
 
   if (!hasRows) {
@@ -158,7 +162,7 @@ function FromTheTv({ device, info, detail, reachable }: FromTheTvProps) {
     <>
       <div className={styles.rows}>
         <InfoRows info={info} />
-        <DevModeRow device={device} detail={detail} reachable={reachable} />
+        <DevModeRow device={device} detail={detail} reachable={reachable} onConfirm={onConfirm} />
       </div>
       {detail.error && <div className={`${styles.notice} ${styles.noticeError}`}>{detail.error}</div>}
     </>
@@ -190,6 +194,7 @@ interface DevModeRowProps {
   device: Device;
   detail: Remote<DeviceDetail>;
   reachable: boolean | undefined;
+  onConfirm: (request: ConfirmRequest) => void;
 }
 
 /**
@@ -198,7 +203,7 @@ interface DevModeRowProps {
  * explainer's job. Renewing sits in the same small action slot the
  * secrets keep their reveal buttons in.
  */
-function DevModeRow({ device, detail, reachable }: DevModeRowProps) {
+function DevModeRow({ device, detail, reachable, onConfirm }: DevModeRowProps) {
   const renew = useRenew(device.id);
   const status: DevModeStatus | null = reachable === false ? null : (detail.data?.devMode ?? null);
   const seconds = status ? remainingSeconds(status.remaining) : null;
@@ -237,7 +242,17 @@ function DevModeRow({ device, detail, reachable }: DevModeRowProps) {
               label="Renew Developer Mode session"
               // Nothing to renew until the current session is known.
               disabled={status === null}
-              onClick={renew.start}
+              onClick={() =>
+                onConfirm({
+                  title: "Renew Developer Mode session?",
+                  message:
+                    "This opens the Developer Mode app on the TV screen, which extends the session's remaining " +
+                    "time. Nothing is installed or removed.",
+                  confirmLabel: "Renew",
+                  tone: "plain",
+                  onConfirm: renew.start,
+                })
+              }
             >
               <RefreshCw size={16} />
             </IconButton>

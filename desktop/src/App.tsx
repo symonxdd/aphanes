@@ -269,6 +269,7 @@ export default function App() {
         onRename={() => setOverlay("rename")}
         onEditHost={() => setOverlay("editHost")}
         onRemoveDevice={askRemoveDevice}
+        onConfirm={setConfirm}
       />
 
       <AppDialog
