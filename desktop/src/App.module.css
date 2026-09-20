@@ -1,0 +1,12 @@
+.app {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+  animation: fade-in 220ms ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}

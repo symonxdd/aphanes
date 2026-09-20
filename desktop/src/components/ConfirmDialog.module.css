@@ -1,0 +1,15 @@
+.dialog {
+  width: min(440px, calc(100vw - 48px));
+}
+
+.message {
+  font-size: 15px;
+  color: var(--on-surface-variant);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 4px;
+}

@@ -1,0 +1,151 @@
+.dialog {
+  width: min(520px, calc(100vw - 48px));
+}
+
+.lead {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+/* The two inputs sit close, their status lines filling the small gap. */
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--on-surface-variant);
+}
+
+.input {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid var(--outline);
+  background: var(--surface);
+  color: var(--on-surface);
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.input:disabled {
+  opacity: 0.6;
+}
+
+.inputError {
+  border-color: var(--error);
+}
+
+/* The passphrase field with its show/hide button laid over its right end.
+   The native reveal control is switched off so there is only ever one. */
+.secret {
+  position: relative;
+  display: flex;
+}
+
+.inputSecret {
+  flex: 1;
+  padding-right: 48px;
+}
+
+.inputSecret::-ms-reveal {
+  display: none;
+}
+
+.reveal {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 16px;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.statusGood {
+  color: var(--primary);
+}
+
+.statusBad {
+  color: var(--error);
+}
+
+.spinner {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error {
+  font-size: 13px;
+  color: var(--error);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+/* The checklist trigger, centered under the buttons as on mobile. */
+.setupLink {
+  align-self: center;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.setupLink:hover {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.setupLinkHighlighted {
+  font-weight: 600;
+  color: var(--error);
+}
+
+.setupLinkHighlighted:hover {
+  background: color-mix(in srgb, var(--error) 8%, transparent);
+}
+
+.success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--primary);
+}

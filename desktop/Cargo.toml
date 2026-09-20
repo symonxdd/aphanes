@@ -1,0 +1,35 @@
+# Cargo workspace for the desktop app. Two crates:
+#
+# - crates/aphanes-protocol: everything that talks to a webOS TV, pure Rust
+#   on russh, with no Tauri types in it.
+# - src-tauri: the Tauri shell. Its commands stay thin: call into the
+#   protocol crate and return.
+#
+# `cargo tauri dev` and `cargo tauri build` are run from src-tauri; plain
+# `cargo check`, `cargo clippy` and `cargo test` work from here.
+[workspace]
+resolver = "2"
+members = ["crates/aphanes-protocol", "src-tauri"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0-only"
+repository = "https://github.com/symonxdd/aphanes"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "io-util", "time", "sync"] }
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+
+# Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"
+strip = true

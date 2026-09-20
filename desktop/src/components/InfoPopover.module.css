@@ -1,0 +1,80 @@
+.popover {
+  /* The browser positions a popover in the centre by default; the
+     component places it next to its (i) button instead. */
+  position: fixed;
+  /* Its own weight, whatever its (i) sits in (a bold label, a pill). */
+  font-weight: 400;
+  inset: auto;
+  margin: 0;
+  width: 380px;
+  max-height: 60vh;
+  overflow: auto;
+  scrollbar-gutter: stable;
+  -webkit-user-select: none;
+  user-select: none;
+  padding: 18px 20px 16px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 20px;
+  background: var(--surface-low);
+  color: var(--on-surface);
+  box-shadow: var(--dialog-shadow);
+
+  /* Enter and exit fade, as for dialogs. */
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease,
+    overlay 120ms allow-discrete,
+    display 120ms allow-discrete;
+}
+
+.popover:popover-open {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .popover:popover-open {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.icon {
+  color: var(--primary);
+  display: flex;
+}
+
+.title {
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.body {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--on-surface);
+  white-space: pre-line;
+}
+
+.more {
+  margin-top: 8px;
+}
+
+/* The gap above the details arrives with them, so a folded panel takes
+   no room under the toggle. */
+.details {
+  margin-top: 0;
+}
+
+.detailsOpen {
+  margin-top: 8px;
+}

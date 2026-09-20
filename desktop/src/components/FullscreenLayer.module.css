@@ -1,0 +1,26 @@
+/* A frameless top-layer surface the size of the window, for a screen that
+   must sit above any open dialog (the replayed intro). */
+.layer {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+  /* Same as Dialog: a top-layer element does not take the body's rule. */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.layer:not([open]) {
+  display: none;
+}
+
+.layer::backdrop {
+  background: transparent;
+}

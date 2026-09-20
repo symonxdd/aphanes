@@ -1,0 +1,49 @@
+.dialog {
+  width: min(440px, calc(100vw - 48px));
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 32px;
+  font-size: 15px;
+  color: var(--on-surface-variant);
+}
+
+.status > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  border-right-color: transparent;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ok {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.error {
+  color: var(--error);
+  flex-shrink: 0;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+}

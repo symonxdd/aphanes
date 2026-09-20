@@ -1,0 +1,33 @@
+.toggle {
+  display: block;
+  margin: 0 auto;
+  padding: 6px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.toggle:hover {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 220ms ease,
+    opacity 220ms ease,
+    margin 220ms ease;
+}
+
+.panelOpen {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.panelInner {
+  min-height: 0;
+  overflow: hidden;
+}

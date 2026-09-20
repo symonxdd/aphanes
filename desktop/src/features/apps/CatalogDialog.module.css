@@ -1,0 +1,186 @@
+.dialog {
+  height: min(580px, calc(100vh - 64px));
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-grow: 1;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 22px;
+  background: var(--surface-low);
+  color: var(--on-surface-variant);
+}
+
+.search input {
+  flex-grow: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 15px;
+  color: var(--on-surface);
+  background: none;
+  border: 0;
+  outline: none;
+}
+
+.search input::placeholder {
+  color: var(--on-surface-variant);
+}
+
+.segments {
+  display: flex;
+  height: 40px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.segment {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+
+.segment + .segment {
+  border-left: 1px solid var(--outline-variant);
+}
+
+.segment[aria-pressed="true"] {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-grow: 1;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+/* The row's icon and text open the package's page; the version and the
+   Install button sit beside them. The whole row tints on hover. */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 68px;
+  /* Rows keep their height; the list scrolls instead of squeezing them. */
+  flex-shrink: 0;
+  padding: 0 8px 0 0;
+  border-radius: 12px;
+}
+
+.row:hover {
+  background: color-mix(in srgb, var(--on-surface) 4%, transparent);
+}
+
+.open {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-grow: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 4px;
+  border-radius: 12px;
+  color: inherit;
+  text-align: left;
+}
+
+.open:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.version {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 16px;
+}
+
+.description {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.installed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 8px;
+  font-size: 14px;
+  color: var(--primary);
+}
+
+/* A footnote, in the same muted treatment as the explainer's trivia. */
+.footer {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--outline);
+  text-align: center;
+}
+
+.empty {
+  padding: 48px 16px;
+  text-align: center;
+  color: var(--on-surface-variant);
+}
+
+.errorText {
+  color: var(--error);
+  margin-bottom: 16px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  border-right-color: transparent;
+  animation: spin 800ms linear infinite;
+}
+
+.refreshing svg {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

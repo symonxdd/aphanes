@@ -1,0 +1,135 @@
+.pane {
+  flex-grow: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 22px 32px 24px;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+/* The name and its rename button on one line: the name gives way first,
+   so the button never leaves the row however long the name gets. */
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.nameRow > button {
+  flex-shrink: 0;
+}
+
+.name {
+  min-width: 0;
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+}
+
+.statusReachable {
+  color: var(--success);
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.host {
+  color: var(--on-surface-variant);
+}
+
+/* The scroll area reaches 22px into the pane's right padding, with its
+   content inset back by 16px: the values stay aligned with the header,
+   and the scrollbar sits out in the margin with a gap from them instead
+   of hugging the last character of every row. */
+.content {
+  flex-grow: 1;
+  min-height: 0;
+  margin-right: -22px;
+  padding-right: 16px;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+/* Remounted on every tab change (keyed), so the new content fades in.
+   Fills the scroll area, so a tab can pin something to its bottom. The
+   entrance settles down from above, as a popover does, rather than
+   rising from below: a tab already fills the area, so any lift from
+   below overflows it for the length of the animation and flashes a
+   scrollbar, while overflow past the top is never scrollable. */
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  animation: tab-in 160ms ease;
+}
+
+@keyframes tab-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.empty {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--on-surface-variant);
+  text-align: center;
+}
+
+.emptyTitle {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+
+.emptyAction {
+  margin-top: 12px;
+}
+
+/* The refresh button's icon turns while a fetch is running. */
+.refreshing svg {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

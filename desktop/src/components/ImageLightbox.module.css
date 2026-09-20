@@ -1,0 +1,218 @@
+/* The window, not a card: a frameless dialog filling the viewport, the
+   image centered in it, the controls laid over it. Fades in and out at
+   the dialogs' pace; switching images within it is instant. */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  -webkit-user-select: none;
+  user-select: none;
+  opacity: 0;
+  transition:
+    opacity 160ms ease,
+    overlay 160ms allow-discrete,
+    display 160ms allow-discrete;
+}
+
+.lightbox:not([open]) {
+  display: none;
+}
+
+.lightbox[open] {
+  opacity: 1;
+}
+
+@starting-style {
+  .lightbox[open] {
+    opacity: 0;
+  }
+}
+
+.lightbox::backdrop {
+  background: rgba(0, 0, 0, 0.82);
+  transition:
+    background-color 160ms ease,
+    overlay 160ms allow-discrete,
+    display 160ms allow-discrete;
+}
+
+@starting-style {
+  .lightbox[open]::backdrop {
+    background: transparent;
+  }
+}
+
+.image {
+  max-width: calc(100vw - 160px);
+  max-height: calc(100vh - 200px);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+/* One image on display: large, with a soft halo of its own colors
+   behind it that breathes, and the image drifting up and down slowly.
+   Both loops are gentle and endless, a piece on a plinth rather than
+   a slideshow. */
+.showcase {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+/* Width set from the image's own size once it has loaded, never more
+   than 2.5 times it: catalog icons are small (130px is typical) and
+   have no sharper version anywhere, so past that they only blur. */
+.showcaseImage {
+  max-width: min(360px, 60vw, 60vh);
+  height: auto;
+  border-radius: 24%;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  animation: showcase-drift 6s ease-in-out infinite;
+}
+
+.showcase::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -60%;
+  width: min(520px, 80vw);
+  height: min(520px, 80vw);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.16), transparent 62%);
+  animation: showcase-breathe 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.showcaseTitle {
+  position: relative;
+  font-size: 22px;
+  font-weight: 500;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes showcase-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes showcase-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+/* Every control on the same dark pill, white on black, whatever the
+   app's theme: they sit on the scrim, not on a surface. */
+.control {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.control:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.top {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.counter {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+}
+
+.arrowLeft {
+  left: 24px;
+}
+
+.arrowRight {
+  right: 24px;
+}
+
+/* The strip along the bottom, centered, the current one lit. */
+.strip {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  max-width: calc(100vw - 48px);
+  padding: 8px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.45);
+  overflow-x: auto;
+}
+
+.thumb {
+  flex-shrink: 0;
+  width: 88px;
+  height: 56px;
+  padding: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  opacity: 0.55;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  transition:
+    opacity 120ms ease,
+    outline-color 120ms ease;
+}
+
+.thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb:hover {
+  opacity: 0.85;
+}
+
+.thumbCurrent {
+  opacity: 1;
+  outline-color: #fff;
+}

@@ -1,0 +1,9 @@
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-highest);
+  color: var(--on-surface-variant);
+  object-fit: cover;
+  flex-shrink: 0;
+}

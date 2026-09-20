@@ -1,0 +1,91 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* The row is the app's page's opener, with the uninstall button beside
+   it: the whole row tints on hover, and the button keeps its own. */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 64px;
+  padding: 0 12px 0 0;
+  border-radius: 12px;
+  color: var(--on-surface-variant);
+}
+
+.row:hover {
+  background: color-mix(in srgb, var(--on-surface) 4%, transparent);
+}
+
+.open {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-grow: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 12px 0 16px;
+  border-radius: 12px;
+  color: inherit;
+  text-align: left;
+}
+
+.open:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--on-surface);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.running {
+  color: var(--success);
+}
+
+.empty {
+  padding: 48px 16px;
+  text-align: center;
+  color: var(--on-surface-variant);
+}
+
+.error {
+  color: var(--error);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

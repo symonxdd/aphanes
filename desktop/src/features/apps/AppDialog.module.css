@@ -1,0 +1,345 @@
+/* A fixed box, not one sized to its content: the description arrives
+   after the page opens and can be any length, and a box that grew with
+   it would shift as it opened and closed. */
+.dialog {
+  width: min(640px, calc(100vw - 48px));
+  height: min(760px, calc(100vh - 64px));
+}
+
+.head {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+/* Label and value pairs, the label muted, as the device details rows. */
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 16px;
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  min-width: 0;
+}
+
+.facts dt {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--on-surface-variant);
+}
+
+/* The label's icon, on the primary color like the device rows' icons,
+   centered on the line. */
+.factIcon {
+  display: flex;
+  align-items: center;
+  margin-right: 6px;
+  color: var(--primary);
+}
+
+/* The (i) is 32px tall against a 20px line; it overhangs rather than
+   pushing the rows apart. */
+.facts dt > button {
+  margin: -6px 0;
+}
+
+.facts dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.factNote {
+  color: var(--on-surface-variant);
+}
+
+/* The icon as a button: a dark overlay with an expand mark appears on
+   hover, at once, with no transition on either, and a click shows the
+   icon large. */
+.iconButton {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  padding: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: zoom-in;
+}
+
+.iconOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  opacity: 0;
+}
+
+.iconButton:hover .iconOverlay,
+.iconButton:focus-visible .iconOverlay {
+  opacity: 1;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.factLink {
+  padding: 0;
+  color: var(--primary);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.factLink:hover {
+  color: color-mix(in srgb, var(--primary) 80%, var(--on-surface));
+}
+
+.warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--error);
+}
+
+.warning svg {
+  flex-shrink: 0;
+}
+
+/* Like a warning, but nothing to be alarmed by: muted, not red. */
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--on-surface-variant);
+}
+
+.note svg {
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+.factMono {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 13px;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Uninstall on its own at the left, the rest at the right, the launch
+   outcome in the room between. */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status {
+  flex-grow: 1;
+  text-align: right;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+/* Where the text below comes from: a caption on its own tinted band,
+   set apart from the description it introduces. */
+.origin {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--primary) 7%, transparent);
+  font-size: 12.5px;
+  color: var(--on-surface-variant);
+}
+
+.origin svg {
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+/* In place of Launch while the app is running on the TV. */
+.running {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--success) 14%, transparent);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--success);
+  white-space: nowrap;
+}
+
+/* The pill's (i) sits inside its right end, in the pill's own green
+   rather than the gray every other (i) wears. */
+.running > button {
+  margin: 0 -8px 0 -4px;
+  color: inherit;
+}
+
+.running > button:not(:disabled):hover {
+  background: color-mix(in srgb, var(--success) 14%, transparent);
+}
+
+.notice {
+  padding: 24px 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+}
+
+.noticeError {
+  color: var(--error);
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The README: the app's type scale rather than the browser's, images
+   kept inside the column, and text selectable as a document should be. */
+.readme {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--on-surface);
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.readme > :first-child {
+  margin-top: 0;
+}
+
+.readme > :last-child {
+  margin-bottom: 0;
+}
+
+.readme h1,
+.readme h2,
+.readme h3,
+.readme h4,
+.readme h5,
+.readme h6 {
+  margin: 20px 0 8px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.readme h1 {
+  font-size: 20px;
+}
+
+.readme h2 {
+  font-size: 17px;
+}
+
+.readme h3,
+.readme h4,
+.readme h5,
+.readme h6 {
+  font-size: 15px;
+}
+
+.readme p,
+.readme ul,
+.readme ol,
+.readme blockquote,
+.readme pre,
+.readme table {
+  margin: 0 0 10px;
+}
+
+.readme ul,
+.readme ol {
+  padding-left: 24px;
+}
+
+.readme a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.readme code,
+.readme kbd {
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: var(--surface-container);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 12.5px;
+}
+
+.readme pre {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface-container);
+  overflow-x: auto;
+}
+
+.readme pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.readme img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 8px 0;
+  border-radius: 12px;
+  cursor: zoom-in;
+}
+
+.readme blockquote {
+  padding-left: 12px;
+  border-left: 3px solid var(--outline-variant);
+  color: var(--on-surface-variant);
+}
+
+.readme hr {
+  margin: 16px 0;
+  border: 0;
+  border-top: 1px solid var(--outline-variant);
+}
+
+.readme table {
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.readme th,
+.readme td {
+  padding: 4px 10px;
+  border: 1px solid var(--outline-variant);
+  text-align: left;
+}

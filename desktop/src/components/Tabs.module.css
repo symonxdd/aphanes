@@ -1,0 +1,39 @@
+.list {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--surface-highest);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--on-surface-variant);
+}
+
+.tab:hover {
+  color: var(--on-surface);
+}
+
+.tab[aria-selected="true"] {
+  color: var(--primary);
+}
+
+/* One underline for the whole row, slid to the selected tab. This is the
+   one place a transition is wanted: it animates the change of selection,
+   never a hover or press. */
+.indicator {
+  position: absolute;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--primary);
+  transition:
+    left 200ms ease,
+    width 200ms ease;
+}

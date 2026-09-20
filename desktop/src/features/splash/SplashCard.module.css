@@ -1,0 +1,68 @@
+/* The title card. Everything that moves is set per frame from one
+   progress value in SplashCard.tsx; these are the resting styles. */
+.card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 0);
+  color: #ffffff;
+  overflow: hidden;
+}
+
+/* Well above dead centre: with a footer at the bottom a centred block
+   reads as sitting low, and the icon is what should hold the eye. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(-14vh);
+}
+
+.name {
+  margin-top: 30px;
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: 5px;
+}
+
+.shippedName {
+  margin-top: 10px;
+  font-size: 12px;
+  letter-spacing: 1.6px;
+  color: rgb(255 255 255 / 0.7);
+}
+
+.rule {
+  margin-top: 30px;
+  width: 64px;
+  height: 1px;
+  background: rgb(255 255 255 / 0.22);
+}
+
+.greek {
+  margin-top: 26px;
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: #fb7185;
+}
+
+.meaning {
+  margin-top: 8px;
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  color: rgb(255 255 255 / 0.55);
+}
+
+.hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 28px;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.8px;
+  color: rgb(255 255 255 / 0.3);
+}

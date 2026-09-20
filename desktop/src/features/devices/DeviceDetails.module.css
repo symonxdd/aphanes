@@ -1,0 +1,182 @@
+.details {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 24px;
+  max-width: 820px;
+  padding: 4px 0 0;
+}
+
+/* Each group is a two-column grid of rows, so the width a desktop has is
+   used without any one row stretching its value far from its label. */
+.group {
+  display: flex;
+  flex-direction: column;
+}
+
+.rows {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 48px;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 4px 0 6px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+}
+
+.rowIcon {
+  display: flex;
+  color: var(--primary);
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-grow: 1;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* An edit or reveal button sits right up against the (i), as on mobile,
+   where the two share one action slot: the buttons' own round hit areas
+   are wider than their glyphs, so the slot pulls in over that padding. */
+.rowAction {
+  display: flex;
+  margin-left: -8px;
+}
+
+.value {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The pairing key's card: the (i) cards' shell, with the key wrapped to
+   the card's width in monospace and scrolling inside it past the card's
+   height cap. The countdown and the copy button sit in the header, where
+   they are in view however far the key has been scrolled. The
+   user-select override matters: the card turns selection off like the
+   page, and a key that cannot be selected is only half revealed. */
+.keyPopover {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* display: flex above overrides the browser's own hiding of a closed
+   popover, so it is restated here, as the dialog does; the discrete
+   display transition holds it off until the exit fade has finished. */
+.keyPopover:not(:popover-open) {
+  display: none;
+}
+
+.keyPopover > :first-child {
+  margin-bottom: 0;
+}
+
+.keyTitle {
+  flex-grow: 1;
+}
+
+.keyText {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface-container);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--on-surface);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.keyCountdown {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+}
+
+.keyError {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--error);
+}
+
+.valueMono {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  letter-spacing: 0.08em;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Remove device sits at the bottom of the tab whatever is above it, a
+   step clear of the edge, as the mobile page keeps it under everything. */
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  padding: 16px 0 24px;
+}
+
+/* A message under a group: an error, the outcome of a renewal, or the
+   spinner for a first visit with nothing stored yet. */
+.notice {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+.noticeError {
+  color: var(--error);
+}
+
+/* Spans both columns of the rows grid, aligned under the labels. */
+.noticeWide {
+  grid-column: 1 / -1;
+  justify-content: flex-start;
+  padding: 4px 0 0 32px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: spin 800ms linear infinite;
+}
+
+/* Sized to the small icon button it replaces, so the row holds still. */
+.actionSpinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--primary);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,91 @@
+.dialog {
+  width: min(520px, calc(100vw - 48px));
+}
+
+.mark {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 4px;
+}
+
+.paragraph {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  padding: 3px 8px;
+  margin: -3px 0 -3px -8px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.link:hover {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.version {
+  align-self: center;
+  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--outline);
+  text-align: center;
+}
+
+.version:hover {
+  background: color-mix(in srgb, var(--on-surface) 6%, transparent);
+}
+
+.divider {
+  height: 1px;
+  margin: 12px 0 6px;
+  background: var(--surface-highest);
+}
+
+.tryTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.tryList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tryRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.tryIcon {
+  width: 24px;
+  display: flex;
+  justify-content: center;
+  color: var(--on-surface-variant);
+}
+
+/* A link inside a sentence: the accent, underlined only on hover, opening
+   in the system browser like every other outward link. */
+.inlineLink {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.inlineLink:hover {
+  text-decoration: underline;
+}

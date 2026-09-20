@@ -1,0 +1,68 @@
+.dialog {
+  width: min(440px, calc(100vw - 48px));
+}
+
+.lead {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--on-surface-variant);
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+/* The mobile sheet's 44px dots. The ring is drawn outside the dot with a
+   gap, so the color itself is never covered by its own selection mark. */
+.swatch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  transition: transform 120ms ease;
+}
+
+.swatch:hover {
+  transform: scale(1.08);
+}
+
+.swatch:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.swatchSelected {
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 4px var(--on-surface);
+}
+
+.checkLight {
+  color: #ffffff;
+}
+
+.checkDark {
+  color: #000000;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+/* Present for the platform picker to anchor to, invisible otherwise. */
+.picker {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}

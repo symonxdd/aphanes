@@ -1,0 +1,61 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  color: var(--on-surface-variant);
+}
+
+.button:not(:disabled):hover {
+  background: color-mix(in srgb, var(--on-surface) 8%, transparent);
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.large {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+}
+
+.small {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+}
+
+/* The immediate tooltip: a small inverse pill centered under the button,
+   fading in as soon as the pointer arrives or focus lands. Not a target
+   itself, so it never gets in the way of the click. */
+.tooltip {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-2px);
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: var(--on-surface);
+  color: var(--surface);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 80ms ease,
+    transform 80ms ease;
+  z-index: 1;
+}
+
+.button:hover .tooltip,
+.button:focus-visible .tooltip {
+  opacity: 1;
+  transform: translateX(-50%);
+}

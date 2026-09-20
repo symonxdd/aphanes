@@ -1,0 +1,49 @@
+/* Same frame as the catalog explainer, for the same easy reading. */
+.dialog {
+  width: min(720px, calc(100vw - 48px));
+  height: min(580px, calc(100vh - 64px));
+}
+
+.paragraph {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.paragraph + .paragraph {
+  margin-top: 10px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+.stepHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.stepNumber {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.stepTitle {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.stepBody {
+  padding-left: 22px;
+}
+
+.closing {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--on-surface-variant);
+  padding-top: 6px;
+}

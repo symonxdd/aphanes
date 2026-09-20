@@ -1,0 +1,119 @@
+/* A flex column, not absolute blocks as on mobile: a phone is tall enough
+   to center the pitch on the whole screen, a resizable window is not, and
+   centering it in the space left between the top and the button is what
+   keeps it clear of both at any height. */
+.screen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 56px 32px 40px;
+  background: var(--surface);
+  animation: fade-in 220ms ease;
+}
+
+/* On the way out the whole screen fades; the app fades in beneath it. */
+.leaving {
+  animation: fade-out 220ms ease forwards;
+  pointer-events: none;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.top {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+/* Takes the space between the top and the button and centers the pitch
+   in it, sitting a little high in that space so the eye finds the pitch
+   above the action rather than level with it. */
+.middle {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 0 56px;
+}
+
+.tagline {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* Centered as a block: the longest row sets the width and the others
+   left-align to it. No optical shift here, unlike mobile, because at this
+   width the rows do not wrap, so there is no ragged edge to correct for. */
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  max-width: 480px;
+  text-align: left;
+}
+
+.feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--on-surface-variant);
+}
+
+.featureIcon {
+  flex: none;
+  display: flex;
+  /* Centered on the first line, plus the usual optical pixel. */
+  margin-top: calc((1.45em - 18px) / 2 + 1px);
+}
+
+.promise {
+  margin-top: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+
+.bottom {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.disclaimer {
+  font-size: 12px;
+  color: var(--outline);
+}
+
+.cta {
+  width: 280px;
+  justify-content: center;
+}

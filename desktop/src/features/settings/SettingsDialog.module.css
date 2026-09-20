@@ -1,0 +1,135 @@
+.dialog {
+  width: min(520px, calc(100vw - 48px));
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0 12px;
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* The word sits a little further from the app mark than from the theme
+   button, so the two read as a lockup rather than a crowded row. */
+.brandTitle {
+  margin-left: 11px;
+}
+
+/* The word's visual centre sits below its line box's, so the theme button
+   drops a touch to line up with it. */
+.brandTheme {
+  margin-top: 3px;
+}
+
+.tagline {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+/* Rows carry their own side padding, unlike mobile's edge-to-edge tiles,
+   so the hover tint has room around the icon and the trailing control.
+   Section titles share the inset to stay aligned with the row icons. */
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 8px 12px 2px;
+}
+
+/* Rows in a section sit tight together, as mobile's list tiles do. */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  width: 100%;
+  padding: 0 12px;
+  text-align: left;
+  border-radius: 12px;
+}
+
+button.row:hover {
+  background: color-mix(in srgb, var(--on-surface) 4%, transparent);
+}
+
+.rowIcon {
+  display: flex;
+  color: var(--primary);
+}
+
+.rowLabel {
+  flex-grow: 1;
+  font-size: 16px;
+}
+
+.trailing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--on-surface-variant);
+}
+
+/* The chosen accent, shown beside its row as mobile shows it. */
+.seedDot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.footer {
+  padding-top: 8px;
+  font-size: 12px;
+  color: var(--outline);
+  text-align: center;
+}
+
+/* The OLED row unfolds and fades in when dark mode arrives and folds
+   away when it leaves, as on mobile, instead of popping. The grid-row
+   trick animates height without knowing it; the negative margin swallows
+   the gap around it while collapsed so nothing is left behind. */
+.reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-bottom: -14px;
+  transition:
+    grid-template-rows 280ms ease,
+    opacity 280ms ease,
+    margin-bottom 280ms ease;
+}
+
+/* Inside a section the gap to swallow is the section's own 2px. */
+.revealTight {
+  margin-bottom: -2px;
+}
+
+.revealOpen {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-bottom: 0;
+}
+
+.revealInner {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}

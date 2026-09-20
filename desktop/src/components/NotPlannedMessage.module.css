@@ -1,0 +1,45 @@
+/* Centered in whatever fills the tab, as the mobile page centers it. */
+.message {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 32px;
+  text-align: center;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+
+.body {
+  max-width: 440px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--on-surface-variant);
+}
+
+/* The linked phrase, inline with the sentence around it. */
+.link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--primary) 40%, transparent);
+  text-underline-offset: 2px;
+}
+
+.link:hover {
+  text-decoration-color: var(--primary);
+}
+
+.link svg {
+  align-self: center;
+}

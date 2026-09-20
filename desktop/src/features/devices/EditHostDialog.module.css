@@ -1,0 +1,101 @@
+.dialog {
+  width: min(480px, calc(100vw - 48px));
+}
+
+.lead {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--on-surface);
+}
+
+/* The Read more toggle, centered under the lead as on mobile, pulled in
+   against the dialog body's gap so it sits close to the sentence it
+   expands on. */
+.more {
+  margin: -8px auto -6px;
+}
+
+/* A folded panel also gives back the body gap it would otherwise hold
+   open under the toggle. */
+.details {
+  margin-bottom: -14px;
+}
+
+.detailsOpen {
+  margin-bottom: 0;
+}
+
+.paragraphs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--on-surface-variant);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 8px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--on-surface-variant);
+}
+
+.input {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid var(--outline);
+  background: var(--surface);
+  color: var(--on-surface);
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.input:disabled {
+  opacity: 0.6;
+}
+
+.inputError {
+  border-color: var(--error);
+}
+
+/* Set off from the input a little more than the field gap, so a hint
+   or an error reads as a line of its own rather than part of the box. */
+.status {
+  min-height: 16px;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.statusBad {
+  color: var(--error);
+}
+
+.hint {
+  color: var(--on-surface-variant);
+}
+
+.error {
+  font-size: 13px;
+  color: var(--error);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 4px;
+}

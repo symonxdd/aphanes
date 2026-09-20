@@ -1,0 +1,122 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* A leading icon reads as wider than it is, so the left inset shrinks
+   to keep the pair visually centred. */
+.withIcon {
+  padding-left: 16px;
+}
+
+.button:disabled {
+  opacity: 0.45;
+}
+
+/* While busy the label keeps its place but goes invisible, and the
+   spinner sits centered over the whole button, so nothing beside it
+   moves. The icon, if any, goes with the label. */
+.spinning > * {
+  visibility: hidden;
+}
+
+.spinning > .spinnerSlot {
+  visibility: visible;
+}
+
+.spinnerSlot {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Filled: the single call to action on a screen. */
+.filled {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.filled:not(:disabled):hover {
+  filter: brightness(0.92);
+}
+
+/* Filled tonal: the one primary action in a group. */
+.tonal {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.tonal:not(:disabled):hover {
+  filter: brightness(0.95);
+}
+
+:root[data-theme="dark"] .tonal:not(:disabled):hover {
+  filter: brightness(1.15);
+}
+
+/* Outlined: the accent throughout, border in a faint wash of it. */
+.outlined {
+  color: var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary) 45%, transparent);
+}
+
+.outlined:not(:disabled):hover {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+/* Destructive, quiet: the mobile app's Remove device pill. Dark mode
+   drops the fill, as mobile does: the dark error container reads far
+   more intense than the light one, so dark keeps only the text and icon
+   in the error color, with a faint tint on hover. */
+.danger {
+  background: var(--error-container);
+  color: var(--error);
+}
+
+.danger:not(:disabled):hover {
+  filter: brightness(0.96);
+}
+
+:root[data-theme="dark"] .danger {
+  background: transparent;
+}
+
+:root[data-theme="dark"] .danger:not(:disabled):hover {
+  filter: none;
+  background: color-mix(in srgb, var(--error) 10%, transparent);
+}
+
+/* Destructive, loud: the confirming button in a confirmation dialog. */
+.filledError {
+  background: var(--error);
+  color: var(--on-error);
+}
+
+.filledError:not(:disabled):hover {
+  filter: brightness(0.92);
+}

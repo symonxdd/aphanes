@@ -1,0 +1,75 @@
+.dialog {
+  width: min(520px, calc(100vw - 48px));
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.number {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.stepTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stepDetail {
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--on-surface-variant);
+}
+
+/* Icon centered on the first line of the note, so it reads as its start. */
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding-top: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--primary);
+}
+
+.note svg {
+  flex: none;
+  /* Half the difference between the line box and the icon centers it on
+     the first line, whatever the line-height above resolves to. The extra
+     pixel is optical: letters sit below the box's middle by about that,
+     since the box reserves room for descenders. */
+  margin-top: calc((1.45em - 16px) / 2 + 1px);
+}
+
+/* The outbound link, styled as the About dialog's links are, centered as
+   the mobile sheet centers it. */
+.guide {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: center;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.guide:hover {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}

@@ -65,8 +65,8 @@ today:
 Not built: an SFTP file browser and an SSH terminal. Both have a tab
 reserved, hidden by default, and neither is ruled out.
 
-A desktop counterpart is planned and lives as an empty placeholder in
-[/desktop](desktop).
+A desktop counterpart (Tauri + Rust, React) is in progress in
+[/desktop](desktop), scaffolded but without features yet.
 
 ## Technical documentation
 
