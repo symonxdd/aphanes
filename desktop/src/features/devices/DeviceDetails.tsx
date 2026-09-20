@@ -15,6 +15,7 @@ import {
   Pencil,
   RefreshCw,
   ShieldCheck,
+  Ticket,
   Trash2,
   Tv,
 } from "lucide-react";
@@ -103,7 +104,7 @@ export function DeviceDetails({ device, detail, reachable, onEditHost, onRemove,
             label="Pairing key"
             value={key.value ? "Shown" : "Hidden"}
             explainer={explain.pairingKey}
-            action={<KeyPopover secret={key} />}
+            action={<SecretPopover secret={key} what="pairing key" title="Pairing key" icon={<KeyRound size={22} />} />}
           />
         </div>
         {(passphrase.error ?? key.error) && <div className={styles.keyError}>{passphrase.error ?? key.error}</div>}
@@ -163,6 +164,9 @@ function FromTheTv({ device, info, detail, reachable, onConfirm }: FromTheTvProp
       <div className={styles.rows}>
         <InfoRows info={info} />
         <DevModeRow device={device} detail={detail} reachable={reachable} onConfirm={onConfirm} />
+        {reachable !== false && detail.data?.devMode.token && (
+          <SessionTokenRow device={device} token={detail.data.devMode.token} />
+        )}
       </div>
       {detail.error && <div className={`${styles.notice} ${styles.noticeError}`}>{detail.error}</div>}
     </>
@@ -267,6 +271,24 @@ function DevModeRow({ device, detail, reachable, onConfirm }: DevModeRowProps) {
         </div>
       )}
     </>
+  );
+}
+
+/**
+ * The session token read with the details, revealed the way the pairing
+ * key is. It is already here, so revealing reads nothing; the reveal is
+ * only what keeps it off the screen until asked for.
+ */
+function SessionTokenRow({ device, token }: { device: Device; token: string }) {
+  const secret = useRevealedSecret(device.id, () => Promise.resolve(token));
+  return (
+    <Row
+      icon={<Ticket size={20} />}
+      label="Session token"
+      value={secret.value ? "Shown" : "Hidden"}
+      explainer={explain.sessionToken}
+      action={<SecretPopover secret={secret} what="session token" title="Session token" icon={<Ticket size={22} />} />}
+    />
   );
 }
 
@@ -426,17 +448,25 @@ function useRevealedSecret(deviceId: string, read: (id: string) => Promise<strin
   };
 }
 
+interface SecretPopoverProps {
+  secret: RevealedSecret;
+  /** Lowercase, for the button labels: "Show pairing key". */
+  what: string;
+  title: string;
+  icon: ReactNode;
+}
+
 /**
- * The pairing key in a card anchored to its eye button, the same card
- * the (i) buttons open. The button is the card's native invoker, so the
- * platform handles closing, Escape and clicks outside, and a click on
- * the button while the card is open closes it rather than reopening.
- * Opening is held back: the first open request is refused while the key
- * is read, and the card opens itself the moment the key lands, so it
- * never shows empty and then jumps. The key is dropped when the card
+ * A secret in a card anchored to its eye button, the same card the (i)
+ * buttons open. The button is the card's native invoker, so the platform
+ * handles closing, Escape and clicks outside, and a click on the button
+ * while the card is open closes it rather than reopening. Opening is
+ * held back: the first open request is refused while the secret is
+ * read, and the card opens itself the moment it lands, so it never
+ * shows empty and then jumps. The secret is dropped when the card
  * closes, however that happens; the timer closes it too.
  */
-function KeyPopover({ secret }: { secret: RevealedSecret }) {
+function SecretPopover({ secret, what, title, icon }: SecretPopoverProps) {
   const id = useId();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -490,7 +520,7 @@ function KeyPopover({ secret }: { secret: RevealedSecret }) {
       await navigator.clipboard.writeText(secret.value);
       setCopied(true);
     } catch {
-      // The clipboard can be unavailable; the key is still on screen to select.
+      // The clipboard can be unavailable; the secret is still on screen to select.
     }
   };
 
@@ -500,7 +530,7 @@ function KeyPopover({ secret }: { secret: RevealedSecret }) {
       <IconButton
         ref={buttonRef}
         size="small"
-        label={open ? "Hide pairing key" : "Show pairing key"}
+        label={open ? `Hide ${what}` : `Show ${what}`}
         popoverTarget={id}
         popoverTargetAction="toggle"
       >
@@ -517,14 +547,12 @@ function KeyPopover({ secret }: { secret: RevealedSecret }) {
         onToggle={handleToggle}
       >
         <div className={popoverStyles.header}>
-          <span className={popoverStyles.icon}>
-            <KeyRound size={22} />
-          </span>
+          <span className={popoverStyles.icon}>{icon}</span>
           <span id={`${id}-title`} className={[popoverStyles.title, styles.keyTitle].join(" ")}>
-            Pairing key
+            {title}
           </span>
           <span className={styles.keyCountdown}>Hides in {secret.secondsLeft} s</span>
-          <IconButton size="small" label={copied ? "Copied" : "Copy pairing key"} onClick={() => void copy()}>
+          <IconButton size="small" label={copied ? "Copied" : `Copy ${what}`} onClick={() => void copy()}>
             {copied ? <Check size={16} /> : <Copy size={16} />}
           </IconButton>
         </div>

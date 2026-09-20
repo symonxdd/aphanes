@@ -10,6 +10,7 @@ import {
   Microchip,
   Network,
   ShieldCheck,
+  Ticket,
   Tv,
 } from "lucide-react";
 import type { Explainer } from "../../components/InfoPopover";
@@ -131,6 +132,22 @@ export const developerMode: Explainer = {
     "resettable from the Developer Mode app on the TV.\n\n" +
     "How much time is left cannot be worked out locally. The figure shown on this page is whatever LG's own " +
     "session endpoint reports; this app does not calculate or count it down itself.",
+};
+
+export const sessionToken: Explainer = {
+  icon: <Ticket size={22} />,
+  title: "Session token",
+  body:
+    "The credential LG's Developer Mode app writes to the TV when a session starts. It identifies that " +
+    "session to LG, and it is what this app hands to developer.lge.com to ask how much time is left; that " +
+    "is the only place it goes.\n\n" +
+    "It is read from the TV each time the details are fetched and never stored on this computer. Shown here " +
+    "for the same reason as the pairing key: every credential this app uses on a person's behalf should be " +
+    "theirs to see.",
+  details:
+    "What someone with a copy could do: ask LG about this session's remaining time, and, with LG's other " +
+    "Developer Mode endpoints, act on the session in the ways LG's own app can. It does not open the TV's " +
+    "SSH port; that still takes the pairing key. Treat it like a password all the same.",
 };
 
 /** Desktop only for now: the (i) beside the pairing key row. */

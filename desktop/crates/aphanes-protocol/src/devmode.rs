@@ -37,12 +37,16 @@ impl DeviceInfo {
 }
 
 /// Whether the TV currently has a Developer Mode session, and how long is
-/// left on it. The session token itself stays in this crate: the UI only
-/// needs to know that there is one.
+/// left on it. The token travels to the UI too, for the same reveal the
+/// pairing key and passphrase get: a person is entitled to see every
+/// credential the app uses on their behalf. It is never stored or logged.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DevModeStatus {
     pub has_session: bool,
+    /// The session token read from the TV, or None when there is no
+    /// session.
+    pub token: Option<String>,
     /// Exactly what LG's session endpoint returned, unparsed, e.g.
     /// "999:52:55". None when there is no session or the check failed.
     pub remaining: Option<String>,
@@ -162,11 +166,12 @@ async fn fetch_dev_mode_status(session: &Session) -> DevModeStatus {
     DevModeStatus {
         has_session: true,
         remaining: check_remaining_time(&token).await,
+        token: Some(token),
     }
 }
 
-/// The session token the Developer Mode app wrote to the TV. Read only
-/// so it can be handed to LG's session check; never stored, never logged.
+/// The session token the Developer Mode app wrote to the TV. Handed to
+/// LG's session check and shown on request; never stored, never logged.
 async fn read_session_token(session: &Session) -> Option<String> {
     let output = session
         .run(&format!("cat {}", shell_escape(DEV_MODE_TOKEN_PATH)))

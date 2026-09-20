@@ -236,6 +236,29 @@ abstract final class DeviceFieldExplainers {
     );
   }
 
+  static Future<void> sessionToken(BuildContext context) {
+    return InfoSheet.show(
+      context,
+      icon: LucideIcons.ticket,
+      title: 'Session token',
+      body:
+          "The credential LG's Developer Mode app writes to the TV when a "
+          'session starts. It identifies that session to LG, and it is '
+          'what this app hands to developer.lge.com to ask how much time '
+          'is left; that is the only place it goes.\n\n'
+          'It is read from the TV each time the details are fetched and '
+          'never stored on this phone. Shown here for the same reason as '
+          'the pairing key: every credential this app uses on a '
+          "person's behalf should be theirs to see.",
+      details:
+          "What someone with a copy could do: ask LG about this session's "
+          "remaining time, and, with LG's other Developer Mode endpoints, "
+          "act on the session in the ways LG's own app can. It does not "
+          "open the TV's SSH port; that still takes the pairing key. "
+          'Treat it like a password all the same.',
+    );
+  }
+
   static Future<void> developerMode(BuildContext context) {
     return InfoSheet.show(
       context,

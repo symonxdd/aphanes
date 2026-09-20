@@ -480,7 +480,14 @@ class _LiveDeviceInfo extends ConsumerWidget {
     // to "Checking..." for the whole of every refetch.
     final DeviceDetail? loaded = detail.value;
     if (loaded != null) {
-      return _DevModeStatusRow(device: device, status: loaded.devMode);
+      final String? token = loaded.devMode.token;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _DevModeStatusRow(device: device, status: loaded.devMode),
+          if (token != null) _SessionTokenRow(token: token),
+        ],
+      );
     }
     // Nothing fetched yet this session. With rows already on screen, the
     // Developer Mode row reports the fetch itself - honest, and what
@@ -1071,35 +1078,84 @@ class _PairingKeyRow extends StatelessWidget {
         constraints: _rowActionConstraints,
         icon: const Icon(LucideIcons.eye, size: _rowActionIconSize),
         tooltip: 'Show pairing key',
-        onPressed: () => _PairingKeySheet.show(context, privateKeyPem),
+        onPressed: () => _SecretSheet.show(
+          context,
+          icon: LucideIcons.keyRound,
+          title: 'Pairing key',
+          secret: privateKeyPem,
+        ),
       ),
     );
   }
 }
 
-/// The pairing key in a sheet of its own, with a copy button and a
-/// countdown: the sheet closes itself once [_revealFor] is up, so the key
-/// is never left on screen by accident.
-class _PairingKeySheet extends StatefulWidget {
-  const _PairingKeySheet({required this.privateKeyPem});
+/// The Developer Mode session token, read from the TV with the rest of
+/// the details and revealed the way the pairing key is. It is already on
+/// the phone by the time this row shows, so revealing reads nothing; the
+/// sheet is only what keeps it off the screen until asked for.
+class _SessionTokenRow extends StatelessWidget {
+  const _SessionTokenRow({required this.token});
 
-  final String privateKeyPem;
+  final String token;
 
-  static Future<void> show(BuildContext context, String privateKeyPem) {
+  @override
+  Widget build(BuildContext context) {
+    return _DetailRow(
+      icon: LucideIcons.ticket,
+      label: 'Session token',
+      value: 'Hidden',
+      onInfoTap: () => DeviceFieldExplainers.sessionToken(context),
+      labelAction: IconButton(
+        style: _rowActionStyle,
+        padding: EdgeInsets.zero,
+        constraints: _rowActionConstraints,
+        icon: const Icon(LucideIcons.eye, size: _rowActionIconSize),
+        tooltip: 'Show session token',
+        onPressed: () => _SecretSheet.show(
+          context,
+          icon: LucideIcons.ticket,
+          title: 'Session token',
+          secret: token,
+        ),
+      ),
+    );
+  }
+}
+
+/// A secret in a sheet of its own, with a copy button and a countdown:
+/// the sheet closes itself once [_revealFor] is up, so the secret is
+/// never left on screen by accident.
+class _SecretSheet extends StatefulWidget {
+  const _SecretSheet({
+    required this.icon,
+    required this.title,
+    required this.secret,
+  });
+
+  final IconData icon;
+  final String title;
+  final String secret;
+
+  static Future<void> show(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String secret,
+  }) {
     return showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
       builder: (BuildContext _) =>
-          _PairingKeySheet(privateKeyPem: privateKeyPem),
+          _SecretSheet(icon: icon, title: title, secret: secret),
     );
   }
 
   @override
-  State<_PairingKeySheet> createState() => _PairingKeySheetState();
+  State<_SecretSheet> createState() => _SecretSheetState();
 }
 
-class _PairingKeySheetState extends State<_PairingKeySheet> {
+class _SecretSheetState extends State<_SecretSheet> {
   late int _secondsLeft = _revealFor.inSeconds;
   Timer? _tick;
   Timer? _copiedReset;
@@ -1125,7 +1181,7 @@ class _PairingKeySheetState extends State<_PairingKeySheet> {
   }
 
   Future<void> _copy() async {
-    await Clipboard.setData(ClipboardData(text: widget.privateKeyPem));
+    await Clipboard.setData(ClipboardData(text: widget.secret));
     if (!mounted) {
       return;
     }
@@ -1153,37 +1209,33 @@ class _PairingKeySheetState extends State<_PairingKeySheet> {
           children: [
             Row(
               children: [
-                Icon(
-                  LucideIcons.keyRound,
-                  size: 22,
-                  color: theme.colorScheme.primary,
-                ),
+                Icon(widget.icon, size: 22, color: theme.colorScheme.primary),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Pairing key',
+                    widget.title,
                     style: theme.textTheme.headlineSmall,
                   ),
                 ),
                 Text('Hides in $_secondsLeft s', style: mutedStyle),
                 const SizedBox(width: 4),
                 IconButton(
-                  tooltip: _copied ? 'Copied' : 'Copy pairing key',
+                  tooltip: _copied ? 'Copied' : 'Copy',
                   icon: Icon(_copied ? LucideIcons.check : LucideIcons.copy),
                   onPressed: _copy,
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            // Capped so a key on a short screen scrolls inside the sheet
-            // rather than pushing the header off the top of it.
+            // Capped so a long secret (the key) on a short screen scrolls
+            // inside the sheet rather than pushing the header off the top.
             ConstrainedBox(
               constraints: BoxConstraints(
                 maxHeight: MediaQuery.sizeOf(context).height * 0.5,
               ),
               child: SingleChildScrollView(
                 child: SelectableText(
-                  widget.privateKeyPem.trim(),
+                  widget.secret.trim(),
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontFamily: 'monospace',
                   ),

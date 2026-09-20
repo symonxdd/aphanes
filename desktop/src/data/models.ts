@@ -28,9 +28,11 @@ export interface DeviceInfo {
   otaId: string | null;
 }
 
-/** Mirrors DevModeStatus in devmode.rs. The token itself never gets here. */
+/** Mirrors DevModeStatus in devmode.rs. */
 export interface DevModeStatus {
   hasSession: boolean;
+  /** The session token read from the TV, or null when there is no session. */
+  token: string | null;
   /** Exactly as LG's endpoint reports it, e.g. "999:52:55", or null when unknown. */
   remaining: string | null;
 }
