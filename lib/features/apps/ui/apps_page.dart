@@ -197,6 +197,12 @@ class _AppsList extends ConsumerWidget {
     return RefreshIndicator(
       onRefresh: () => ref.read(installedAppsProvider.notifier).refresh(),
       child: apps.when(
+        // A list that is being fetched again, because the TV was probed
+        // again (pull to refresh, the app coming back to the foreground),
+        // keeps showing what it had rather than dropping to a spinner.
+        // The fresh list, or the unreachable state, replaces it when the
+        // answer is in.
+        skipLoadingOnReload: true,
         data: (List<InstalledApp> list) => list.isEmpty
             ? ListView(
                 children: const [

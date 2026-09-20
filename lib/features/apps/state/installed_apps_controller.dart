@@ -43,7 +43,16 @@ class InstalledAppsController extends AsyncNotifier<List<InstalledApp>> {
     return ref.watch(appsServiceProvider).listInstalled(device);
   }
 
+  /// Pull to refresh: probes the TV again first, then fetches the list.
+  /// The probe is what turns an off TV into "not reachable" in a few
+  /// seconds; going straight to SSH would sit on its ten-second connect
+  /// timeout and report a connection error instead. The list already on
+  /// screen stays there until the answer is in (see the page's `when`).
   Future<void> refresh() async {
+    final String? activeId = ref.read(activeDeviceProvider);
+    if (activeId != null) {
+      ref.invalidate(deviceReachabilityProvider(activeId));
+    }
     ref.invalidateSelf();
     await future;
   }

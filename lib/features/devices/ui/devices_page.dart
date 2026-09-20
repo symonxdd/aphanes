@@ -165,12 +165,20 @@ class _DeviceListState extends ConsumerState<_DeviceList> {
               selected: device.id == activeId,
               onTap: () =>
                   ref.read(activeDeviceProvider.notifier).select(device.id),
-              onInfoTap: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (BuildContext _) =>
-                      DeviceDetailPage(deviceId: device.id),
-                ),
-              ),
+              onInfoTap: () {
+                // The detail page fetches from the TV on every visit, and
+                // that fetch is gated on the probe; probing again here is
+                // what makes an off TV say so in a few seconds rather
+                // than after a full SSH connect timeout. The stored facts
+                // show meanwhile either way.
+                ref.invalidate(deviceReachabilityProvider(device.id));
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (BuildContext _) =>
+                        DeviceDetailPage(deviceId: device.id),
+                  ),
+                );
+              },
             ),
           ),
       ],
