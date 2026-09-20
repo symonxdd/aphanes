@@ -69,17 +69,23 @@ export function RenameDialog({ open, device, onClose, onSave }: RenameDialogProp
           disabled={saving}
           autoFocus
         />
-        <div className={styles.status}>{shownProblem && <span className={styles.statusBad}>{shownProblem}</span>}</div>
+        <div className={styles.status}>
+          {shownProblem ? (
+            <span className={styles.statusBad}>{shownProblem}</span>
+          ) : (
+            <span className={styles.hint}>Any name works, emojis included.</span>
+          )}
+        </div>
       </label>
 
       {error && <div className={styles.error}>{error}</div>}
 
       <div className={styles.actions}>
-        <Button variant="outlined" onClick={onClose} disabled={saving}>
+        <Button variant="outlined" onClick={onClose}>
           Cancel
         </Button>
-        <Button variant="filled" onClick={() => void save()} disabled={saving}>
-          {saving ? "Saving..." : "Save"}
+        <Button variant="filled" onClick={() => void save()} disabled={saving} busy={saving}>
+          Save
         </Button>
       </div>
     </Dialog>

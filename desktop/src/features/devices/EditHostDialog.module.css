@@ -72,13 +72,20 @@
   border-color: var(--error);
 }
 
+/* Set off from the input a little more than the field gap, so a hint
+   or an error reads as a line of its own rather than part of the box. */
 .status {
   min-height: 16px;
+  margin-top: 4px;
   font-size: 12px;
 }
 
 .statusBad {
   color: var(--error);
+}
+
+.hint {
+  color: var(--on-surface-variant);
 }
 
 .error {
