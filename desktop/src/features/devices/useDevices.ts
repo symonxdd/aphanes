@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Device } from "../../data/models";
 import { checkReachable, listDevices, removeDevice, renameDevice, updateDeviceHost } from "../../ipc/commands";
 
@@ -31,11 +31,24 @@ export function useDevices() {
     void refresh();
   }, [refresh]);
 
+  // One probe per TV at a time: a second ask while one is running joins
+  // it rather than starting another.
+  const probes = useRef(new Map<string, Promise<boolean>>());
+
   /** Probes the TV's SSH port and records the answer; also returns it. */
-  const check = useCallback(async (device: Device) => {
-    const reachable = await checkReachable(device.host, device.port);
-    setReachability((current) => ({ ...current, [device.id]: reachable }));
-    return reachable;
+  const check = useCallback((device: Device): Promise<boolean> => {
+    const running = probes.current.get(device.id);
+    if (running) {
+      return running;
+    }
+    const probe = checkReachable(device.host, device.port)
+      .then((reachable) => {
+        setReachability((current) => ({ ...current, [device.id]: reachable }));
+        return reachable;
+      })
+      .finally(() => probes.current.delete(device.id));
+    probes.current.set(device.id, probe);
+    return probe;
   }, []);
 
   const remove = useCallback(

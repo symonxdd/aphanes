@@ -88,23 +88,22 @@ export default function App() {
 
   // What the TV reports, fetched once it is known to answer.
   const data = useDeviceData(selected, selectedReachable);
-  // Coming back to the window after a while asks the TV again: the
-  // reachability probe for the dot, then the app list with its running
-  // flags if the TV answers. The TV only; the details, whose session
-  // check goes out to developer.lge.com, wait for a Refresh.
-  // Coming back to the window asks the TV again over the held connection:
-  // the reachability probe for the dot, then the app list with its
-  // running flags if the TV answers. The details, whose session check
-  // reaches developer.lge.com, wait for a Refresh.
+  // Coming back to the window asks again: the reachability probe for
+  // every paired TV, so each sidebar dot is right, then the selected
+  // TV's app list with its running flags over the held connection if it
+  // answers. The details, whose session check reaches developer.lge.com,
+  // wait for a Refresh.
   useFocusRecheck(() => {
-    if (!selected) {
-      return;
-    }
-    void check(selected).then((reachable) => {
-      if (reachable) {
-        data.refreshApps();
+    for (const device of devices) {
+      const probe = check(device);
+      if (device.id === selected?.id) {
+        void probe.then((reachable) => {
+          if (reachable) {
+            data.refreshApps();
+          }
+        });
       }
-    });
+    }
   });
 
   const refreshSelected = async () => {
@@ -113,12 +112,16 @@ export default function App() {
     }
   };
 
-  // Reachability is checked when a TV comes into view, never on a timer.
+  // Every TV whose reachability is not yet known is probed as soon as it
+  // is in the list: all of them at launch, a new one after pairing, and
+  // one again after its address changed. Never on a timer.
   useEffect(() => {
-    if (selected && selectedReachable === undefined) {
-      void check(selected);
+    for (const device of devices) {
+      if (reachability[device.id] === undefined) {
+        void check(device);
+      }
     }
-  }, [selected, selectedReachable, check]);
+  }, [devices, reachability, check]);
 
   // One install or uninstall at a time, shown in its own dialog over
   // whatever is open; the app list is refetched once it succeeds.
