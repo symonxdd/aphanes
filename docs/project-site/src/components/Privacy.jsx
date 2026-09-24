@@ -5,7 +5,7 @@ import { Bullet } from './Bullet';
 
 const STAYS = [
   'Your paired TVs, their addresses and their names',
-  'The pairing key for each one, in the phone’s keystore',
+  'The pairing key for each one, in the phone’s keystore or Windows Credential Manager',
   'Everything you install, and everything you remove',
   'How you use the app, which is measured nowhere',
 ];
@@ -29,6 +29,18 @@ const LEAVES = [
     to: 'developer.lge.com, LG’s own server',
     sends: 'The session token read from that TV',
   },
+  {
+    what: 'An app’s description',
+    when: 'Desktop only, on an installed app’s page',
+    to: 'repo.webosbrew.org, and its images wherever their author put them, usually GitHub',
+    sends: 'Nothing about you or your TVs',
+  },
+  {
+    what: 'The update check',
+    when: 'Desktop only, when Check for updates is clicked in Settings',
+    to: 'GitHub, this project’s own repository',
+    sends: 'Nothing about you or your TVs',
+  },
 ];
 
 export function Privacy() {
@@ -36,13 +48,13 @@ export function Privacy() {
     <Section
       id="privacy"
       eyebrow="Privacy"
-      title="Your TV, your network, your phone."
+      title="Your TV, your network, your device."
       lead="Managing a TV happens directly between the app and the TV. There is no account, no sync and no server in the middle."
     >
       <div className="grid gap-12 md:grid-cols-2">
         <div>
           <h3 className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            Never leaves the phone
+            Never leaves the device
           </h3>
           <ul className="mt-5 space-y-3">
             {STAYS.map((item) => (
@@ -58,7 +70,7 @@ export function Privacy() {
           <h3 className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
             Reaches the internet
           </h3>
-          {/* Named in full rather than summarised. Three is a short
+          {/* Named in full rather than summarized. Five is a short
               enough list to simply show.
 
               Each one says where it goes as well as what it carries: a
@@ -80,8 +92,8 @@ export function Privacy() {
             ))}
           </ul>
           <p className="mt-4 text-xs leading-relaxed text-muted-foreground/80">
-            The last one is the only request that sends anything at all, and
-            it goes to LG. A Developer Mode session is theirs: they issue it,
+            The session time check is the only request that sends anything at
+            all, and it goes to LG. A Developer Mode session is theirs: they issue it,
             they time it, and their server is the only thing that knows how
             much of it is left. The TV cannot answer the question, by LG’s
             design rather than for want of trying, so there is no local check

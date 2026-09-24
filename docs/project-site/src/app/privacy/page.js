@@ -5,7 +5,7 @@ import { Bullet } from '@/components/Bullet';
 export const metadata = {
   title: 'Privacy Policy | webOS Dev Mode Manager',
   description:
-    'How webOS Dev Mode Manager handles data. No account, no telemetry, and three named outbound requests.',
+    'How webOS Dev Mode Manager handles data. No account, no telemetry, and a closed list of named outbound requests.',
 };
 
 /// The Play Store listing and the app's About sheet both point here, so
@@ -20,7 +20,7 @@ export const metadata = {
 /// written yesterday, and the first-published date is the part that
 /// says which.
 const PUBLISHED = '9 September 2026';
-const UPDATED = '9 September 2026';
+const UPDATED = '24 September 2026';
 
 /// Contact address shown in the policy. A privacy policy has to name a
 /// way to reach the developer, and Play checks that it does.
@@ -85,6 +85,20 @@ const REQUESTS = [
     sends:
       'The Developer Mode session token read from that TV. This is the only request that carries anything at all.',
   },
+  {
+    what: 'An installed app’s description (desktop only)',
+    to: 'repo.webosbrew.org, and for the images in it, whichever hosts its author put them on, usually github.com',
+    when: 'When an installed app’s page is opened, and only while it is shown',
+    sends:
+      'Nothing about the user or their TVs. It is a plain read of public files.',
+  },
+  {
+    what: 'The update check (desktop only)',
+    to: 'github.com, this project’s own repository',
+    when: 'When Check for updates is clicked in Settings. Downloading an update, and installing it, each take a further click.',
+    sends:
+      'Nothing about the user or their TVs. A downloaded update is checked against a signature built into the app and refused on a mismatch.',
+  },
 ];
 
 export default function PrivacyPolicy() {
@@ -116,7 +130,8 @@ export default function PrivacyPolicy() {
             Privacy Policy
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-            This policy covers the Android app webOS Dev Mode Manager.
+            This policy covers webOS Dev Mode Manager, both the Android app
+            and the Windows desktop app. Where the two differ, it says so.
           </p>
 
           {/* The package name and the two dates as a labelled row rather
@@ -159,7 +174,7 @@ export default function PrivacyPolicy() {
             Electronics Inc. or the webOS Open Source Edition project.
           </Body>
 
-          <Heading>What stays on the phone</Heading>
+          <Heading>What stays on the device</Heading>
           <Body>
             The following is created and held on the device only. None of it is
             transmitted anywhere, and none of it is readable by the developer.
@@ -167,28 +182,31 @@ export default function PrivacyPolicy() {
           <Bullets
             items={[
               'Paired TVs: their names, their network addresses and their identifiers.',
-              'The Developer Mode pairing key and passphrase for each paired TV, held in the Android keystore through encrypted platform storage.',
+              'The Developer Mode pairing key and passphrase for each paired TV, held in the Android keystore through encrypted platform storage, or in Windows Credential Manager on desktop.',
               'The Developer Mode session token read from a paired TV.',
               'Cached hardware and firmware details of a paired TV, so a detail page can be shown before the TV answers.',
               'App settings such as the chosen theme and accent color.',
             ]}
           />
           <Body>
-            Automatic cloud backup and phone-to-phone transfer are switched off
-            for this app, so none of the above is copied off the device by
-            Android either.
+            On Android, automatic cloud backup and phone-to-phone transfer are
+            switched off for this app, so none of the above is copied off the
+            device by Android either. On desktop, everything above other than
+            the keys sits in one file in the app’s own data folder on that
+            computer.
           </Body>
 
-          <Heading>What leaves the phone</Heading>
+          <Heading>What leaves the device</Heading>
           <Body>
-            Two kinds of traffic exist. The first is between the phone and the
+            Two kinds of traffic exist. The first is between the app and the
             paired TV itself, over the local network, using SSH. That traffic
             carries device credentials and commands, it never passes through
             any third party, and the TV is the user’s own hardware.
           </Body>
           <Body>
-            The second is a closed list of three requests to the public
-            internet. Each runs only because a person opened the screen or
+            The second is a closed list of requests to the public internet:
+            three on both apps, and two more on desktop only. Each runs only
+            because a person opened the screen or
             started the action that needs it. None runs in the background, on a
             schedule, or at launch.
           </Body>
@@ -219,7 +237,7 @@ export default function PrivacyPolicy() {
             service is governed by LG’s privacy policy, not this one.
           </Body>
           <Body>
-            Any request necessarily reveals the phone’s public IP address to
+            Any request necessarily reveals the device’s public IP address to
             the host being contacted, as every internet request does. The app
             adds no identifier of its own to these requests.
           </Body>
@@ -238,13 +256,15 @@ export default function PrivacyPolicy() {
 
           <Heading>Permissions</Heading>
           <Body>
-            The app requests one Android permission: internet access. It is
-            needed to reach a paired TV on the local network and to make the
-            three requests listed above. The app requests no location,
+            The Android app requests one Android permission: internet access.
+            It is needed to reach a paired TV on the local network and to make
+            the requests listed above. The app requests no location,
             contacts, storage, camera, microphone or telephony permissions.
             Choosing a local package file to install uses the Android system
             file picker, which grants access to that one chosen file without a
-            storage permission.
+            storage permission. The desktop app runs as an ordinary Windows
+            program, asks for no special permissions, and uses the Windows file
+            picker the same way.
           </Body>
 
           <Heading>Retention and deletion</Heading>
@@ -253,8 +273,10 @@ export default function PrivacyPolicy() {
             stored elsewhere to request the deletion of. Data held on the
             device is removed by the user directly: deleting a paired device
             from the app removes that device’s credentials, cached details and
-            session token immediately. Uninstalling the app removes everything
-            it stored.
+            session token immediately. Uninstalling the Android app removes
+            everything it stored. On desktop, removing a paired device clears
+            its keys from Windows Credential Manager, and the uninstaller offers
+            to delete the rest of the app’s data.
           </Body>
 
           <Heading>Children</Heading>
