@@ -11,6 +11,8 @@ import { appVersion } from "../../ipc/commands";
 import { useTheme } from "../../theme/ThemeProvider";
 import { oledTheme } from "../devices/explainers";
 import type { TabVisibility } from "./tabVisibility";
+import { UpdateRow } from "./UpdateRow";
+import type { Updater } from "./useUpdater";
 import styles from "./SettingsDialog.module.css";
 
 interface SettingsDialogProps {
@@ -20,15 +22,25 @@ interface SettingsDialogProps {
   onAccentColor: () => void;
   onAbout: () => void;
   onShowIntro: () => void;
+  updater: Updater;
 }
 
 /**
  * The mobile settings sheet, as a dialog. Same header (the codename as a
  * signature, with the shipped name in the footer line), same sections in
  * the same order: Appearance, Tabs, General. The ambient backdrop is the
- * one mobile row not here.
+ * one mobile row not here, and updates are the one desktop row mobile
+ * lacks, since a store updates the phone app.
  */
-export function SettingsDialog({ open, tabs, onClose, onAccentColor, onAbout, onShowIntro }: SettingsDialogProps) {
+export function SettingsDialog({
+  open,
+  tabs,
+  onClose,
+  onAccentColor,
+  onAbout,
+  onShowIntro,
+  updater,
+}: SettingsDialogProps) {
   const { mode, toggle, oled, setOled, seed } = useTheme();
   const isDark = mode === "dark";
   const [version, setVersion] = useState<string | null>(null);
@@ -125,6 +137,8 @@ export function SettingsDialog({ open, tabs, onClose, onAccentColor, onAbout, on
             <ChevronRight size={22} />
           </span>
         </button>
+        <UpdateRow updater={updater} />
+        <div className={styles.divider} role="separator" />
         <button type="button" className={styles.row} onClick={onShowIntro}>
           <span className={styles.rowIcon}>
             <RotateCcw size={22} />

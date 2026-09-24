@@ -26,6 +26,7 @@ import { AboutDialog } from "./features/settings/AboutDialog";
 import { AccentColorDialog } from "./features/settings/AccentColorDialog";
 import { SettingsDialog } from "./features/settings/SettingsDialog";
 import { useTabVisibility } from "./features/settings/tabVisibility";
+import { useUpdater } from "./features/settings/useUpdater";
 import { VersionExplainerDialog } from "./features/settings/VersionExplainerDialog";
 import styles from "./App.module.css";
 
@@ -75,6 +76,7 @@ export default function App() {
   const [page, setPage] = useState<{ subject: AppSubject; from: "installed" | "catalog" } | null>(null);
   const [version, setVersion] = useState<string | null>(null);
   const tabs = useTabVisibility();
+  const updater = useUpdater();
 
   // Keep a valid selection: the first TV once loaded, or whatever is left
   // after one is removed.
@@ -336,6 +338,7 @@ export default function App() {
         onAccentColor={() => setOverlay("accent")}
         onAbout={() => setOverlay("about")}
         onShowIntro={() => setIntroReplay(true)}
+        updater={updater}
       />
       <AccentColorDialog open={overlay === "accent"} onClose={() => setOverlay("settings")} />
       <FullscreenLayer open={introReplay} onCancel={() => setIntroReplay(false)}>

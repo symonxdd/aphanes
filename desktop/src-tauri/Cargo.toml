@@ -33,6 +33,9 @@ uuid = { version = "1", features = ["v4"] }
 # The native file picker for "Install .ipk". Tauri's own first-party
 # plugin; the frontend only ever asks it to open, never to save.
 tauri-plugin-dialog = "2"
+# In-app updates, checked only when asked from Settings. Every download is
+# verified against the public key in tauri.conf.json before it installs.
+tauri-plugin-updater = "2"
 
 [lints]
 workspace = true

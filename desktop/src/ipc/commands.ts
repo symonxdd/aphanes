@@ -2,11 +2,12 @@ import { Channel, invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { open as openFileDialog } from "@tauri-apps/plugin-dialog";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { check, type Update } from "@tauri-apps/plugin-updater";
 import type { CatalogPackage, Device, DeviceDetail, InstalledApp, OperationProgress } from "../data/models";
 
 /**
  * Typed wrappers around the Tauri commands in src-tauri/src/commands.rs,
- * plus the one plugin call the frontend makes. The only place `invoke` is
+ * plus the plugin calls the frontend makes. The only place `invoke` is
  * called, so every command's name and shape lives in one file on each
  * side of the bridge. Errors arrive as display-ready strings.
  */
@@ -164,4 +165,15 @@ export function removeDevice(id: string): Promise<void> {
  */
 export function openInBrowser(url: string): Promise<void> {
   return openUrl(url);
+}
+
+/**
+ * Reads the desktop update feed on GitHub and says whether it names a
+ * newer release than this build, or null when it does not. Only ever
+ * called from a click in Settings; nothing checks on its own. The returned
+ * handle downloads and installs, each on a further click, and refuses a
+ * download whose signature does not match the key built into the app.
+ */
+export function checkForUpdate(): Promise<Update | null> {
+  return check();
 }

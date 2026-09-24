@@ -1,0 +1,95 @@
+/* A pending update needs more than one line and a button beside it, so
+   the row grows past the usual 48px and keeps its padding top and bottom. */
+.pending {
+  padding-block: 10px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.detail {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--on-surface-variant);
+}
+
+.error {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--error);
+}
+
+.actions {
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+/* The same outward link as About's privacy policy one. */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.link:hover {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.track {
+  display: block;
+  height: 4px;
+  margin-top: 6px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--surface-highest);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--primary);
+  transition: width 150ms linear;
+}
+
+/* A size the server never sent: a sliver that travels instead of a bar
+   that fills, so it never claims a percentage it does not know. */
+.indeterminate {
+  width: 30%;
+  animation: travel 1.2s ease-in-out infinite;
+}
+
+@keyframes travel {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(340%);
+  }
+}
+
+.spinning {
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indeterminate,
+  .spinning {
+    animation: none;
+  }
+}

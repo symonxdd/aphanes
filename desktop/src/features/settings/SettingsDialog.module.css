@@ -93,6 +93,14 @@ button.row:hover {
   margin-right: 4px;
 }
 
+/* Sets the one-off action below it apart from the rows about the app
+   itself, inset to line up with the row icons. */
+.divider {
+  height: 1px;
+  margin: 6px 12px;
+  background: var(--surface-highest);
+}
+
 .footer {
   padding-top: 8px;
   font-size: 12px;
