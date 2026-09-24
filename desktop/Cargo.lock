@@ -86,7 +86,7 @@ checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
 
 [[package]]
 name = "aphanes-desktop"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "aphanes-protocol",
  "keyring",
@@ -104,7 +104,7 @@ dependencies = [
 
 [[package]]
 name = "aphanes-protocol"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "aes",
  "cbc",
