@@ -1,0 +1,11 @@
+{
+  "platforms": {
+    "windows-x86_64": {
+      "url": "https://github.com/symonxdd/aphanes/releases/download/desktop-v1.0.0/aphanes-desktop-v1.0.0-setup.exe",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSenNmekl0NzY4UTZrMkdWdjdCdXpQUEVJczhqMHllR05RY0FQbnVXa3ZQdWxwWFFLdS9UL01abHN1Zk5vUVY4MHdtVUtCZ2pMZURPeXg3bmpUbElDRHBKbnR2Y2pzZFEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkwMjg0NzU5CWZpbGU6d2ViT1MgRGV2IE1vZGUgTWFuYWdlcl8xLjAuMF94NjQtc2V0dXAuZXhlCjFiSVJ1WnVTSGF5U2ozM2NOdWZPM3dkRUk2eUdMTFdac1k2MkFhdG14NGtLZFlmZDhUVXZTaGYwc2VVM25Xdk5JdlBxdFNzTnRZbkRuLzF0Ymp2U0N3PT0K"
+    }
+  },
+  "version": "1.0.0",
+  "notes": "See the release notes on GitHub.",
+  "pub_date": "2026-09-24T21:19:28Z"
+}
