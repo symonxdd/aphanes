@@ -1,0 +1,212 @@
+name: Release desktop
+
+# Only ever runs from a desktop-v* tag, which `npm run release` in
+# desktop/ pushes as its last step. The prefix keeps it apart from the
+# Android release, whose plain v* tags never match it, and vice versa.
+on:
+  push:
+    tags:
+      - 'desktop-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          # The whole history, tags included. The release notes name the
+          # previous desktop tag, and the default shallow fetch has none.
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      # A release build compiles every dependency with LTO, which is most
+      # of the job's time. Cached between runs, only this app's own crates
+      # are rebuilt.
+      - name: Cache Rust builds
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop -> target
+
+      - name: Install dependencies
+        working-directory: desktop
+        run: npm ci
+
+      # The tag names the version, but the installer and the updater take
+      # theirs from tauri.conf.json. A tag pushed by hand without the bump
+      # would otherwise publish an installer claiming the old version.
+      - name: Check the tag matches the app version
+        run: |
+          $version = "${env:GITHUB_REF_NAME}" -replace '^desktop-v', ''
+          $config = (Get-Content -Raw desktop/src-tauri/tauri.conf.json | ConvertFrom-Json).version
+          if ($config -ne $version) {
+            echo "::error::Tag says $version, tauri.conf.json says $config."
+            exit 1
+          }
+          echo "VERSION=$version" >> $env:GITHUB_ENV
+
+      # The same four checks every desktop commit passes.
+      - name: Check types and formatting
+        working-directory: desktop
+        run: |
+          npm run typecheck
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          npm run format:check
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          cargo fmt --all --check
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Clippy and tests
+        working-directory: desktop
+        run: |
+          cargo clippy --workspace --all-targets -- -D warnings
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          cargo test --workspace
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      # Build only, no release: tauri-action publishes nothing without a
+      # tag name. Signed, so the installer gets a .sig beside it, which is
+      # what the in-app updater verifies a download against.
+      - name: Build the signed installer
+        uses: tauri-apps/tauri-action@v0.6.2
+        with:
+          projectPath: desktop
+          args: --bundles nsis
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      # Tauri names the installer after productName, spaces and all. The
+      # asset takes the codename instead, like the APK, and the signature
+      # is renamed with it.
+      - name: Rename installer
+        run: |
+          $dir = "desktop/target/release/bundle/nsis"
+          $source = Get-ChildItem $dir -Filter "*_${env:VERSION}_x64-setup.exe" | Select-Object -First 1
+          if (-not $source) {
+            echo "::error::No installer for $env:VERSION in $dir."
+            exit 1
+          }
+          $target = "aphanes-desktop-v${env:VERSION}-setup.exe"
+
+          Rename-Item -Path $source.FullName -NewName $target
+          Rename-Item -Path "$($source.FullName).sig" -NewName "$target.sig"
+
+          echo "RENAMED_EXE=$dir/$target" >> $env:GITHUB_ENV
+          echo "RENAMED_SIG=$dir/$target.sig" >> $env:GITHUB_ENV
+
+      # The notes are this version's own section of desktop/CHANGELOG.md,
+      # under a header line, above a compare link to the previous desktop
+      # tag. The link is left out of a first release, which has none.
+      - name: Compose the release notes
+        shell: bash
+        run: |
+          SECTION=$(awk -v want="## v$VERSION" '
+            $0 == want { inside = 1; next }
+            inside && /^## / { exit }
+            inside { print }
+          ' desktop/CHANGELOG.md | sed 's/^### /## /')
+
+          if [ -z "$(echo "$SECTION" | tr -d '[:space:]')" ]; then
+            echo "::error::desktop/CHANGELOG.md has no section for v$VERSION."
+            exit 1
+          fi
+
+          {
+            echo "🖥️ New Windows version released: v$VERSION"
+            echo
+            echo "Already installed? Check for updates, in Settings, installs it in place."
+            echo "$SECTION"
+            PREVIOUS=$(git tag --list 'desktop-v*' --sort=-version:refname \
+              | grep -vx "$GITHUB_REF_NAME" | head -n 1)
+            if [ -n "$PREVIOUS" ]; then
+              printf -- '---\n\n'
+              echo "**Full Changelog**: https://github.com/$GITHUB_REPOSITORY/compare/$PREVIOUS...$GITHUB_REF_NAME"
+            fi
+          } > "$RUNNER_TEMP/notes.md"
+
+      # Marked Latest like any newest release. Nothing depends on which
+      # platform holds that badge: the download links find their own
+      # platform's newest release, and the updater reads its own feed.
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $title = "Aphanes Desktop v$env:VERSION"
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release edit $tag --title $title --notes-file "$env:RUNNER_TEMP/notes.md"
+          } else {
+            gh release create $tag --title $title --notes-file "$env:RUNNER_TEMP/notes.md"
+          }
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Upload installer
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload $env:GITHUB_REF_NAME "${env:RENAMED_EXE}#Aphanes Desktop v$env:VERSION for Windows (.exe installer)" --clobber
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      # latest.json is what the in-app updater reads. The installer's real
+      # download URL is read back from GitHub's API rather than built
+      # locally, so it is exactly the URL GitHub serves.
+      - name: Generate latest.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $signature = Get-Content -Raw "${env:RENAMED_SIG}"
+          $url = gh api "repos/${{ github.repository }}/releases/tags/$tag" --jq '.assets[] | select(.name | endswith(".exe")) | .browser_download_url'
+          $pubDate = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+
+          $manifest = @{
+            version = $env:VERSION
+            notes = "See the release notes on GitHub."
+            pub_date = $pubDate
+            platforms = @{
+              "windows-x86_64" = @{
+                signature = $signature.Trim()
+                url = $url
+              }
+            }
+          }
+
+          $manifest | ConvertTo-Json -Depth 5 | Set-Content -Path "$env:RUNNER_TEMP/latest.json" -Encoding utf8
+
+      # Not a release asset. The updater needs one address that always
+      # serves the newest desktop latest.json, and /releases/latest cannot
+      # be it: after an Android release, that is the Android release. So
+      # latest.json lives on the desktop-updates branch instead, one file
+      # on one commit, replaced on every desktop release. Force-pushed on
+      # purpose, as nothing but this step ever writes to that branch.
+      - name: Publish latest.json to the update feed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch --orphan desktop-updates
+          Copy-Item "$env:RUNNER_TEMP/latest.json" latest.json
+          git add latest.json
+          git commit -m "chore(release): point the updater at $env:GITHUB_REF_NAME"
+          git push --force origin desktop-updates
+          if ($LASTEXITCODE -ne 0) { exit 1 }
