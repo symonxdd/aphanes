@@ -15,6 +15,7 @@ interface VersionExplainerDialogProps {
  */
 export function VersionExplainerDialog({ open, version, onClose }: VersionExplainerDialogProps) {
   const shown = version ?? "0.1.0";
+  const preOne = shown.startsWith("0.");
   return (
     <Dialog open={open} onClose={onClose} title="Version numbers, explained" className={styles.dialog}>
       <p className={styles.paragraph}>
@@ -33,9 +34,9 @@ export function VersionExplainerDialog({ open, version, onClose }: VersionExplai
         the app is used.
       </p>
       <p className={styles.paragraph}>
-        A leading zero, as in this app's current {shown}, carries a specific meaning under the semver spec: everything
-        is still considered unstable, and any part of it may change at any point, even between small updates. Version
-        1.0.0 is meant to mark the first release treated as a stable, public commitment.
+        {preOne
+          ? `A leading zero, as in this app's current ${shown}, carries a specific meaning under the semver spec: everything is still considered unstable, and any part of it may change at any point, even between small updates. Version 1.0.0 is meant to mark the first release treated as a stable, public commitment.`
+          : `A leading zero carries a specific meaning under the semver spec: everything is still considered unstable, and any part of it may change at any point, even between small updates. Version 1.0.0 marks the first release treated as a stable, public commitment, which this app, at ${shown}, has passed.`}
       </p>
       <p className={styles.trivia}>
         <strong>Trivia.</strong> Semver was written by Tom Preston-Werner, a co-founder of GitHub, first published a
