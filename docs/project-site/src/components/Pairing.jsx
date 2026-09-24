@@ -13,9 +13,9 @@ const STEPS = [
   },
   {
     n: '02',
-    title: 'Unlock it on the phone',
+    title: 'Unlock it in the app',
     body:
-      'The six characters on the TV screen decrypt that file, on the phone. The passphrase never crosses the network at all.',
+      'The six characters on the TV screen decrypt that file, on the phone or the PC. The passphrase never crosses the network at all.',
     code: 'decrypted locally',
   },
   {
@@ -33,7 +33,7 @@ export function Pairing() {
       id="pairing"
       eyebrow="How pairing works"
       title="Six characters, once, and then never again."
-      lead="No account, no cloud, no relay. The phone and the TV work it out between themselves on your own network."
+      lead="No account, no cloud, no relay. The app and the TV work it out between themselves on your own network."
     >
       <ol className="grid gap-8 md:grid-cols-3">
         {STEPS.map(({ n, title, body, code }) => (

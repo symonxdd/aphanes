@@ -55,7 +55,7 @@ export function Screens() {
       id="screens"
       eyebrow="Screens"
       title="Nothing hides under a system bar."
-      lead="Every screen respects the status bar, the navigation bar and display cutouts. That was the whole point. Switch this site between light and dark and a couple of them follow, showing the app's true-black OLED theme."
+      lead="The Android app, where every screen respects the status bar, the navigation bar and display cutouts. That was the whole point. Switch this site between light and dark and a couple of them follow, showing the app's true-black OLED theme."
     >
       <div
         ref={strip}

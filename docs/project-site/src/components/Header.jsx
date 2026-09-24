@@ -4,14 +4,15 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SiGithub } from 'react-icons/si';
 import { ThemeToggle } from './ThemeToggle';
-import { useLatestRelease } from '@/hooks/useLatestRelease';
+import { usePrimaryDownload } from '@/hooks/usePrimaryDownload';
 
+// Only the sections a visitor jumps to. Pairing and Privacy stay on the
+// page below, and the footer links the full privacy policy.
 const NAV = [
   { label: 'Screens', href: '#screens' },
-  { label: 'What it does', href: '#what' },
-  { label: 'Why it exists', href: '#why' },
-  { label: 'Pairing', href: '#pairing' },
-  { label: 'Privacy', href: '#privacy' },
+  { label: 'Features', href: '#features' },
+  { label: 'Downloads', href: '#downloads' },
+  { label: 'Why', href: '#why' },
 ];
 
 const Path = (props) => (
@@ -68,11 +69,11 @@ const menuItem = {
 };
 
 export function Header() {
+  const primary = usePrimaryDownload();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState('');
   const [overHero, setOverHero] = useState(true);
-  const { downloadUrl } = useLatestRelease();
 
   useEffect(() => {
     const onScroll = () => {
@@ -174,12 +175,17 @@ export function Header() {
               <SiGithub className="w-4.5 h-4.5" />
             </a>
             <ThemeToggle overHero={onDark} />
-            <a
-              href={downloadUrl}
-              className={`hidden sm:inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity ${downloadButton}`}
-            >
-              Download for Android
-            </a>
+            {/* The same download as the hero's, shown only where there
+                is one to give. Elsewhere the Downloads item in the nav
+                already leads to both apps. */}
+            {primary?.direct && (
+              <a
+                href={primary.href}
+                className={`hidden sm:inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity ${downloadButton}`}
+              >
+                {primary.label}
+              </a>
+            )}
             <button
               onClick={() => setOpen(!open)}
               className={`md:hidden w-9 h-9 flex items-center justify-center rounded-lg transition-colors ${iconButton}`}
@@ -225,13 +231,15 @@ export function Header() {
                   {item.label}
                 </motion.button>
               ))}
-              <motion.a
-                variants={menuItem}
-                href={downloadUrl}
-                className="mt-1 py-3 px-4 rounded-xl bg-foreground text-background font-medium"
-              >
-                Download for Android
-              </motion.a>
+              {primary?.direct && (
+                <motion.a
+                  variants={menuItem}
+                  href={primary.href}
+                  className="mt-1 py-3 px-4 rounded-xl bg-foreground text-background font-medium"
+                >
+                  {primary.label}
+                </motion.a>
+              )}
             </div>
           </motion.div>
         )}

@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
 import { SiGithub } from 'react-icons/si';
-import { useLatestRelease } from '@/hooks/useLatestRelease';
+import { usePrimaryDownload } from '@/hooks/usePrimaryDownload';
 
 // Each element arrives a beat after the one before, the same staggered
 // settle the app's own title card uses when the icon is tapped.
@@ -14,7 +14,7 @@ const rise = (delay) => ({
 });
 
 export function Hero() {
-  const { version, downloadUrl, size } = useLatestRelease();
+  const primary = usePrimaryDownload();
 
   return (
     <section
@@ -80,7 +80,7 @@ export function Hero() {
           className="mt-12 max-w-md text-base leading-relaxed text-white/70"
         >
           Pair an LG TV in Developer Mode and install homebrew apps from
-          your phone.
+          your phone or your PC.
         </motion.p>
 
         {/* Its own line, quieter and a beat later: an aside rather than
@@ -107,11 +107,23 @@ export function Hero() {
           {...rise(0.82)}
           className="mt-10 flex flex-wrap items-center justify-center gap-3"
         >
+          {/* Held invisible for the moment before the device is known,
+              so the row never shifts when the label arrives. */}
+          {/* Where it leads to the downloads section rather than a file,
+              it scrolls there the way the header's nav does, instead of
+              the jump a bare #anchor makes. */}
           <a
-            href={downloadUrl}
-            className="inline-flex items-center rounded-xl bg-white px-5 py-3 text-sm font-medium text-black transition-transform hover:scale-[1.02]"
+            href={primary?.href ?? '#downloads'}
+            onClick={(event) => {
+              if (primary?.direct) return;
+              event.preventDefault();
+              document
+                .querySelector('#downloads')
+                ?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className={`inline-flex items-center rounded-xl bg-white px-5 py-3 text-sm font-medium text-black transition-transform hover:scale-[1.02] ${primary ? '' : 'invisible'}`}
           >
-            Download for Android
+            {primary?.label ?? 'Download for Android'}
           </a>
           <a
             href="https://symonxdd.github.io/aphanes/"
@@ -132,8 +144,6 @@ export function Hero() {
         </motion.div>
 
         <motion.p {...rise(0.92)} className="mt-5 text-xs text-white/35">
-          {version ? `${version} · ` : ''}
-          {size ? `${size} MB · ` : ''}
           free forever · no ads · open source
         </motion.p>
       </div>

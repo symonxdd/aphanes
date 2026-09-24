@@ -42,6 +42,17 @@ export function WhyItExists() {
             The first of those was a regression in their Android build,
             fixed in v1.99.19 in August 2026. The other two still stand.
           </p>
+          {/* The desktop app came second, and needs its own reason: a
+              rewrite of a desktop tool for the desktop is only worth it
+              if the desktop tool has the same problems there. */}
+          <p className="leading-relaxed text-muted-foreground">
+            The Windows app followed for the same reason. On the desktop,
+            the existing tool has the same habits: an unlabeled icon rail, a
+            setup form full of fields most people never need, and a delete
+            that is hard to find. So the Windows app carries over the
+            Android app’s labels, its six-character pairing and its
+            removal in plain sight.
+          </p>
         </div>
       </div>
     </Section>

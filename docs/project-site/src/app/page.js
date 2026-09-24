@@ -3,6 +3,7 @@ import { Hero } from '@/components/Hero';
 import { WhatItDoes } from '@/components/WhatItDoes';
 import { WhyItExists } from '@/components/WhyItExists';
 import { Screens } from '@/components/Screens';
+import { Platforms } from '@/components/Platforms';
 import { Pairing } from '@/components/Pairing';
 import { Privacy } from '@/components/Privacy';
 import { Footer } from '@/components/Footer';
@@ -15,6 +16,7 @@ export default function Home() {
         <Hero />
         <Screens />
         <WhatItDoes />
+        <Platforms />
         <WhyItExists />
         <Pairing />
         <Privacy />

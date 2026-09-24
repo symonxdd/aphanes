@@ -5,9 +5,9 @@ import { Info } from 'lucide-react';
 
 /// A word in running text that can explain itself.
 ///
-/// Deliberately not hover-only. This is a site about a phone app, read
-/// mostly on phones, where there is no hover at all: the word is a real
-/// button, so a tap works, and so does a keyboard.
+/// Deliberately not hover-only. This site is read mostly on phones,
+/// where there is no hover at all: the word is a real button, so a tap
+/// works, and so does a keyboard.
 ///
 /// Hovering opens it and leaving closes it again. Clicking pins it open
 /// until the next click, Escape, or a press somewhere else, which is what

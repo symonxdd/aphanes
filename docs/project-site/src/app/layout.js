@@ -4,12 +4,12 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 export const metadata = {
   title: 'webOS Dev Mode Manager',
   description:
-    'A mobile-first Android app for LG webOS TVs in Developer Mode. Pair a TV from a phone, install homebrew apps on it, and keep track of how long the Developer Mode session has left.',
+    'An app for LG webOS TVs in Developer Mode, for Android and Windows. Pair a TV from a phone or a PC, install homebrew apps on it, and keep track of how long the Developer Mode session has left.',
   icons: { icon: '/icon.svg' },
   openGraph: {
     title: 'webOS Dev Mode Manager',
     description:
-      'Manage an LG webOS TV in Developer Mode from a phone. Pair, install homebrew apps, and watch the session clock.',
+      'Manage an LG webOS TV in Developer Mode from a phone or a PC. Pair, install homebrew apps, and watch the session clock.',
     type: 'website',
   },
 };
