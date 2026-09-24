@@ -136,8 +136,10 @@ jobs:
             echo
             echo "Already installed? Check for updates, in Settings, installs it in place."
             echo "$SECTION"
+            # `|| true`: on a first release grep finds nothing, which
+            # pipefail would otherwise turn into a failed step.
             PREVIOUS=$(git tag --list 'desktop-v*' --sort=-version:refname \
-              | grep -vx "$GITHUB_REF_NAME" | head -n 1)
+              | { grep -vx "$GITHUB_REF_NAME" || true; } | head -n 1)
             if [ -n "$PREVIOUS" ]; then
               printf -- '---\n\n'
               echo "**Full Changelog**: https://github.com/$GITHUB_REPOSITORY/compare/$PREVIOUS...$GITHUB_REF_NAME"
@@ -200,13 +202,21 @@ jobs:
       # latest.json lives on the desktop-updates branch instead, one file
       # on one commit, replaced on every desktop release. Force-pushed on
       # purpose, as nothing but this step ever writes to that branch.
+      # Built from git's own plumbing, so the build's working tree is
+      # never switched or touched.
       - name: Publish latest.json to the update feed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch --orphan desktop-updates
-          Copy-Item "$env:RUNNER_TEMP/latest.json" latest.json
-          git add latest.json
-          git commit -m "chore(release): point the updater at $env:GITHUB_REF_NAME"
-          git push --force origin desktop-updates
+          $blob = git hash-object -w "$env:RUNNER_TEMP/latest.json"
+          # A throwaway index holding that one file, so the real one is
+          # left alone, and no text is piped into git, where PowerShell
+          # would add a byte order mark.
+          $env:GIT_INDEX_FILE = "$env:RUNNER_TEMP/feed.index"
+          git update-index --add --cacheinfo "100644,$blob,latest.json"
+          $tree = git write-tree
+          Remove-Item Env:GIT_INDEX_FILE
+          $commit = git commit-tree $tree -m "chore(release): point the updater at $env:GITHUB_REF_NAME"
+          if (-not $commit) { exit 1 }
+          git push --force origin "${commit}:refs/heads/desktop-updates"
           if ($LASTEXITCODE -ne 0) { exit 1 }
