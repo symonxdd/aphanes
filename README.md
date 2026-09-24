@@ -5,10 +5,11 @@
 
 A mobile-first Android app for LG webOS TVs in Developer Mode. Pair a TV
 from a phone, install homebrew apps on it, and keep track of how long the
-Developer Mode session has left.
+Developer Mode session has left. A Windows desktop version does the same
+from a PC; it lives in [desktop/](desktop/).
 
 - **Website**: [aphanes-app.vercel.app](https://aphanes-app.vercel.app)
-- **Download**: [the latest APK](https://github.com/symonxdd/aphanes/releases/latest)
+- **Download**: for Android or Windows, from the [website](https://aphanes-app.vercel.app) or the [Releases page](https://github.com/symonxdd/aphanes/releases)
 - **Technical documentation**: [symonxdd.github.io/aphanes](https://symonxdd.github.io/aphanes/)
 
 ## Free, and always will be
@@ -90,6 +91,10 @@ flutter run
 
 ## Releasing
 
+This covers the Android app. The desktop app is versioned and released
+on its own, as [desktop/README.md](desktop/README.md#releasing)
+describes.
+
 A release takes two steps: the changelog entry, then the release itself.
 
 ### 1. The changelog entry
@@ -144,10 +149,11 @@ published that way.
   [flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage)
 - ☁️ No account, no sync, no telemetry
 - 🌐 Three things reach the internet: the Homebrew catalog, app
-  downloads, and the Developer Mode time check
+  downloads, and the Developer Mode time check. The desktop app adds two:
+  an installed app's description, and the update check, only when asked
 
-The [project site](https://aphanes-app.vercel.app/#privacy) covers those
-three in detail.
+The [project site](https://aphanes-app.vercel.app/#privacy) covers each
+of them in detail.
 
 ## Credits
 
